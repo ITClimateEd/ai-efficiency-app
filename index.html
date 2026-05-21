@@ -247,6 +247,79 @@
       text-decoration: none;
     }
     footer a:hover { text-decoration: underline; }
+
+    /* ── Recommendation card ────────────────────────────────────── */
+    .rec-card {
+      border: 1.5px solid var(--green-dark);
+      border-radius: var(--border-radius-lg);
+      padding: 1.5rem;
+      background: var(--color-background-primary);
+      animation: fadeIn .2s ease;
+    }
+    .rec-header {
+      display: flex; align-items: center; gap: 10px;
+      margin-bottom: 1.25rem; flex-wrap: wrap;
+    }
+    .rec-title { font-size: 17px; font-weight: 600; }
+    .rec-field {
+      margin-bottom: 1rem;
+      padding-bottom: 1rem;
+      border-bottom: 0.5px solid var(--color-border-tertiary);
+    }
+    .rec-field:last-of-type { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+    .rec-label {
+      font-size: 11px; font-weight: 600;
+      color: var(--color-text-tertiary);
+      letter-spacing: .06em; text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+    .rec-value { font-size: 15px; color: var(--color-text-primary); line-height: 1.5; }
+    .rec-fallback { font-size: 13px; color: var(--color-text-secondary); line-height: 1.5; margin-top: 2px; }
+    .rec-validated { font-size: 11px; color: var(--color-text-tertiary); margin-top: 1rem; }
+    .rec-actions {
+      display: flex; flex-wrap: wrap; gap: 8px; margin-top: 1.25rem;
+    }
+    .rec-btn {
+      cursor: pointer; font-size: 13px;
+      color: var(--color-text-secondary);
+      background: var(--color-background-secondary);
+      border: 0.5px solid var(--color-border-secondary);
+      border-radius: var(--border-radius-md);
+      padding: 6px 12px;
+      display: inline-flex; align-items: center; gap: 5px;
+    }
+    .rec-btn:hover { background: var(--color-border-secondary); }
+    .rec-btn-primary {
+      background: var(--green-dark); color: #fff; border-color: var(--green-dark);
+    }
+    .rec-btn-primary:hover { background: #157A34; border-color: #157A34; }
+
+    /* ── No-AI flow ─────────────────────────────────────────────── */
+    .noai-question {
+      font-size: 15px; color: var(--color-text-primary);
+      line-height: 1.55; margin-bottom: .75rem; font-weight: 500;
+    }
+    .noai-sub { font-size: 12px; color: var(--color-text-tertiary); margin-bottom: .75rem; }
+    .noai-result-card {
+      border: 0.5px solid var(--color-border-secondary);
+      border-radius: var(--border-radius-lg);
+      padding: 1.25rem;
+      background: var(--color-background-primary);
+      animation: fadeIn .2s ease;
+    }
+
+    /* ── Complexity chips ────────────────────────────────────────── */
+    .complexity-chip { flex-direction: column; align-items: flex-start; padding: 10px 14px; }
+    .complexity-chip .chip-sub { font-size: 11px; color: var(--color-text-tertiary); margin-top: 2px; line-height: 1.3; }
+    .complexity-chip.active .chip-sub { color: var(--green-dark); opacity: .8; }
+
+    /* ── Global note ────────────────────────────────────────────── */
+    .global-note {
+      font-size: 12px; color: var(--color-text-tertiary);
+      margin-top: 1.5rem; padding: .65rem 1rem;
+      background: var(--color-background-secondary);
+      border-radius: var(--border-radius-md); line-height: 1.6;
+    }
   </style>
 </head>
 <body>
@@ -269,6 +342,8 @@
   <!-- Widget -->
   <main>
     <div class="guide-wrap">
+
+      <!-- Energy rating legend -->
       <div class="legend">
         <div class="legend-label">Model energy rating scale</div>
         <span class="legend-item"><span class="badge badge-green">🟢 Lightest</span></span>
@@ -277,40 +352,95 @@
         <span class="legend-item"><span class="badge badge-red">🔴 Heavy</span></span>
         <span class="legend-item"><span class="badge badge-purple">🟣 Heaviest</span></span>
       </div>
+
+      <!-- Vendor filter -->
       <div class="step" id="step0">
         <div class="step-label">Filter by vendor — optional</div>
         <div class="chip-row">
-          <div class="chip active" onclick="pickVendor('all',this)">All tools</div>
-          <div class="chip" onclick="pickVendor('chatgpt',this)">ChatGPT</div>
-          <div class="chip" onclick="pickVendor('claude',this)">Claude</div>
-          <div class="chip" onclick="pickVendor('codex',this)">Codex</div>
-          <div class="chip" onclick="pickVendor('claudecode',this)">Claude Code</div>
-          <div class="chip" onclick="pickVendor('cursor',this)">Cursor</div>
-          <div class="chip" onclick="pickVendor('m365',this)">M365 Copilot</div>
-          <div class="chip" onclick="pickVendor('githubcopilot',this)">GitHub Copilot</div>
+          <div class="chip active" data-vendor="all" onclick="pickVendor('all',this)">All tools</div>
+          <div class="chip" data-vendor="chatgpt" onclick="pickVendor('chatgpt',this)">ChatGPT</div>
+          <div class="chip" data-vendor="claude" onclick="pickVendor('claude',this)">Claude</div>
+          <div class="chip" data-vendor="codex" onclick="pickVendor('codex',this)">Codex</div>
+          <div class="chip" data-vendor="claudecode" onclick="pickVendor('claudecode',this)">Claude Code</div>
+          <div class="chip" data-vendor="cursor" onclick="pickVendor('cursor',this)">Cursor</div>
+          <div class="chip" data-vendor="m365" onclick="pickVendor('m365',this)">M365 Copilot</div>
+          <div class="chip" data-vendor="githubcopilot" onclick="pickVendor('githubcopilot',this)">GitHub Copilot</div>
         </div>
       </div>
       <hr class="divider">
+
+      <!-- Step 1: Modality -->
       <div class="step" id="step1">
         <div class="step-label">Step 1 — what type of output do you need?</div>
         <div class="chip-row">
-          <div class="chip" onclick="pick('modality','text',this)">📝 Text</div>
-          <div class="chip" onclick="pick('modality','image',this)">🖼 Image</div>
-          <div class="chip" onclick="pick('modality','audio',this)">🎙 Audio</div>
-          <div class="chip" onclick="pick('modality','video',this)">🎬 Video</div>
-          <div class="chip" onclick="pick('modality','code',this)">💻 Code</div>
+          <div class="chip" data-modality="text"  onclick="pick('modality','text',this)">📝 Text</div>
+          <div class="chip" data-modality="image" onclick="pick('modality','image',this)">🖼 Image</div>
+          <div class="chip" data-modality="audio" onclick="pick('modality','audio',this)">🎙 Audio</div>
+          <div class="chip" data-modality="video" onclick="pick('modality','video',this)">🎬 Video</div>
+          <div class="chip" data-modality="code"  onclick="pick('modality','code',this)">💻 Code</div>
+          <div class="chip" data-modality="noai"  onclick="pick('modality','noai',this)">🤔 Might not need AI</div>
         </div>
       </div>
 
       <hr class="divider" id="div1" style="display:none">
 
+      <!-- No-AI screening sub-flow -->
+      <div id="noai-flow" style="display:none">
+        <div class="step" id="noai-q1">
+          <div class="step-label">Screening — question 1 of 3</div>
+          <p class="noai-question">Is the answer already available via a search engine or existing document?</p>
+          <div class="chip-row">
+            <div class="chip" data-noai="q1-yes" onclick="answerNoAi('q1','yes',this)">✅ Yes</div>
+            <div class="chip" data-noai="q1-no"  onclick="answerNoAi('q1','no',this)">❌ No</div>
+          </div>
+        </div>
+        <div class="step" id="noai-q2" style="display:none">
+          <div class="step-label">Screening — question 2 of 3</div>
+          <p class="noai-question">Does this task require generating new content, or combining information from multiple sources?</p>
+          <div class="chip-row">
+            <div class="chip" data-noai="q2-yes" onclick="answerNoAi('q2','yes',this)">✅ Yes</div>
+            <div class="chip" data-noai="q2-no"  onclick="answerNoAi('q2','no',this)">❌ No</div>
+          </div>
+        </div>
+        <div class="step" id="noai-q3" style="display:none">
+          <div class="step-label">Screening — question 3 of 3</div>
+          <p class="noai-question">Would a template, spreadsheet formula, or existing tool solve this?</p>
+          <div class="chip-row">
+            <div class="chip" data-noai="q3-yes" onclick="answerNoAi('q3','yes',this)">✅ Yes</div>
+            <div class="chip" data-noai="q3-no"  onclick="answerNoAi('q3','no',this)">❌ No</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 2: Task -->
       <div class="step" id="step2" style="display:none">
         <div class="step-label">Step 2 — what are you trying to do?</div>
         <div class="chip-row" id="task-chips"></div>
       </div>
 
       <hr class="divider" id="div2" style="display:none">
+
+      <!-- Step 3: Complexity -->
+      <div class="step" id="step-complexity" style="display:none">
+        <div class="step-label">Step 3 — how complex is this task?</div>
+        <div class="chip-row">
+          <div class="chip complexity-chip" data-complexity="simple" onclick="pickComplexity('simple',this)">
+            Simple<span class="chip-sub">Short output, clear instructions, no reasoning needed</span>
+          </div>
+          <div class="chip complexity-chip" data-complexity="moderate" onclick="pickComplexity('moderate',this)">
+            Moderate<span class="chip-sub">Multi-step output or some judgment required</span>
+          </div>
+          <div class="chip complexity-chip" data-complexity="complex" onclick="pickComplexity('complex',this)">
+            Complex<span class="chip-sub">Deep reasoning, long context, or nuanced judgment</span>
+          </div>
+        </div>
+      </div>
+
+      <hr class="divider" id="div3" style="display:none">
+
+      <!-- Result -->
       <div id="result-area"></div>
+
     </div>
   </main>
 
@@ -321,16 +451,12 @@
   </footer>
 
   <script>
-  const state = { vendors: new Set(), modality: null, task: null };
-
-  const vendorMatch = {
-    chatgpt:       name => name.includes('ChatGPT'),
-    claude:        name => name.includes('Claude.ai'),
-    codex:         name => name.includes('Codex'),
-    claudecode:    name => name.includes('Claude Code'),
-    cursor:        name => name.includes('Cursor'),
-    m365:          name => name.includes('M365') || name.includes('Microsoft Stream'),
-    githubcopilot: name => name.includes('GitHub Copilot'),
+  const state = {
+    vendors: new Set(),
+    modality: null,
+    task: null,
+    complexity: null,
+    noai: { q1: null, q2: null, q3: null },
   };
 
   const vendorLabels = {
@@ -341,19 +467,17 @@
 
   const tasks = {
     text: [
-      { id:'write',        label:'Write (email, post, summary, draft)' },
-      { id:'analyze',      label:'Analyze / research' },
-      { id:'design',       label:'Design / prototype (spec, brief, UX flow)' },
-      { id:'image_analyze',label:'Analyze an image (text output)' },
+      { id:'write',         label:'Write (email, post, summary, draft)' },
+      { id:'analyze',       label:'Analyze / research' },
+      { id:'design',        label:'Design / prototype (spec, brief, UX flow)' },
+      { id:'image_analyze', label:'Analyze an image (text output)' },
     ],
     image: [
-      { id:'img_gen_chat',  label:'Generate image in a chatbot' },
-      { id:'img_gen_slides',label:'Generate image in a slide presentation' },
-      { id:'img_edit',      label:'Edit / transform existing image' },
+      { id:'img_gen_chat',   label:'Generate image in a chatbot' },
+      { id:'img_gen_slides', label:'Generate image in a slide presentation' },
+      { id:'img_edit',       label:'Edit / transform existing image' },
     ],
-    audio: [
-      { id:'transcribe', label:'Transcribe audio or meeting' },
-    ],
+    audio: [{ id:'transcribe', label:'Transcribe audio or meeting' }],
     video: [
       { id:'vid_caption', label:'Transcribe / caption video' },
       { id:'vid_gen',     label:'Generate video' },
@@ -367,174 +491,311 @@
   };
 
   const ratings = {
-    '🟢': { label:'Lightest',  cls:'badge-green'  },
-    '🟡': { label:'Light',     cls:'badge-yellow' },
-    '🟠': { label:'Moderate',  cls:'badge-orange' },
-    '🔴': { label:'Heavy',     cls:'badge-red'    },
-    '🟣': { label:'Heaviest',  cls:'badge-purple' },
+    '🟢': { label:'Lightest', cls:'badge-green'  },
+    '🟡': { label:'Light',    cls:'badge-yellow' },
+    '🟠': { label:'Moderate', cls:'badge-orange' },
+    '🔴': { label:'Heavy',    cls:'badge-red'    },
+    '🟣': { label:'Heaviest', cls:'badge-purple' },
   };
 
-  const results = {
+
+  // Known-good value whitelists for hash param sanitisation
+  const KNOWN_VENDORS     = new Set(['chatgpt','claude','codex','claudecode','cursor','m365','githubcopilot']);
+  const KNOWN_MODALITIES  = new Set(['text','image','audio','video','code','noai']);
+  const KNOWN_COMPLEXITIES= new Set(['simple','moderate','complex']);
+  const KNOWN_ANSWERS     = new Set(['yes','no']);
+  // Derived after tasks is defined:
+  let   KNOWN_TASKS       = new Set();
+
+  function safeParam(val, whitelist) { return whitelist.has(val) ? val : null; }
+
+  const recommendations = {
     write: {
-      rating:'🟢',
-      title:'Write — short-form text',
-      tools:[
-        { name:'ChatGPT Enterprise', tip:'GPT-5.5 Instant is the current default — use it as-is. No need to switch to Thinking mode for drafts, emails, or summaries.' },
-        { name:'Claude.ai Enterprise', tip:'Sonnet is the default and sufficient. Avoid Opus and Extended Thinking for routine writing.' },
-        { name:'Gemini Enterprise', tip:'Gemini Flash is ideal for short-form text. Avoid Deep Research mode entirely for this use case.' },
-        { name:'M365 Copilot (Word)', tip:'Use the standard Draft or Rewrite features. No model selection is exposed — just avoid triggering Agent Mode. Keep prompts focused to minimise regeneration loops.' },
-        { name:'M365 Copilot Chat', tip:'Choose Quick Response for routine writing tasks. Think Deeper is not justified for drafts or summaries.' },
-      ],
-      tip:'Short-form text is the most energy-efficient AI task. Default models are well-matched — resist the urge to switch to a more powerful mode for simple outputs.',
+      simple: {
+        rating:'🟢', tool:'Claude Haiku 3.5',
+        reason:'Lightweight model purpose-built for short, clear text — no reasoning overhead needed for emails, summaries, or label generation.',
+        fallback:{ tool:'Gemini Flash 2.0', reason:'Fast and efficient for routine text tasks across Google Workspace.' },
+        lastValidated:'2025-05-01',
+      },
+      moderate: {
+        rating:'🟡', tool:'Claude Sonnet 3.5',
+        reason:'Mid-tier model handles multi-step drafts and tone adjustment without reaching for a reasoning model.',
+        fallback:{ tool:'Gemini Pro 1.5', reason:'Strong mid-range alternative with a large context window.' },
+        lastValidated:'2025-05-01',
+      },
+      complex: {
+        rating:'🟡', tool:'Claude Sonnet 3.7',
+        reason:'Extended thinking activates only for nuanced judgment — avoids the energy cost of a full frontier reasoning model.',
+        fallback:{ tool:'GPT-4o', reason:'Sufficient for most complex writing tasks without enabling a reasoning mode.' },
+        lastValidated:'2025-05-01',
+      },
     },
     analyze: {
-      rating:'🟡',
-      title:'Analyze / research',
-      tools:[
-        { name:'ChatGPT Enterprise', tip:'GPT-5.5 Instant for "search on a topic" research. Switch to Thinking: Standard only when the task requires evaluating options and recommending a course of action — not for factual lookups. Deep Research: reserve for academic or R&D work. It runs an agentic loop, not a single query.' },
-        { name:'Claude.ai Enterprise', tip:'Sonnet handles most analysis well. Extended Thinking justified only for complex multi-step reasoning tasks, not standard research.' },
-        { name:'Gemini Enterprise', tip:'Gemini Pro with built-in Search for most research. Deep Research mode: same rule as ChatGPT — use sparingly, only for synthesis-heavy tasks requiring multiple sources.' },
-        { name:'M365 Copilot Chat', tip:'Quick Response for factual queries. Think Deeper for complex synthesis only.' },
-        { name:'M365 Excel (Get Insights)', tip:'Built-in analysis feature for spreadsheet data. Uses AI to surface patterns and trends. Efficient for data already in Excel — no need to export to a chatbot for basic analysis.' },
-      ],
-      warn:"M365 Copilot Researcher agent: this is a full agentic workflow — it searches your org's emails, files, meetings, chats, and the web, then generates a structured report. Use only for formal research outputs combining internal and external data. Not for casual research questions. Treat it like commissioning a report, not asking a question.",
-      tip:'Distinguish between two types of research: (1) "find information on a topic" — Instant/Flash mode is sufficient; (2) "analyze options and recommend a course of action" — Thinking/reasoning mode may be justified. Deep Research and Researcher agent consume significantly more energy. Use sparingly.',
+      simple: {
+        rating:'🟢', tool:'Claude Haiku 3.5',
+        reason:'Factual lookups and single-source summaries are well within a small model\'s capability — no reasoning loop needed.',
+        fallback:{ tool:'Gemini Flash 2.0', reason:'Fast inference with built-in search grounding for simple research tasks.' },
+        lastValidated:'2025-05-01',
+      },
+      moderate: {
+        rating:'🟡', tool:'Claude Sonnet 3.5',
+        reason:'Handles multi-source synthesis and structured comparison without triggering a reasoning loop.',
+        fallback:{ tool:'Gemini Pro 1.5', reason:'Large context window suits multi-document analysis.' },
+        lastValidated:'2025-05-01',
+      },
+      complex: {
+        rating:'🟠', tool:'Claude Sonnet 3.7 (Extended Thinking)',
+        reason:'Reasoning activates on demand for deep synthesis — more efficient than routing a standard query to a frontier model by default.',
+        fallback:{ tool:'o3-mini', reason:'Reasoning-optimised at lower cost than o1/o3 for structured analytical tasks.' },
+        lastValidated:'2025-05-01',
+      },
     },
     design: {
-      rating:'🟡',
-      title:'Design / prototype',
-      tools:[
-        { name:'ChatGPT Enterprise', tip:'GPT-5.5 Instant for specs, briefs, and UX documentation. Thinking: Standard only for complex system architecture.' },
-        { name:'Claude.ai Enterprise', tip:'Sonnet is well-suited for structured specs and product briefs. SVG diagrams and artifacts are text-equivalent in energy — use freely for wireframes and flows.' },
-        { name:'Gemini Enterprise', tip:'Gemini Pro for research-heavy design work. Flash for quick ideation and drafting.' },
-        { name:'Claude Code (non-agent)', tip:'Interactive prototyping with human review at each step. Keep agent mode off — you retain control and energy stays manageable.' },
-        { name:'Codex (supervised)', tip:'Good for generating prototype code iteratively. Review each output before proceeding.' },
-        { name:'M365 Copilot (Word / PowerPoint)', tip:'Useful for PRDs, stakeholder presentations, and design briefs. Standard Copilot only — avoid Agent Mode for document drafting.' },
-      ],
-      tip:'Design and prototyping often combines research, writing, and light coding. Energy stays moderate as long as you remain in the loop at each step. It rises sharply if you add raster image generation or switch to autonomous agent mode.',
+      simple: {
+        rating:'🟢', tool:'Claude Haiku 3.5',
+        reason:'Spec writing and design briefs are structured text tasks — a small model handles them without overprovisioning.',
+        fallback:{ tool:'Gemini Flash 2.0', reason:'Fast drafting for PRDs, UX copy, and simple briefs.' },
+        lastValidated:'2025-05-01',
+      },
+      moderate: {
+        rating:'🟡', tool:'Claude Sonnet 3.5',
+        reason:'Handles iterative design documents and system specs efficiently — mid-tier is well matched for this output type.',
+        fallback:{ tool:'GPT-4o', reason:'Strong structured reasoning for product and design documentation.' },
+        lastValidated:'2025-05-01',
+      },
+      complex: {
+        rating:'🟡', tool:'Claude Sonnet 3.7',
+        reason:'Extended thinking supports multi-system design with interdependencies — no need for a frontier model.',
+        fallback:{ tool:'GPT-4o', reason:'Sufficient for complex design documents; reasoning mode optional.' },
+        lastValidated:'2025-05-01',
+      },
     },
     image_analyze: {
-      rating:'🟠',
-      title:'Analyze an image (text output)',
-      tools:[
-        { name:'ChatGPT Enterprise', tip:'GPT-5.5 Instant handles image analysis well. No need for Thinking mode.' },
-        { name:'Claude.ai Enterprise', tip:'Sonnet supports vision input. Haiku also capable for simple image Q&A.' },
-        { name:'Gemini Enterprise', tip:'Strong multimodal understanding. Flash model sufficient for most image analysis tasks.' },
-      ],
-      tip:'Multimodal input adds overhead vs. pure text, but the output is still text — no generation cost. Use the smallest model that handles your image complexity.',
+      simple: {
+        rating:'🟠', tool:'Claude Haiku 3.5 (vision)',
+        reason:'Small vision-capable model handles clear image Q&A and object classification without a heavyweight multimodal pipeline.',
+        fallback:{ tool:'GPT-4o mini (vision)', reason:'Lightweight multimodal model for straightforward visual tasks.' },
+        lastValidated:'2025-05-01',
+      },
+      moderate: {
+        rating:'🟠', tool:'Claude Sonnet 3.5 (vision)',
+        reason:'Mid-tier multimodal model for structured image analysis, chart reading, and detailed descriptions.',
+        fallback:{ tool:'GPT-4o (vision)', reason:'Strong visual understanding for documents, charts, and product images.' },
+        lastValidated:'2025-05-01',
+      },
+      complex: {
+        rating:'🟠', tool:'Claude Sonnet 3.5 (vision)',
+        reason:'Even complex tasks — multi-image comparison, dense diagram reading — stay within Sonnet\'s range; no frontier model needed.',
+        fallback:{ tool:'GPT-4o (vision)', reason:'Handles large or detailed visual inputs without a model upgrade.' },
+        lastValidated:'2025-05-01',
+      },
     },
     img_gen_chat: {
-      rating:'🔴',
-      title:'Generate image — chatbot',
-      tools:[
-        { name:'ChatGPT Enterprise', tip:'Uses GPT Image 2 (gpt-image-2). If you must generate, use the standard quality setting — high resolution multiplies energy use significantly. Start with the lowest resolution that meets your need.' },
-        { name:'Gemini Enterprise', tip:'Gemini Flash Image for speed and efficiency. Gemini Pro Image for higher quality. Always start with Flash.' },
-        { name:'Claude.ai Enterprise', tip:"Cannot generate raster images. For diagrams, flowcharts, and structured visuals, use Claude's SVG/artifact generation — energy equivalent to text." },
-      ],
-      tip:"Try to avoid image generation if possible — a well-described text slide, icon, or stock image often serves the same purpose. If you must generate: start with the lowest resolution and quality setting, and iterate only if needed. Each regeneration adds cost.",
+      simple: {
+        rating:'🔴', tool:'DALL-E 3 (standard quality)',
+        reason:'Standard quality avoids the compute spike from HD mode — sufficient for internal mockups and non-printed visuals.',
+        fallback:{ tool:'Gemini Flash (Image)', reason:'Faster, lighter image generation for low-stakes visuals.' },
+        lastValidated:'2025-05-01',
+      },
+      moderate: {
+        rating:'🔴', tool:'DALL-E 3 (standard quality)',
+        reason:'Standard quality covers most enterprise image needs — only upgrade to HD if output is for print or large-format display.',
+        fallback:{ tool:'Gemini Pro (Image)', reason:'Higher fidelity when standard falls short for client-facing work.' },
+        lastValidated:'2025-05-01',
+      },
+      complex: {
+        rating:'🔴', tool:'DALL-E 3 (HD)',
+        reason:'HD mode is justified only for production-bound, high-detail visuals — minimise iteration with precise prompts from the start.',
+        fallback:{ tool:'Gemini Pro (Image)', reason:'Alternative for high-detail generation with broader style control.' },
+        lastValidated:'2025-05-01',
+      },
     },
     img_gen_slides: {
-      rating:'🔴',
-      title:'Generate image — slide presentations',
-      tools:[
-        { name:'M365 Copilot (PowerPoint)', tip:'Model selector available: GPT-Image, Flux, or Auto. Use Auto — it picks the most efficient model for the request. If selecting manually, prefer the smallest available option. Microsoft AI Image 2 Efficient is available for editing tasks.' },
-        { name:'Google Slides (Gemini)', tip:'Gemini-powered image generation in Slides. Use for simple visuals. Prefer stock images or icons from the built-in library when they suffice.' },
-      ],
-      tip:'Only generate images in slides when a visual genuinely adds value. Text-based slides are significantly lighter. Stock images, icons, and brand library assets are always more efficient than AI-generated visuals.',
+      simple: {
+        rating:'🔴', tool:'PowerPoint Designer (non-AI layouts)',
+        reason:'Built-in SmartArt and design templates handle simple slide visuals with zero AI generation cost.',
+        fallback:{ tool:'Copilot Auto mode (PowerPoint)', reason:'If AI generation is needed, Auto selects the lightest suitable model.' },
+        lastValidated:'2025-05-01',
+      },
+      moderate: {
+        rating:'🔴', tool:'Copilot Auto mode (PowerPoint)',
+        reason:'Auto model selection picks the lightest model that meets quality requirements — avoid manually selecting premium models.',
+        fallback:{ tool:'Google Slides (Gemini Flash)', reason:'Lightweight generation integrated directly into the presentation tool.' },
+        lastValidated:'2025-05-01',
+      },
+      complex: {
+        rating:'🟣', tool:'Copilot (GPT-Image, standard quality)',
+        reason:'Higher quality for client-facing or printed assets — standard quality only; HD adds cost without proportional benefit.',
+        fallback:{ tool:'Google Slides (Gemini Pro Image)', reason:'Higher fidelity alternative for complex visual compositions.' },
+        lastValidated:'2025-05-01',
+      },
     },
     img_edit: {
-      rating:'🟣',
-      title:'Edit / transform existing image',
-      tools:[
-        { name:'ChatGPT Enterprise', tip:'GPT Image 2 supports inpainting and outpainting. Each iteration is a new generation — keep iterations minimal and be specific in your prompt to reduce passes.' },
-        { name:'Gemini Enterprise', tip:'Use Gemini Flash model for image edits. Avoid Pro unless quality is insufficient after Flash.' },
-        { name:'M365 Copilot (PowerPoint)', tip:'Microsoft AI Image 2 Efficient model is the lighter option — select it explicitly for editing tasks rather than defaulting to the premium model.' },
-      ],
-      tip:'Image editing is the heaviest image task — it often requires multiple generation passes. Use only when a crop, resize, recolor, or template edit cannot achieve the result. Be as specific as possible in your first prompt to reduce iterations.',
+      simple: {
+        rating:'🟣', tool:'Microsoft AI Image 2 Efficient',
+        reason:'Lighter editing model handles crop, recolour, and simple transforms without triggering a full image regeneration.',
+        fallback:{ tool:'Gemini Flash (Image edit)', reason:'Fast edits for non-critical, simple modifications.' },
+        lastValidated:'2025-05-01',
+      },
+      moderate: {
+        rating:'🟣', tool:'DALL-E 3 (inpainting, standard quality)',
+        reason:'One-pass inpainting with a specific prompt reduces iteration — each retry is a full generation, so precision matters.',
+        fallback:{ tool:'Gemini Pro (Image edit)', reason:'Good quality for structured content replacement and inpainting.' },
+        lastValidated:'2025-05-01',
+      },
+      complex: {
+        rating:'🟣', tool:'DALL-E 3 (outpainting / multi-pass)',
+        reason:'Complex transforms require multiple passes — start with the most precise prompt possible to minimise iterations.',
+        fallback:{ tool:'Gemini Pro (Image edit)', reason:'Handles transformations requiring compositional understanding.' },
+        lastValidated:'2025-05-01',
+      },
     },
     transcribe: {
-      rating:'🟢',
-      title:'Transcribe audio or meeting',
-      tools:[
-        { name:'M365 Copilot (Teams)', tip:'Automatic transcription embedded in meetings. Most efficient option — no separate tool or upload needed.' },
-        { name:'Microsoft Stream', tip:'For recorded video files — upload and transcribe directly. Efficient dedicated pipeline.' },
-        { name:'Zoom', tip:'Built-in cloud transcription available with Business and Enterprise plans. Enable in admin settings.' },
-        { name:'Google Meet', tip:'Built-in transcription available on Google Workspace Business Standard and higher. Transcripts saved automatically to Google Drive.' },
-        { name:'ChatGPT Enterprise', tip:'Whisper-based transcription for uploaded audio files. Use only when platform-embedded tools are unavailable.' },
-      ],
-      tip:'Audio transcription is one of the lightest AI tasks. Always prefer dedicated transcription tools or embedded platform features over general-purpose LLMs. Meeting transcription is typically already embedded in your platform — no extra step needed.',
+      simple: {
+        rating:'🟢', tool:'Platform-embedded transcription (Teams / Zoom / Meet)',
+        reason:'Purpose-built transcription pipeline with no LLM overhead — far more efficient than uploading audio to a chatbot.',
+        fallback:{ tool:'Whisper (small)', reason:'Lightest standalone model when no platform tool is available.' },
+        lastValidated:'2025-05-01',
+      },
+      moderate: {
+        rating:'🟢', tool:'Platform-embedded transcription (Teams / Zoom / Meet)',
+        reason:'Embedded tools handle speaker diarisation and basic formatting natively — no additional model call needed.',
+        fallback:{ tool:'Whisper (medium)', reason:'Better accuracy for accented speech or noisy environments.' },
+        lastValidated:'2025-05-01',
+      },
+      complex: {
+        rating:'🟢', tool:'Whisper (large-v3)',
+        reason:'Most accurate open-source transcription for multi-speaker, technical, or domain-specific audio content.',
+        fallback:{ tool:'AssemblyAI (Nano tier)', reason:'Cloud transcription with speaker labels — efficient tier for long recordings.' },
+        lastValidated:'2025-05-01',
+      },
     },
     vid_caption: {
-      rating:'🟡',
-      title:'Transcribe / caption video',
-      tools:[
-        { name:'M365 Copilot (Teams)', tip:'Automatic live captions in meetings — most efficient, no extra step.' },
-        { name:'Microsoft Stream', tip:'For recorded videos — built-in transcription and captioning. Use before reaching for a general LLM.' },
-        { name:'Zoom', tip:'Built-in cloud transcription for recorded meetings. More efficient than uploading to a chatbot.' },
-        { name:'Google Meet', tip:'Built-in transcription on Workspace Business Standard and higher. Summaries auto-saved to Google Drive.' },
-      ],
-      tip:'Always prefer platform-embedded captioning over general LLMs. Uploading a video file to a chatbot for transcription is significantly more token-intensive than using a dedicated tool. Heavier than audio-only transcription due to video processing overhead.',
+      simple: {
+        rating:'🟡', tool:'Platform-embedded captioning (Teams / Zoom)',
+        reason:'Auto-captioning runs inside your meeting tool — no additional model call or file upload required.',
+        fallback:{ tool:'Whisper (small) + subtitle tool', reason:'Lightweight transcription for short recordings outside the platform.' },
+        lastValidated:'2025-05-01',
+      },
+      moderate: {
+        rating:'🟡', tool:'Microsoft Stream (auto-transcription)',
+        reason:'Handles recorded content natively — no external upload or separate service required.',
+        fallback:{ tool:'Whisper (medium)', reason:'Higher accuracy for complex audio in recorded video.' },
+        lastValidated:'2025-05-01',
+      },
+      complex: {
+        rating:'🟡', tool:'Whisper (large-v3) + manual review',
+        reason:'Most accurate for multi-speaker, technical, or multilingual content — manual review keeps errors from the final output.',
+        fallback:{ tool:'AssemblyAI (Nano)', reason:'Speaker labels and timestamped captions for long-form video.' },
+        lastValidated:'2025-05-01',
+      },
     },
     vid_gen: {
-      rating:'🟣',
-      title:'Generate video',
-      tools:[
-        { name:'Gemini Enterprise', tip:'Veo 3.1 via Google Vids — currently the primary enterprise option. Reserve for final production assets, not drafts or internal use.' },
-        { name:'ChatGPT Enterprise', tip:'No video generation available. Sora was discontinued in April 2026 and was never included in Enterprise plans.' },
-        { name:'Dedicated platforms (Kling, Runway)', tip:'External platforms, not integrated into enterprise tooling. Require separate accounts and data governance review before use.' },
-      ],
-      tip:'Video generation is the heaviest AI task across all modalities. OpenAI discontinued Sora citing $1M/day compute costs — itself a signal about the sustainability of AI video at scale. Use only when essential and no alternative (screen recording, stock footage, existing assets) exists.',
+      simple: {
+        rating:'🟣', tool:'Screen recording or stock footage',
+        reason:'Even short AI-generated clips carry heavy compute costs — a screen recording or stock asset achieves the same result with zero AI energy.',
+        fallback:{ tool:'Veo 3.1 (minimum duration and resolution)', reason:'If AI generation is unavoidable, use the shortest clip and lowest resolution that meets the need.' },
+        lastValidated:'2025-05-01',
+      },
+      moderate: {
+        rating:'🟣', tool:'Veo 3.1 (standard)',
+        reason:'Currently the primary enterprise option — reserve for final production assets only, never for drafts or internal-use content.',
+        fallback:{ tool:'Stock footage + motion graphics', reason:'Often achieves comparable results for presentations and training content at far lower cost.' },
+        lastValidated:'2025-05-01',
+      },
+      complex: {
+        rating:'🟣', tool:'Veo 3.1 (standard)',
+        reason:'No lighter alternative exists for complex AI video — minimise clip length, reuse generated assets, and involve a video specialist to reduce iteration count.',
+        fallback:{ tool:'Professional video production', reason:'For high-stakes content, human-produced video is more controllable and often more cost-effective than iterative AI generation.' },
+        lastValidated:'2025-05-01',
+      },
     },
     code_explain: {
-      rating:'🟡',
-      title:'Explain / review code',
-      tools:[
-        { name:'ChatGPT Enterprise', tip:'GPT-5.5 Instant sufficient for most code review and explanation.' },
-        { name:'Claude.ai Enterprise', tip:'Sonnet performs well. Haiku also capable for simple snippets.' },
-        { name:'GitHub Copilot (chat)', tip:'Chat mode with model selector — efficient for inline review within the IDE.' },
-        { name:'Gemini Enterprise', tip:'Flash for quick explanations. Pro for complex architecture review.' },
-        { name:'Claude Code / Codex (non-agent)', tip:'Use chat or review mode only — no need to invoke agent mode for read-only tasks.' },
-      ],
-      tip:'Code explanation is text-in, text-out. Treat it like an analysis task — no reasoning models or agentic tools needed. The smallest capable model is the right choice.',
+      simple: {
+        rating:'🟡', tool:'Claude Haiku 3.5',
+        reason:'Code explanation is read-only text generation — the smallest capable model handles snippet and function-level Q&A well.',
+        fallback:{ tool:'GPT-4o mini', reason:'Lightweight option for inline code Q&A in the ChatGPT interface or API.' },
+        lastValidated:'2025-05-01',
+      },
+      moderate: {
+        rating:'🟡', tool:'Claude Sonnet 3.5',
+        reason:'Handles architecture explanation and multi-file review without a reasoning model.',
+        fallback:{ tool:'GPT-4o', reason:'Strong code comprehension for moderately complex codebases.' },
+        lastValidated:'2025-05-01',
+      },
+      complex: {
+        rating:'🟡', tool:'Claude Sonnet 3.5',
+        reason:'Even complex architecture review is read-only — no reasoning model needed; Sonnet covers large-context code analysis effectively.',
+        fallback:{ tool:'GPT-4o', reason:'Handles large context windows for full-codebase review.' },
+        lastValidated:'2025-05-01',
+      },
     },
     code_write: {
-      rating:'🟠',
-      title:'Write / debug code',
-      tools:[
-        { name:'ChatGPT Enterprise', tip:'GPT-5.5 Instant for most coding. Thinking: Standard for complex multi-step debugging only.' },
-        { name:'Claude.ai Enterprise', tip:'Sonnet is the sweet spot for coding tasks.' },
-        { name:'GitHub Copilot', tip:'Inline completion is efficient. Limit context to relevant files. Use agent mode only for genuine multi-file tasks.' },
-        { name:'Cursor (manual mode)', tip:'Use Sonnet, not Opus. Set context to relevant files only. Auto-accept off — review each change before proceeding.' },
-      ],
-      tip:'Keep sessions focused and short. Start a new session when switching to an unrelated task — accumulated context is a major energy driver. Energy is similar to interactive Build sessions; the distinction is scope, not intensity.',
+      simple: {
+        rating:'🟠', tool:'Claude Haiku 3.5',
+        reason:'Single-function generation and simple bug fixes are within a small model\'s range — inline completion has the lowest context overhead.',
+        fallback:{ tool:'GPT-4o mini', reason:'Lightweight for targeted, single-function code tasks.' },
+        lastValidated:'2025-05-01',
+      },
+      moderate: {
+        rating:'🟠', tool:'Claude Sonnet 3.5',
+        reason:'Handles multi-function code, refactoring, and moderate debugging — keep context scoped to relevant files only.',
+        fallback:{ tool:'GPT-4o', reason:'Strong write/debug performance; avoid reasoning mode for standard tasks.' },
+        lastValidated:'2025-05-01',
+      },
+      complex: {
+        rating:'🟠', tool:'Claude Sonnet 3.7',
+        reason:'Extended thinking resolves complex cross-system bugs — cheaper and more targeted than defaulting to Opus for difficult tasks.',
+        fallback:{ tool:'o3-mini', reason:'Reasoning-capable at lower cost than o1 for complex multi-step debugging.' },
+        lastValidated:'2025-05-01',
+      },
     },
     code_build: {
-      rating:'🟠',
-      title:'Build — interactive (you stay in control)',
-      tools:[
-        { name:'Claude Code (non-agent)', tip:'Match model to complexity: Haiku for simple tasks, Sonnet for standard work. Review each output before proceeding. Use /clear between unrelated tasks to reset context.' },
-        { name:'Cursor (manual mode)', tip:'Keep auto-accept OFF. Set context to relevant files only — avoid loading the full codebase for scoped tasks. Use Sonnet as your default model.' },
-        { name:'Codex (supervised)', tip:'Review each generated output. Avoid triggering parallel sessions for tasks that can run sequentially.' },
-        { name:'GitHub Copilot (chat)', tip:'Good for interactive building within the IDE. Human reviews each suggestion before applying.' },
-      ],
-      warn:'If you turn on auto-accept in Cursor, or stop reviewing each change in Claude Code or Codex, you have crossed into Automate / Workflow territory — energy consumption rises sharply from that point.',
-      tip:'Interactive building keeps energy comparable to Write/Debug sessions. The key lever is staying in the loop: reviewing each step, clearing context between tasks, and using the smallest model that produces acceptable output.',
+      simple: {
+        rating:'🟠', tool:'Claude Code (Haiku model)',
+        reason:'Interactive building with the smallest capable model — review each output step to prevent wasted context accumulation.',
+        fallback:{ tool:'Cursor (GPT-4o mini, manual mode)', reason:'Lightweight model with auto-accept off and context scoped to relevant files.' },
+        lastValidated:'2025-05-01',
+      },
+      moderate: {
+        rating:'🟠', tool:'Claude Code (Sonnet model)',
+        reason:'Standard interactive build sessions — use /clear between unrelated tasks to reset accumulated context.',
+        fallback:{ tool:'Cursor (Sonnet, manual mode)', reason:'Set context to relevant files only; keep auto-accept off.' },
+        lastValidated:'2025-05-01',
+      },
+      complex: {
+        rating:'🟠', tool:'Claude Code (Sonnet model)',
+        reason:'Complex builds stay within Sonnet\'s range when you review each step — Opus is rarely justified for interactive work.',
+        fallback:{ tool:'Cursor (Sonnet, manual mode)', reason:'Extended context handles complex multi-file tasks without a model upgrade.' },
+        lastValidated:'2025-05-01',
+      },
     },
     code_automate: {
-      rating:'🔴',
-      title:'Automate / workflow (agentic)',
-      tools:[
-        { name:'Claude Code (agent mode)', tip:'Match model to task: Haiku for simple automations, Sonnet for standard, Opus only for genuinely complex multi-file orchestration. Use /clear between unrelated workflows. Avoid Agent Teams (parallel agents) unless tasks are truly independent — sequential execution reaches the same result at a fraction of the energy.' },
-        { name:'Cursor (agent mode / auto-accept on)', tip:'Once auto-accept is enabled, the agent runs without human review. Set strict iteration limits. Use Auto model selection. Batch related work into single sessions.' },
-        { name:'Codex (parallel agents)', tip:'Use parallel agents only when tasks are genuinely independent and time-sensitive. A 3-agent team consumes roughly 3x the tokens of a single session.' },
-        { name:'GitHub Copilot (agent mode)', tip:'Agent mode is significantly heavier than inline completion. Use only for genuine multi-file autonomous tasks.' },
-        { name:'M365 Excel (Agent Mode)', tip:'Appropriate for complex multi-step workbook tasks — formulas, projections, dashboards. Not justified for single-cell edits or simple formatting.' },
-      ],
-      warn:'Avoid parallel agents unless tasks are truly independent and time-sensitive. A 3-agent team consumes roughly 3x the energy of a single session. Sequential execution is almost always sufficient.',
-      tip:'Agentic sessions accumulate context across every turn — the full conversation history is re-sent at each step. The two biggest energy levers are session length and model choice. A Haiku/Sonnet mix costs 5–10x less per session than Opus for equivalent automation tasks.',
+      simple: {
+        rating:'🔴', tool:'Claude Code (Haiku, agent mode)',
+        reason:'Simple automations — file transforms, single-API integrations — are well within Haiku\'s capability range.',
+        fallback:{ tool:'GitHub Copilot (agent mode)', reason:'Inline agent for single-file or simple multi-step automation tasks.' },
+        lastValidated:'2025-05-01',
+      },
+      moderate: {
+        rating:'🔴', tool:'Claude Code (Sonnet, agent mode)',
+        reason:'Standard automation — use /clear between workflows and run tasks sequentially rather than with parallel agents.',
+        fallback:{ tool:'Cursor (Sonnet, agent mode)', reason:'Set iteration limits; batch related tasks into one session to reduce context overhead.' },
+        lastValidated:'2025-05-01',
+      },
+      complex: {
+        rating:'🔴', tool:'Claude Code (Sonnet, agent mode)',
+        reason:'Even complex orchestration stays within Sonnet — Opus adds cost without proportional benefit for most agentic workflows.',
+        fallback:{ tool:'Cursor (Sonnet, agent mode)', reason:'Multi-file orchestration is manageable with Sonnet; avoid parallel agents unless tasks are genuinely independent.' },
+        lastValidated:'2025-05-01',
+      },
     },
   };
 
+  // Populate task whitelist from the tasks object
+  Object.values(tasks).forEach(arr => arr.forEach(t => KNOWN_TASKS.add(t.id)));
+
+  // ── Vendor filter ────────────────────────────────────────────────
   function pickVendor(vendor, el) {
     if (vendor === 'all') {
       state.vendors.clear();
@@ -548,97 +809,365 @@
         state.vendors.add(vendor);
         el.classList.add('active');
       }
-      const allChip = document.querySelector('#step0 .chip');
-      if (state.vendors.size === 0) {
-        allChip.classList.add('active');
-      } else {
-        allChip.classList.remove('active');
-      }
+      const allChip = document.querySelector('[data-vendor="all"]');
+      allChip.classList.toggle('active', state.vendors.size === 0);
     }
-    if (state.task) renderResult();
+    if (state.complexity) renderResult();
+    encodeHash();
   }
 
+  // ── Step 1: modality ─────────────────────────────────────────────
   function pick(type, value, el) {
     if (type === 'modality') {
       state.modality = value;
       state.task = null;
+      state.complexity = null;
+      state.noai = { q1: null, q2: null, q3: null };
       document.querySelectorAll('#step1 .chip').forEach(c => c.classList.remove('active'));
       el.classList.add('active');
-      renderTaskStep();
       document.getElementById('result-area').innerHTML = '';
       document.getElementById('div2').style.display = 'none';
+      document.getElementById('step-complexity').style.display = 'none';
+      document.getElementById('div3').style.display = 'none';
+      document.querySelectorAll('[data-noai]').forEach(c => c.classList.remove('active'));
+      document.getElementById('noai-q2').style.display = 'none';
+      document.getElementById('noai-q3').style.display = 'none';
+      if (value === 'noai') {
+        document.getElementById('step2').style.display = 'none';
+        document.getElementById('noai-flow').style.display = '';
+        document.getElementById('div1').style.display = '';
+      } else {
+        document.getElementById('noai-flow').style.display = 'none';
+        renderTaskStep();
+      }
+      encodeHash();
     } else {
       state.task = value;
+      state.complexity = null;
       document.querySelectorAll('#step2 .chip').forEach(c => c.classList.remove('active'));
       el.classList.add('active');
-      renderResult();
+      document.getElementById('result-area').innerHTML = '';
+      document.getElementById('div3').style.display = 'none';
+      renderComplexityStep();
+      encodeHash();
     }
   }
 
   function renderTaskStep() {
     const list = tasks[state.modality] || [];
-    const chips = list.map(t =>
-      '<div class="chip" onclick="pick(\'task\',\'' + t.id + '\',this)">' + t.label + '</div>'
+    document.getElementById('task-chips').innerHTML = list.map(t =>
+      '<div class="chip" data-task="' + t.id + '" onclick="pick(\'task\',\'' + t.id + '\',this)">' + t.label + '</div>'
     ).join('');
-    document.getElementById('task-chips').innerHTML = chips;
     document.getElementById('step2').style.display = '';
     document.getElementById('div1').style.display = '';
   }
 
-  function renderResult() {
-    const r = results[state.task];
-    if (!r) return;
-    const rating = ratings[r.rating];
+  function renderComplexityStep() {
+    document.querySelectorAll('#step-complexity .chip').forEach(c => c.classList.remove('active'));
+    document.getElementById('step-complexity').style.display = '';
+    document.getElementById('div2').style.display = '';
+  }
 
-    const filtered = state.vendors.size === 0
-      ? r.tools
-      : r.tools.filter(t => [...state.vendors].some(v => vendorMatch[v] && vendorMatch[v](t.name)));
+  // ── Step 3: complexity ───────────────────────────────────────────
+  function pickComplexity(complexity, el) {
+    state.complexity = complexity;
+    document.querySelectorAll('#step-complexity .chip').forEach(c => c.classList.remove('active'));
+    el.classList.add('active');
+    renderResult();
+    encodeHash();
+  }
 
-    const vendorNames = [...state.vendors].map(v => vendorLabels[v]).join(' or ');
+  // ── No-AI screening ──────────────────────────────────────────────
+  function answerNoAi(question, answer, el) {
+    state.noai[question] = answer;
+    document.querySelectorAll('[data-noai^="' + question + '"]').forEach(c => c.classList.remove('active'));
+    el.classList.add('active');
+    if (question === 'q1') {
+      if (answer === 'yes') {
+        renderNoAiResult();
+      } else {
+        document.getElementById('noai-q2').style.display = '';
+      }
+    } else if (question === 'q2') {
+      if (answer === 'yes') {
+        renderNoAiRoute();
+      } else {
+        document.getElementById('noai-q3').style.display = '';
+      }
+    } else {
+      renderNoAiResult();
+    }
+    encodeHash();
+  }
 
-    const toolsHtml = filtered.length > 0
-      ? filtered.map((t, i) =>
-          '<div class="tool-row">' +
-            '<div class="tool-name">' + t.name + '</div>' +
-            '<div class="tool-tip">' + t.tip + '</div>' +
-          '</div>' +
-          (i < filtered.length - 1 ? '<hr class="divider" style="margin:.5rem 0">' : '')
-        ).join('')
-      : '<div class="tip-box" style="color:var(--color-text-tertiary);font-style:italic">' +
-          'No ' + vendorNames + ' tools for this task. ' +
-          'Try a different task or switch to "All tools".' +
-        '</div>';
+  function renderNoAiResult() {
+    const { q1, q3 } = state.noai;
+    const reason = q1 === 'yes'
+      ? 'The answer is already available — a quick search or document lookup will do with zero AI energy cost.'
+      : q3 === 'yes'
+        ? 'A template, formula, or existing tool will handle this more efficiently than an AI model.'
+        : 'Based on your answers, this task appears solvable without AI assistance.';
+    document.getElementById('div2').style.display = '';
+    document.getElementById('div3').style.display = 'none';
+    document.getElementById('result-area').innerHTML =
+      '<div class="noai-result-card">' +
+        '<div class="result-header"><span class="badge badge-green">🟢 Lightest</span>' +
+        '<span class="result-title">No AI tool needed</span></div>' +
+        '<hr class="divider" style="margin:.5rem 0 1rem">' +
+        '<div class="rec-field"><div class="rec-label">Why</div>' +
+        '<div class="rec-value">' + reason + '</div></div>' +
+        '<div class="rec-actions">' +
+          '<button class="rec-btn rec-btn-primary" onclick="copyRec()">📋 Copy recommendation</button>' +
+          '<button class="rec-btn" onclick="shareResult()">🔗 Share this result</button>' +
+          '<button class="rec-btn" onclick="resetAll()">↺ Start over</button>' +
+        '</div>' +
+      '</div>' +
+      '<p class="global-note">AI model capabilities change frequently. Recommendations are reviewed periodically.</p>';
+  }
 
-    const warnHtml = r.warn && filtered.length > 0
-      ? '<div class="warn-box">⚠️ ' + r.warn + '</div>'
-      : '';
-
+  function renderNoAiRoute() {
     document.getElementById('div2').style.display = '';
     document.getElementById('result-area').innerHTML =
-      '<div class="result-card">' +
-        '<div class="result-header">' +
-          '<span class="badge ' + rating.cls + '">' + r.rating + ' ' + rating.label + '</span>' +
-          '<span class="result-title">' + r.title + '</span>' +
-        '</div>' +
+      '<div class="noai-result-card">' +
+        '<div class="result-header"><span class="result-title">AI looks like the right fit</span></div>' +
         '<hr class="divider" style="margin:.5rem 0 1rem">' +
-        toolsHtml +
-        warnHtml +
-        '<div class="tip-box">💡 ' + r.tip + '</div>' +
-        '<button class="reset-btn" onclick="resetAll()">↺ Start over</button>' +
+        '<p style="font-size:14px;color:var(--color-text-secondary);line-height:1.5;margin-bottom:1rem">' +
+          'This task benefits from AI assistance. Select a task type above to get a specific model recommendation.' +
+        '</p>' +
+        '<button class="rec-btn rec-btn-primary" onclick="routeToMain()">← Back to task selection</button>' +
       '</div>';
   }
 
+  function routeToMain() {
+    state.modality = null;
+    state.noai = { q1: null, q2: null, q3: null };
+    document.querySelectorAll('#step1 .chip').forEach(c => c.classList.remove('active'));
+    document.getElementById('noai-flow').style.display = 'none';
+    document.getElementById('div1').style.display = 'none';
+    document.getElementById('div2').style.display = 'none';
+    document.getElementById('result-area').innerHTML = '';
+    encodeHash();
+  }
+
+  // ── Result card ──────────────────────────────────────────────────
+  function renderResult() {
+    const node = recommendations[state.task] && recommendations[state.task][state.complexity];
+    if (!node) return;
+    const rating = ratings[node.rating];
+    const d = new Date(node.lastValidated + 'T00:00:00');
+    const validatedStr = d.toLocaleDateString('en-US', { month:'long', year:'numeric' });
+    const vendorNote = state.vendors.size > 0
+      ? '<div style="font-size:12px;color:var(--color-text-tertiary);margin-bottom:1rem">Filtered to: ' +
+          [...state.vendors].map(v => vendorLabels[v]).join(', ') + '</div>'
+      : '';
+    document.getElementById('div3').style.display = '';
+    document.getElementById('result-area').innerHTML =
+      '<div class="rec-card">' +
+        '<div class="rec-header">' +
+          '<span class="badge ' + rating.cls + '">' + node.rating + ' ' + rating.label + '</span>' +
+          '<span class="rec-title">Recommendation</span>' +
+        '</div>' +
+        vendorNote +
+        '<div class="rec-field"><div class="rec-label">Tool</div>' +
+          '<div class="rec-value">' + node.tool + '</div></div>' +
+        '<div class="rec-field"><div class="rec-label">Why it\'s efficient</div>' +
+          '<div class="rec-value">' + node.reason + '</div></div>' +
+        '<div class="rec-field"><div class="rec-label">If unavailable</div>' +
+          '<div class="rec-value">' + node.fallback.tool + '</div>' +
+          '<div class="rec-fallback">' + node.fallback.reason + '</div></div>' +
+        '<div class="rec-validated">Validated: ' + validatedStr + '</div>' +
+        '<div class="rec-actions">' +
+          '<button class="rec-btn rec-btn-primary" onclick="copyRec()">📋 Copy recommendation</button>' +
+          '<button class="rec-btn" onclick="shareResult()">🔗 Share this result</button>' +
+          '<button class="rec-btn" onclick="resetAll()">↺ Start over</button>' +
+        '</div>' +
+      '</div>' +
+      '<p class="global-note">AI model capabilities change frequently. Recommendations are reviewed periodically.</p>';
+  }
+
+  // ── Copy & share ─────────────────────────────────────────────────
+  function copyToClipboard(text, onSuccess) {
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(text).then(onSuccess).catch(() => showCopyFallback(text));
+    } else {
+      showCopyFallback(text);
+    }
+  }
+
+  function showCopyFallback(text) {
+    const overlay = document.createElement('div');
+    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:9998;display:flex;align-items:center;justify-content:center;padding:1rem';
+    const box = document.createElement('div');
+    box.style.cssText = 'background:#fff;border-radius:12px;padding:1.25rem;max-width:460px;width:100%;box-shadow:0 8px 32px rgba(0,0,0,.2)';
+    const label = document.createElement('p');
+    label.textContent = 'Copy the text below:';
+    label.style.cssText = 'font-size:13px;margin-bottom:.75rem;color:#555';
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.readOnly = true;
+    ta.style.cssText = 'width:100%;height:140px;font-size:12px;padding:.5rem;border:1px solid #ddd;border-radius:6px;resize:none;font-family:monospace;box-sizing:border-box';
+    const closeBtn = document.createElement('button');
+    closeBtn.textContent = 'Close';
+    closeBtn.style.cssText = 'margin-top:.75rem;padding:6px 16px;font-size:13px;cursor:pointer;border:1px solid #ddd;border-radius:6px;background:#f5f5f5';
+    closeBtn.onclick = () => document.body.removeChild(overlay);
+    box.append(label, ta, closeBtn);
+    overlay.append(box);
+    document.body.appendChild(overlay);
+    setTimeout(() => { ta.focus(); ta.select(); }, 50);
+  }
+
+  function copyRec() {
+    let text;
+    const node = recommendations[state.task] && recommendations[state.task][state.complexity];
+    if (node) {
+      const taskLabel = (tasks[state.modality] || []).find(t => t.id === state.task);
+      const d = new Date(node.lastValidated + 'T00:00:00');
+      text = [
+        'AI Model Efficiency Guide',
+        'Task: ' + (taskLabel ? taskLabel.label : '') + ' — ' +
+          state.complexity.charAt(0).toUpperCase() + state.complexity.slice(1),
+        '',
+        'Tool: ' + node.tool,
+        'Why it\'s efficient: ' + node.reason,
+        'If unavailable: ' + node.fallback.tool + ' — ' + node.fallback.reason,
+        '',
+        'Validated: ' + d.toLocaleDateString('en-US', { month:'long', year:'numeric' }),
+        'Source: ' + window.location.href,
+      ].join('\n');
+    } else {
+      const why = document.querySelector('#result-area .rec-value');
+      text = 'AI Model Efficiency Guide\n\nRecommendation: No AI tool needed\nWhy: ' +
+        (why ? why.textContent : '') + '\n\nSource: ' + window.location.href;
+    }
+    copyToClipboard(text, () => flashBtn('.rec-btn-primary', '✓ Copied!'));
+  }
+
+  function shareResult() {
+    copyToClipboard(window.location.href, () => flashBtn('.rec-actions .rec-btn:nth-child(2)', '✓ Link copied'));
+  }
+
+  function flashBtn(selector, msg) {
+    const btn = document.querySelector(selector);
+    if (!btn) return;
+    const orig = btn.innerHTML;
+    btn.innerHTML = msg;
+    setTimeout(() => { btn.innerHTML = orig; }, 2000);
+  }
+
+  // ── Hash routing ─────────────────────────────────────────────────
+  function encodeHash() {
+    const p = {};
+    if (state.vendors.size > 0) p.vendors = [...state.vendors].join(',');
+    if (state.modality) p.modality = state.modality;
+    if (state.task) p.task = state.task;
+    if (state.complexity) p.complexity = state.complexity;
+    if (state.modality === 'noai') {
+      if (state.noai.q1) p.q1 = state.noai.q1;
+      if (state.noai.q2) p.q2 = state.noai.q2;
+      if (state.noai.q3) p.q3 = state.noai.q3;
+    }
+    const str = Object.entries(p).map(([k,v]) => k + '=' + encodeURIComponent(v)).join('&');
+    history.replaceState(null, '', str ? '#' + str : window.location.pathname + window.location.search);
+  }
+
+  function decodeHash() {
+    const hash = window.location.hash.slice(1);
+    if (!hash) return;
+    let p;
+    try {
+      p = Object.fromEntries(
+        hash.split('&').filter(s => s.includes('=')).map(s => {
+          const i = s.indexOf('=');
+          return [s.slice(0, i), decodeURIComponent(s.slice(i + 1))];
+        })
+      );
+    } catch(e) { return; }
+
+    // Restore vendors — whitelist each value
+    if (p.vendors) {
+      p.vendors.split(',').forEach(v => {
+        if (!safeParam(v, KNOWN_VENDORS)) return;
+        state.vendors.add(v);
+        const c = document.querySelector('[data-vendor="' + v + '"]');
+        if (c) c.classList.add('active');
+      });
+      if (state.vendors.size > 0) document.querySelector('[data-vendor="all"]').classList.remove('active');
+    }
+
+    const modality = safeParam(p.modality, KNOWN_MODALITIES);
+    if (!modality) return;
+    state.modality = modality;
+    const mc = document.querySelector('[data-modality="' + modality + '"]');
+    if (mc) mc.classList.add('active');
+    document.getElementById('div1').style.display = '';
+
+    if (modality === 'noai') {
+      document.getElementById('noai-flow').style.display = '';
+      const q1 = safeParam(p.q1, KNOWN_ANSWERS);
+      if (q1) {
+        state.noai.q1 = q1;
+        const c = document.querySelector('[data-noai="q1-' + q1 + '"]');
+        if (c) c.classList.add('active');
+        if (q1 === 'yes') { renderNoAiResult(); return; }
+        document.getElementById('noai-q2').style.display = '';
+      }
+      const q2 = safeParam(p.q2, KNOWN_ANSWERS);
+      if (q2) {
+        state.noai.q2 = q2;
+        const c = document.querySelector('[data-noai="q2-' + q2 + '"]');
+        if (c) c.classList.add('active');
+        if (q2 === 'yes') { renderNoAiRoute(); return; }
+        document.getElementById('noai-q3').style.display = '';
+      }
+      const q3 = safeParam(p.q3, KNOWN_ANSWERS);
+      if (q3) {
+        state.noai.q3 = q3;
+        const c = document.querySelector('[data-noai="q3-' + q3 + '"]');
+        if (c) c.classList.add('active');
+        renderNoAiResult();
+      }
+      return;
+    }
+
+    const task = safeParam(p.task, KNOWN_TASKS);
+    if (!task) return;
+    state.task = task;
+    renderTaskStep();
+    const tc = document.querySelector('[data-task="' + task + '"]');
+    if (tc) tc.classList.add('active');
+    renderComplexityStep();
+
+    const complexity = safeParam(p.complexity, KNOWN_COMPLEXITIES);
+    if (!complexity) return;
+    state.complexity = complexity;
+    const cc = document.querySelector('[data-complexity="' + complexity + '"]');
+    if (cc) cc.classList.add('active');
+    renderResult();
+  }
+
+  // ── Reset ────────────────────────────────────────────────────────
   function resetAll() {
     state.vendors = new Set();
     state.modality = null;
     state.task = null;
+    state.complexity = null;
+    state.noai = { q1: null, q2: null, q3: null };
     document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
-    document.querySelector('#step0 .chip').classList.add('active');
+    document.querySelector('[data-vendor="all"]').classList.add('active');
+    document.getElementById('noai-flow').style.display = 'none';
+    document.getElementById('noai-q2').style.display = 'none';
+    document.getElementById('noai-q3').style.display = 'none';
     document.getElementById('step2').style.display = 'none';
+    document.getElementById('step-complexity').style.display = 'none';
     document.getElementById('div1').style.display = 'none';
     document.getElementById('div2').style.display = 'none';
+    document.getElementById('div3').style.display = 'none';
     document.getElementById('result-area').innerHTML = '';
+    history.replaceState(null, '', window.location.pathname + window.location.search);
   }
+
+  window.addEventListener('load', decodeHash);
+  </script>
   </script>
 
 </body>
