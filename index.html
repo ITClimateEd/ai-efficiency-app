@@ -321,7 +321,7 @@
   </footer>
 
   <script>
-  const state = { vendor: 'all', modality: null, task: null };
+  const state = { vendors: new Set(), modality: null, task: null };
 
   const vendorMatch = {
     chatgpt:       name => name.includes('ChatGPT'),
@@ -536,9 +536,25 @@
   };
 
   function pickVendor(vendor, el) {
-    state.vendor = vendor;
-    document.querySelectorAll('#step0 .chip').forEach(c => c.classList.remove('active'));
-    el.classList.add('active');
+    if (vendor === 'all') {
+      state.vendors.clear();
+      document.querySelectorAll('#step0 .chip').forEach(c => c.classList.remove('active'));
+      el.classList.add('active');
+    } else {
+      if (state.vendors.has(vendor)) {
+        state.vendors.delete(vendor);
+        el.classList.remove('active');
+      } else {
+        state.vendors.add(vendor);
+        el.classList.add('active');
+      }
+      const allChip = document.querySelector('#step0 .chip');
+      if (state.vendors.size === 0) {
+        allChip.classList.add('active');
+      } else {
+        allChip.classList.remove('active');
+      }
+    }
     if (state.task) renderResult();
   }
 
@@ -574,9 +590,11 @@
     if (!r) return;
     const rating = ratings[r.rating];
 
-    const filtered = state.vendor === 'all'
+    const filtered = state.vendors.size === 0
       ? r.tools
-      : r.tools.filter(t => vendorMatch[state.vendor] && vendorMatch[state.vendor](t.name));
+      : r.tools.filter(t => [...state.vendors].some(v => vendorMatch[v] && vendorMatch[v](t.name)));
+
+    const vendorNames = [...state.vendors].map(v => vendorLabels[v]).join(' or ');
 
     const toolsHtml = filtered.length > 0
       ? filtered.map((t, i) =>
@@ -587,7 +605,7 @@
           (i < filtered.length - 1 ? '<hr class="divider" style="margin:.5rem 0">' : '')
         ).join('')
       : '<div class="tip-box" style="color:var(--color-text-tertiary);font-style:italic">' +
-          'No ' + vendorLabels[state.vendor] + ' tools for this task. ' +
+          'No ' + vendorNames + ' tools for this task. ' +
           'Try a different task or switch to "All tools".' +
         '</div>';
 
@@ -611,7 +629,7 @@
   }
 
   function resetAll() {
-    state.vendor = 'all';
+    state.vendors = new Set();
     state.modality = null;
     state.task = null;
     document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
