@@ -732,7 +732,7 @@
     },
     code_write: {
       simple: {
-        rating:'🟠', tool:'Claude Haiku 3.5',
+        rating:'🟢', tool:'Claude Haiku 3.5',
         reason:'Single-function generation and simple bug fixes are within a small model\'s range — inline completion has the lowest context overhead.',
         fallback:{ tool:'GPT-4o mini', reason:'Lightweight for targeted, single-function code tasks.' },
         lastValidated:'2025-05-01',
@@ -960,6 +960,42 @@
       ? '<div style="font-size:12px;color:var(--color-text-tertiary);margin-bottom:1rem">Filtered to: ' +
           [...state.vendors].map(v => vendorLabels[v]).join(', ') + '</div>'
       : '';
+
+    // Bug 2: Claude vs Claude Code tip for coding tasks
+    const codeVendorTip = (state.task && state.task.startsWith('code_') &&
+      state.vendors.has('claude') && state.vendors.has('claudecode'))
+      ? '<div class="tip-box">💡 <strong>Claude Code vs Claude:</strong> For coding tasks, Claude Code is more efficient than Claude chat — it\'s purpose-built for code, uses less conversational overhead, and keeps context tighter. Prefer Claude Code when both are available.</div>'
+      : '';
+
+    // Bug 3: suppress fallback if it doesn't match any selected vendor
+    let fallbackHtml;
+    if (state.vendors.size > 0) {
+      const fallbackLower = node.fallback.tool.toLowerCase();
+      const vendorKeywords = {
+        chatgpt: ['chatgpt', 'gpt', 'openai', 'dall-e', 'whisper', 'o3', 'codex'],
+        claude:  ['claude'],
+        codex:   ['codex'],
+        claudecode: ['claude code'],
+        cursor:  ['cursor'],
+        m365:    ['m365', 'microsoft', 'copilot', 'stream', 'powerpoint', 'excel'],
+        githubcopilot: ['github copilot', 'github'],
+      };
+      const matches = [...state.vendors].some(v =>
+        (vendorKeywords[v] || []).some(kw => fallbackLower.includes(kw))
+      );
+      fallbackHtml = matches
+        ? '<div class="rec-field"><div class="rec-label">If unavailable</div>' +
+            '<div class="rec-value">' + node.fallback.tool + '</div>' +
+            '<div class="rec-fallback">' + node.fallback.reason + '</div></div>'
+        : '<div class="rec-field"><div class="rec-label">If unavailable</div>' +
+            '<div class="rec-value" style="color:var(--color-text-tertiary);font-style:italic">No fallback available within your selected tools.</div></div>';
+    } else {
+      fallbackHtml =
+        '<div class="rec-field"><div class="rec-label">If unavailable</div>' +
+        '<div class="rec-value">' + node.fallback.tool + '</div>' +
+        '<div class="rec-fallback">' + node.fallback.reason + '</div></div>';
+    }
+
     document.getElementById('div3').style.display = '';
     document.getElementById('result-area').innerHTML =
       '<div class="rec-card">' +
@@ -972,9 +1008,8 @@
           '<div class="rec-value">' + node.tool + '</div></div>' +
         '<div class="rec-field"><div class="rec-label">Why it\'s efficient</div>' +
           '<div class="rec-value">' + node.reason + '</div></div>' +
-        '<div class="rec-field"><div class="rec-label">If unavailable</div>' +
-          '<div class="rec-value">' + node.fallback.tool + '</div>' +
-          '<div class="rec-fallback">' + node.fallback.reason + '</div></div>' +
+        fallbackHtml +
+        codeVendorTip +
         '<div class="rec-validated">Validated: ' + validatedStr + '</div>' +
         '<div class="rec-actions">' +
           '<button class="rec-btn rec-btn-primary" onclick="copyRec()">📋 Copy recommendation</button>' +
