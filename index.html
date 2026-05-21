@@ -950,16 +950,50 @@
   }
 
   // ── Result card ──────────────────────────────────────────────────
+
+  // Resolve which selected vendor best matches the recommended model
+  function resolveToolFromVendors(modelStr, vendors, taskId) {
+    const s = modelStr.toLowerCase();
+    const isCode = taskId && taskId.startsWith('code_');
+    const patterns = {
+      chatgpt:       () => /gpt|dall-e|whisper|o3-mini/.test(s),
+      claude:        () => /claude (haiku|sonnet|opus)/.test(s) && !/claude code/.test(s),
+      codex:         () => /codex/.test(s),
+      claudecode:    () => /claude code/.test(s),
+      cursor:        () => /cursor/.test(s) || /claude (haiku|sonnet|opus)/.test(s),
+      m365:          () => /m365|microsoft|copilot|powerpoint|excel|stream/.test(s),
+      githubcopilot: () => /github copilot/.test(s),
+    };
+    const codePriority    = ['cursor','claudecode','claude','chatgpt','githubcopilot','codex','m365'];
+    const nonCodePriority = ['claude','claudecode','cursor','chatgpt','m365','githubcopilot','codex'];
+    const order = isCode ? codePriority : nonCodePriority;
+    return order.find(v => vendors.has(v) && patterns[v] && patterns[v]()) || null;
+  }
+
   function renderResult() {
     const node = recommendations[state.task] && recommendations[state.task][state.complexity];
     if (!node) return;
     const rating = ratings[node.rating];
     const d = new Date(node.lastValidated + 'T00:00:00');
     const validatedStr = d.toLocaleDateString('en-US', { month:'long', year:'numeric' });
-    const vendorNote = state.vendors.size > 0
-      ? '<div style="font-size:12px;color:var(--color-text-tertiary);margin-bottom:1rem">Filtered to: ' +
-          [...state.vendors].map(v => vendorLabels[v]).join(', ') + '</div>'
-      : '';
+    // Resolve Tool / Model display
+    let toolFieldHtml;
+    if (state.vendors.size > 0) {
+      const resolved = resolveToolFromVendors(node.tool, state.vendors, state.task);
+      const toolName = resolved ? vendorLabels[resolved] : null;
+      toolFieldHtml = toolName
+        ? '<div class="rec-field"><div class="rec-label">Tool</div>' +
+            '<div class="rec-value">' + toolName + '</div>' +
+            '<div class="rec-label" style="margin-top:.75rem">Model</div>' +
+            '<div class="rec-value">' + node.tool + '</div></div>'
+        : '<div class="rec-field"><div class="rec-label">Tool</div>' +
+            '<div class="rec-value" style="color:var(--color-text-tertiary);font-style:italic">No matching tool in your selection</div>' +
+            '<div class="rec-label" style="margin-top:.75rem">Model</div>' +
+            '<div class="rec-value">' + node.tool + '</div></div>';
+    } else {
+      toolFieldHtml = '<div class="rec-field"><div class="rec-label">Tool</div>' +
+        '<div class="rec-value">' + node.tool + '</div></div>';
+    }
 
     // Bug 2: Claude vs Claude Code tip for coding tasks
     const codeVendorTip = (state.task && state.task.startsWith('code_') &&
@@ -1003,9 +1037,7 @@
           '<span class="badge ' + rating.cls + '">' + node.rating + ' ' + rating.label + '</span>' +
           '<span class="rec-title">Recommendation</span>' +
         '</div>' +
-        vendorNote +
-        '<div class="rec-field"><div class="rec-label">Tool</div>' +
-          '<div class="rec-value">' + node.tool + '</div></div>' +
+        toolFieldHtml +
         '<div class="rec-field"><div class="rec-label">Why it\'s efficient</div>' +
           '<div class="rec-value">' + node.reason + '</div></div>' +
         fallbackHtml +
