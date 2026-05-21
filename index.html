@@ -957,7 +957,7 @@
     const isCode = taskId && taskId.startsWith('code_');
     const patterns = {
       chatgpt:       () => /gpt|dall-e|whisper|o3-mini/.test(s),
-      claude:        () => /claude (haiku|sonnet|opus)/.test(s) && !/claude code/.test(s),
+      claude:        () => /^claude/i.test(s),
       codex:         () => /codex/.test(s),
       claudecode:    () => /claude code/.test(s),
       cursor:        () => /cursor/.test(s) || /claude (haiku|sonnet|opus)/.test(s),
