@@ -277,6 +277,20 @@
         <span class="legend-item"><span class="badge badge-red">🔴 Heavy</span></span>
         <span class="legend-item"><span class="badge badge-purple">🟣 Heaviest</span></span>
       </div>
+      <div class="step" id="step0">
+        <div class="step-label">Filter by vendor — optional</div>
+        <div class="chip-row">
+          <div class="chip active" onclick="pickVendor('all',this)">All tools</div>
+          <div class="chip" onclick="pickVendor('chatgpt',this)">ChatGPT</div>
+          <div class="chip" onclick="pickVendor('claude',this)">Claude</div>
+          <div class="chip" onclick="pickVendor('codex',this)">Codex</div>
+          <div class="chip" onclick="pickVendor('claudecode',this)">Claude Code</div>
+          <div class="chip" onclick="pickVendor('cursor',this)">Cursor</div>
+          <div class="chip" onclick="pickVendor('m365',this)">M365 Copilot</div>
+          <div class="chip" onclick="pickVendor('githubcopilot',this)">GitHub Copilot</div>
+        </div>
+      </div>
+      <hr class="divider">
       <div class="step" id="step1">
         <div class="step-label">Step 1 — what type of output do you need?</div>
         <div class="chip-row">
@@ -307,7 +321,23 @@
   </footer>
 
   <script>
-  const state = { modality: null, task: null };
+  const state = { vendor: 'all', modality: null, task: null };
+
+  const vendorMatch = {
+    chatgpt:       name => name.includes('ChatGPT'),
+    claude:        name => name.includes('Claude.ai'),
+    codex:         name => name.includes('Codex'),
+    claudecode:    name => name.includes('Claude Code'),
+    cursor:        name => name.includes('Cursor'),
+    m365:          name => name.includes('M365') || name.includes('Microsoft Stream'),
+    githubcopilot: name => name.includes('GitHub Copilot'),
+  };
+
+  const vendorLabels = {
+    chatgpt: 'ChatGPT', claude: 'Claude', codex: 'Codex',
+    claudecode: 'Claude Code', cursor: 'Cursor',
+    m365: 'M365 Copilot', githubcopilot: 'GitHub Copilot',
+  };
 
   const tasks = {
     text: [
@@ -505,6 +535,13 @@
     },
   };
 
+  function pickVendor(vendor, el) {
+    state.vendor = vendor;
+    document.querySelectorAll('#step0 .chip').forEach(c => c.classList.remove('active'));
+    el.classList.add('active');
+    if (state.task) renderResult();
+  }
+
   function pick(type, value, el) {
     if (type === 'modality') {
       state.modality = value;
@@ -537,15 +574,24 @@
     if (!r) return;
     const rating = ratings[r.rating];
 
-    const toolsHtml = r.tools.map((t, i) =>
-      '<div class="tool-row">' +
-        '<div class="tool-name">' + t.name + '</div>' +
-        '<div class="tool-tip">' + t.tip + '</div>' +
-      '</div>' +
-      (i < r.tools.length - 1 ? '<hr class="divider" style="margin:.5rem 0">' : '')
-    ).join('');
+    const filtered = state.vendor === 'all'
+      ? r.tools
+      : r.tools.filter(t => vendorMatch[state.vendor] && vendorMatch[state.vendor](t.name));
 
-    const warnHtml = r.warn
+    const toolsHtml = filtered.length > 0
+      ? filtered.map((t, i) =>
+          '<div class="tool-row">' +
+            '<div class="tool-name">' + t.name + '</div>' +
+            '<div class="tool-tip">' + t.tip + '</div>' +
+          '</div>' +
+          (i < filtered.length - 1 ? '<hr class="divider" style="margin:.5rem 0">' : '')
+        ).join('')
+      : '<div class="tip-box" style="color:var(--color-text-tertiary);font-style:italic">' +
+          'No ' + vendorLabels[state.vendor] + ' tools for this task. ' +
+          'Try a different task or switch to "All tools".' +
+        '</div>';
+
+    const warnHtml = r.warn && filtered.length > 0
       ? '<div class="warn-box">⚠️ ' + r.warn + '</div>'
       : '';
 
@@ -565,9 +611,11 @@
   }
 
   function resetAll() {
+    state.vendor = 'all';
     state.modality = null;
     state.task = null;
     document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+    document.querySelector('#step0 .chip').classList.add('active');
     document.getElementById('step2').style.display = 'none';
     document.getElementById('div1').style.display = 'none';
     document.getElementById('div2').style.display = 'none';
