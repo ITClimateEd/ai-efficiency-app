@@ -285,7 +285,7 @@ const recommendations = {
     simple: {
       rating:'🟠', tool:'Claude Code (Haiku model)',
       reason:'Interactive building with the smallest capable model — review each output step to prevent wasted context accumulation.',
-      fallback:{ tool:'Cursor (GPT-4o mini, manual mode)', reason:'Lightweight model with auto-accept off and context scoped to relevant files.' },
+      fallback:{ tool:'Cursor (Haiku, manual mode)', reason:'Lightweight model with auto-accept off and context scoped to relevant files.' },
       lastValidated:'2026-05-01',
     },
     moderate: {
