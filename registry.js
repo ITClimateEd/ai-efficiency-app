@@ -155,26 +155,40 @@ const recommendations = {
     },
   },
   img_gen_chat: {
+    // nonai = GR-12 Yes path: user has existing images
+    nonai: {
+      rating:'🟢', tool:'Your existing images or photos',
+      reason:'Use owned or licensed images — zero AI generation cost and full control over the output.',
+      lastValidated:'2026-05-01',
+    },
+    // simple/moderate/complex = GR-12 No path: no existing image; explicit energy cost below
     simple: {
       rating:'🔴', tool:'DALL-E 3 (standard quality)',
-      reason:'Standard quality avoids the compute spike from HD mode — sufficient for internal mockups and non-printed visuals.',
+      reason:'AI image generation carries significant compute cost — equivalent to running dozens of text requests. Standard quality reduces the overhead; use only when no existing image meets the need.',
       fallback:{ tool:'Gemini Flash (Image)', reason:'Faster, lighter image generation for low-stakes visuals.' },
       lastValidated:'2026-05-01',
     },
     moderate: {
       rating:'🔴', tool:'DALL-E 3 (standard quality)',
-      reason:'Standard quality covers most enterprise image needs — only upgrade to HD if output is for print or large-format display.',
+      reason:'AI image generation is energy-intensive. Standard quality avoids the HD compute spike — use only for content that truly requires custom imagery and cannot be sourced from existing assets.',
       fallback:{ tool:'Gemini Pro (Image)', reason:'Higher fidelity when standard falls short for client-facing work.' },
       lastValidated:'2026-05-01',
     },
     complex: {
       rating:'🔴', tool:'DALL-E 3 (HD)',
-      reason:'HD mode is justified only for production-bound, high-detail visuals — minimise iteration with precise prompts from the start.',
+      reason:'HD image generation has high compute cost and should be reserved only for production-bound, high-detail visuals with no stock alternative. Minimise iteration with precise prompts from the start.',
       fallback:{ tool:'Gemini Pro (Image)', reason:'Alternative for high-detail generation with broader style control.' },
       lastValidated:'2026-05-01',
     },
   },
   img_gen_slides: {
+    // nonai = GR-12 Yes path: user has existing images/photos for slides
+    nonai: {
+      rating:'🟢', tool:'Stock images or personal photos',
+      reason:'Insert your own or licensed images into slides — zero AI generation cost. PowerPoint Designer arranges them automatically with no AI overhead.',
+      lastValidated:'2026-05-01',
+    },
+    // simple/moderate/complex = GR-12 No path: no existing assets; explicit energy cost below
     simple: {
       rating:'🔴', tool:'PowerPoint Designer (non-AI layouts)',
       reason:'Built-in SmartArt and design templates handle simple slide visuals with zero AI generation cost.',
@@ -183,33 +197,40 @@ const recommendations = {
     },
     moderate: {
       rating:'🔴', tool:'M365 Copilot PowerPoint (Auto)',
-      reason:'Auto picks the most efficient eligible model for slide image generation — avoid manually selecting premium models.',
+      reason:'AI image generation in presentations carries significant compute cost. If no stock imagery is available, Auto selects the most efficient eligible model — avoid manually selecting premium models.',
       fallback:{ tool:'Google Slides (Gemini Flash)', reason:'Lightweight generation integrated directly into the presentation tool.' },
       lastValidated:'2026-05-01',
     },
     complex: {
       rating:'🟣', tool:'M365 Copilot PowerPoint (Auto)',
-      reason:'Auto routes complex visual tasks to the most capable eligible model — specify quality requirements in the Copilot prompt rather than selecting a model manually.',
+      reason:'Complex AI visual generation for slides has high energy overhead. Auto routes to the most capable eligible model — specify quality requirements in the prompt rather than selecting a model manually. Use only when no stock alternative exists.',
       fallback:{ tool:'Google Slides (Gemini Pro Image)', reason:'Higher fidelity alternative for complex visual compositions.' },
       lastValidated:'2026-05-01',
     },
   },
   img_edit: {
+    // nonai = GR-12 Yes path: user can edit the existing image with native tools
+    nonai: {
+      rating:'🟢', tool:'Built-in image editing (Photos / Snip & Sketch / Preview)',
+      reason:'Crop, resize, rotate, and colour-correct with native OS tools — zero AI energy cost for straightforward edits.',
+      lastValidated:'2026-05-01',
+    },
+    // simple/moderate/complex = GR-12 No path: native tools insufficient; explicit energy cost below
     simple: {
       rating:'🟣', tool:'Microsoft AI Image 2 Efficient',
-      reason:'Lighter editing model handles crop, recolour, and simple transforms without triggering a full image regeneration.',
+      reason:'AI image editing carries high compute cost even for simple transforms. The efficient model tier minimises this overhead — use only when native editing tools cannot achieve the desired result.',
       fallback:{ tool:'Gemini Flash (Image edit)', reason:'Fast edits for non-critical, simple modifications.' },
       lastValidated:'2026-05-01',
     },
     moderate: {
       rating:'🟣', tool:'DALL-E 3 (inpainting, standard quality)',
-      reason:'One-pass inpainting with a specific prompt reduces iteration — each retry is a full generation, so precision matters.',
+      reason:'AI inpainting is energy-intensive — each failed pass is a full generation. Standard quality reduces overhead; write a precise prompt before starting to minimise iteration count.',
       fallback:{ tool:'Gemini Pro (Image edit)', reason:'Good quality for structured content replacement and inpainting.' },
       lastValidated:'2026-05-01',
     },
     complex: {
       rating:'🟣', tool:'DALL-E 3 (outpainting / multi-pass)',
-      reason:'Complex transforms require multiple passes — start with the most precise prompt possible to minimise iterations.',
+      reason:'Multi-pass AI image transforms have high cumulative compute cost. Each additional pass multiplies the energy overhead — start with the most precise prompt possible to minimise iterations.',
       fallback:{ tool:'Gemini Pro (Image edit)', reason:'Handles transformations requiring compositional understanding.' },
       lastValidated:'2026-05-01',
     },
@@ -218,19 +239,19 @@ const recommendations = {
     simple: {
       rating:'🟢', tool:'Platform-embedded transcription (Teams / Zoom / Meet)',
       reason:'Purpose-built transcription pipeline with no LLM overhead — far more efficient than uploading audio to a chatbot.',
-      fallback:{ tool:'Whisper (small)', reason:'Lightest standalone model when no platform tool is available.' },
+      fallback:{ tool:'Microsoft Teams Premium (auto-transcription)', reason:'Teams Premium provides enhanced accuracy and speaker labels without a separate service.' },
       lastValidated:'2026-05-01',
     },
     moderate: {
       rating:'🟢', tool:'Platform-embedded transcription (Teams / Zoom / Meet)',
       reason:'Embedded tools handle speaker diarisation and basic formatting natively — no additional model call needed.',
-      fallback:{ tool:'Whisper (medium)', reason:'Better accuracy for accented speech or noisy environments.' },
+      fallback:{ tool:'Microsoft Teams Premium (enhanced transcription)', reason:'Enhanced tier improves accuracy for accented speech without an external service.' },
       lastValidated:'2026-05-01',
     },
     complex: {
-      rating:'🟢', tool:'Whisper (large-v3)',
-      reason:'Most accurate open-source transcription for multi-speaker, technical, or domain-specific audio content.',
-      fallback:{ tool:'AssemblyAI (Nano tier)', reason:'Cloud transcription with speaker labels — efficient tier for long recordings.' },
+      rating:'🟢', tool:'Platform-embedded transcription (Teams / Zoom / Meet)',
+      reason:'For multi-speaker or technical content, use your platform\'s built-in transcription with manual review and correction — avoids routing audio to an out-of-scope standalone service.',
+      fallback:{ tool:'Microsoft Teams Premium + manual review', reason:'Enhanced diarisation and speaker labels within the Teams ecosystem — no external service needed.' },
       lastValidated:'2026-05-01',
     },
   },
@@ -238,39 +259,46 @@ const recommendations = {
     simple: {
       rating:'🟡', tool:'Platform-embedded captioning (Teams / Zoom)',
       reason:'Auto-captioning runs inside your meeting tool — no additional model call or file upload required.',
-      fallback:{ tool:'Whisper (small) + subtitle tool', reason:'Lightweight transcription for short recordings outside the platform.' },
+      fallback:{ tool:'Zoom or Meet closed captions', reason:'Platform-native captioning runs inside the tool — no external model or file upload required.' },
       lastValidated:'2026-05-01',
     },
     moderate: {
       rating:'🟡', tool:'Microsoft Stream (auto-transcription)',
       reason:'Handles recorded content natively — no external upload or separate service required.',
-      fallback:{ tool:'Whisper (medium)', reason:'Higher accuracy for complex audio in recorded video.' },
+      fallback:{ tool:'Microsoft Stream enhanced transcription', reason:'Handles recorded content natively with improved accuracy — no external service required.' },
       lastValidated:'2026-05-01',
     },
     complex: {
-      rating:'🟡', tool:'Whisper (large-v3) + manual review',
-      reason:'Most accurate for multi-speaker, technical, or multilingual content — manual review keeps errors from the final output.',
-      fallback:{ tool:'AssemblyAI (Nano)', reason:'Speaker labels and timestamped captions for long-form video.' },
+      rating:'🟡', tool:'Microsoft Stream (auto-transcription) + manual review',
+      reason:'Platform-native transcription for multi-speaker or multilingual content — manual review keeps errors from the final output without routing to an out-of-scope service.',
+      fallback:{ tool:'Teams Premium transcription + manual review', reason:'Enhanced diarisation within the Microsoft ecosystem for long-form or complex video.' },
       lastValidated:'2026-05-01',
     },
   },
   vid_gen: {
+    // nonai = GR-12 Yes path: user has existing footage → zero AI cost
+    nonai: {
+      rating:'🟢', tool:'Screen recording or stock footage',
+      reason:'Use existing recordings or licensed stock footage — zero AI generation cost. For most enterprise needs, this achieves equivalent results without any AI overhead.',
+      lastValidated:'2026-05-01',
+    },
+    // simple/moderate/complex = GR-12 No path: no existing media, explicit energy cost stated
     simple: {
-      rating:'🟣', tool:'Screen recording or stock footage',
-      reason:'Even short AI-generated clips carry heavy compute costs — a screen recording or stock asset achieves the same result with zero AI energy.',
-      fallback:{ tool:'Veo 3.1 (minimum duration and resolution)', reason:'If AI generation is unavoidable, use the shortest clip and lowest resolution that meets the need.' },
+      rating:'🟣', tool:'Slide-based animation (PowerPoint / Canva)',
+      reason:'AI video generation carries among the highest compute costs of any enterprise AI task — a short clip consumes 10–50× the energy of a text request. Slide-based animations achieve comparable results for most internal and training content at a fraction of the energy cost.',
+      fallback:{ tool:'Screen recording with voiceover', reason:'Record a narrated walkthrough — no AI generation cost, immediate output, fully controllable.' },
       lastValidated:'2026-05-01',
     },
     moderate: {
-      rating:'🟣', tool:'Veo 3.1 (standard)',
-      reason:'Currently the primary enterprise option — reserve for final production assets only, never for drafts or internal-use content.',
-      fallback:{ tool:'Stock footage + motion graphics', reason:'Often achieves comparable results for presentations and training content at far lower cost.' },
+      rating:'🟣', tool:'Professional video production',
+      reason:'AI video generation at this scale consumes extreme compute resources — among the highest of any enterprise AI task. No approved AI video tool is in the current shortlist. Professional production delivers better quality control and is typically more cost-effective than iterative AI generation.',
+      fallback:{ tool:'Motion graphics (Canva / After Effects)', reason:'Purpose-built animation tools avoid AI overhead while producing high-quality results for training and marketing content.' },
       lastValidated:'2026-05-01',
     },
     complex: {
-      rating:'🟣', tool:'Veo 3.1 (standard)',
-      reason:'No lighter alternative exists for complex AI video — minimise clip length, reuse generated assets, and involve a video specialist to reduce iteration count.',
-      fallback:{ tool:'Professional video production', reason:'For high-stakes content, human-produced video is more controllable and often more cost-effective than iterative AI generation.' },
+      rating:'🟣', tool:'Professional video production',
+      reason:'Complex AI video generation has extreme energy overhead and no approved AI video tool exists in the current shortlist. Professional human production provides full creative control without the environmental and cost trade-offs of iterative AI generation.',
+      fallback:{ tool:'Specialized AI video service (evaluate with IT)', reason:'If AI generation is required, evaluate dedicated enterprise video tools with IT and sustainability teams before proceeding.' },
       lastValidated:'2026-05-01',
     },
   },
