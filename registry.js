@@ -55,24 +55,28 @@ const githubCopilotModels = [
   // GPT-5.5 (7.5x) and Opus variants are excluded — cost too high for standard enterprise use
 ];
 
+// NOTE (M365 Copilot Word — summer 2026): Anthropic model support is coming to M365 Copilot Word
+// in summer 2026. When available, Word entries (write, analyze, design) should be updated to
+// surface Claude Haiku / Sonnet as explicit mode alternatives alongside Auto / Quick Response /
+// Think Deeper. Revisit all write.*, analyze.*, and design.* fallback entries at that point.
 const recommendations = {
   write: {
     simple: {
       rating:'🟢', tool:'Claude Haiku 3.5',
       reason:'Lightweight model purpose-built for short, clear text — no reasoning overhead needed for emails, summaries, or label generation.',
-      fallback:{ tool:'Gemini Flash 2.0', reason:'Fast and efficient for routine text tasks across Google Workspace.' },
+      fallback:{ tool:'M365 Copilot Word (Auto)', reason:'Auto selects the most efficient Word mode for short drafts, emails, and summaries — no model configuration needed.' },
       lastValidated:'2026-05-01',
     },
     moderate: {
       rating:'🟡', tool:'Claude Sonnet 3.5',
       reason:'Mid-tier model handles multi-step drafts and tone adjustment without reaching for a reasoning model.',
-      fallback:{ tool:'Gemini Pro 1.5', reason:'Strong mid-range alternative with a large context window.' },
+      fallback:{ tool:'M365 Copilot Word (Quick Response)', reason:'Quick Response handles multi-step drafts and tone adjustments with minimal processing overhead.' },
       lastValidated:'2026-05-01',
     },
     complex: {
       rating:'🟡', tool:'Claude Sonnet 3.7',
       reason:'Extended thinking activates only for nuanced judgment — avoids the energy cost of a full frontier reasoning model.',
-      fallback:{ tool:'ChatGPT Auto', reason:'Auto mode handles complex writing without a fixed model override — GPT-5.5 Instant available for faster iteration.' },
+      fallback:{ tool:'M365 Copilot Word (Think Deeper)', reason:'Think Deeper applies extended reasoning for complex drafts requiring nuanced judgment — no manual model selection.' },
       lastValidated:'2026-05-01',
     },
   },
@@ -80,19 +84,19 @@ const recommendations = {
     simple: {
       rating:'🟢', tool:'Claude Haiku 3.5',
       reason:'Factual lookups and single-source summaries are well within a small model\'s capability — no reasoning loop needed.',
-      fallback:{ tool:'Gemini Flash 2.0', reason:'Fast inference with built-in search grounding for simple research tasks.' },
+      fallback:{ tool:'M365 Copilot Word (Auto)', reason:'Auto mode handles factual lookups and single-source summaries efficiently within Word.' },
       lastValidated:'2026-05-01',
     },
     moderate: {
       rating:'🟡', tool:'Claude Sonnet 3.5',
       reason:'Handles multi-source synthesis and structured comparison without triggering a reasoning loop.',
-      fallback:{ tool:'Gemini Pro 1.5', reason:'Large context window suits multi-document analysis.' },
+      fallback:{ tool:'M365 Copilot Word (Quick Response)', reason:'Quick Response covers multi-source synthesis and structured comparison within Word.' },
       lastValidated:'2026-05-01',
     },
     complex: {
       rating:'🟠', tool:'Claude Sonnet 3.7 (Extended Thinking)',
       reason:'Reasoning activates on demand for deep synthesis — more efficient than routing a standard query to a frontier model by default.',
-      fallback:{ tool:'GPT-5.5 Thinking', reason:'Thinking mode applies reasoning on demand for deep synthesis — lower cost than Pro Reasoning for structured analytical tasks.' },
+      fallback:{ tool:'M365 Copilot Word (Think Deeper)', reason:'Think Deeper applies extended reasoning for deep synthesis — no manual model selection required.' },
       lastValidated:'2026-05-01',
     },
   },
@@ -100,19 +104,19 @@ const recommendations = {
     simple: {
       rating:'🟢', tool:'Claude Haiku 3.5',
       reason:'Spec writing and design briefs are structured text tasks — a small model handles them without overprovisioning.',
-      fallback:{ tool:'Gemini Flash 2.0', reason:'Fast drafting for PRDs, UX copy, and simple briefs.' },
+      fallback:{ tool:'M365 Copilot Word (Auto)', reason:'Auto mode handles simple specs and design briefs within Word.' },
       lastValidated:'2026-05-01',
     },
     moderate: {
       rating:'🟡', tool:'Claude Sonnet 3.5',
       reason:'Handles iterative design documents and system specs efficiently — mid-tier is well matched for this output type.',
-      fallback:{ tool:'ChatGPT Auto', reason:'Auto mode selects the appropriate GPT-5.5 tier for structured product and design documents.' },
+      fallback:{ tool:'M365 Copilot Word (Quick Response)', reason:'Quick Response handles iterative design documents and system specs efficiently.' },
       lastValidated:'2026-05-01',
     },
     complex: {
       rating:'🟡', tool:'Claude Sonnet 3.7',
       reason:'Extended thinking supports multi-system design with interdependencies — no need for a frontier model.',
-      fallback:{ tool:'ChatGPT Auto', reason:'Auto mode handles complex design documents; switch to GPT-5.5 Thinking only if multi-system reasoning is required.' },
+      fallback:{ tool:'M365 Copilot Word (Think Deeper)', reason:'Think Deeper supports complex multi-system design with interdependencies — use for documents requiring structured reasoning.' },
       lastValidated:'2026-05-01',
     },
   },
