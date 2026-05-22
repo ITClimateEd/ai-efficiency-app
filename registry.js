@@ -55,6 +55,20 @@ const githubCopilotModels = [
   // GPT-5.5 (7.5x) and Opus variants are excluded — cost too high for standard enterprise use
 ];
 
+// M365 Copilot Excel and PowerPoint model list.
+// Anthropic models (Claude Opus 4.6 and 4.7) enabled by default since May 4, 2026
+// per Microsoft announcement. EU data boundary constraints may apply — see open item 3.5.
+// TODO (open item 3.5): surface an EU data boundary warning when Claude Opus 4.6 or 4.7
+//   is surfaced in the Excel / PowerPoint vendor path. Wire warning in WI-09 display.
+// Note: Excel recommendations align with the analyze/* task nodes; PowerPoint with img_gen_slides.
+const m365OfficeModels = [
+  { id:'auto',         label:'Auto',             note:'Always the default; routes to the most efficient eligible model' },
+  { id:'gpt54',        label:'GPT-5.4',           note:'Microsoft-native; standard analytical and presentation tasks' },
+  { id:'gpt55',        label:'GPT-5.5',           note:'Higher capability; use only when Auto is insufficient' },
+  { id:'claudeOpus46', label:'Claude Opus 4.6',   note:'Anthropic model; strong structured reasoning for complex data and slide composition' },
+  { id:'claudeOpus47', label:'Claude Opus 4.7',   note:'Latest Anthropic model; highest capability in the Opus family for Excel and PowerPoint' },
+];
+
 // NOTE (M365 Copilot Word — summer 2026): Anthropic model support is coming to M365 Copilot Word
 // in summer 2026. When available, Word entries (write, analyze, design) should be updated to
 // surface Claude Haiku / Sonnet as explicit mode alternatives alongside Auto / Quick Response /
@@ -164,18 +178,18 @@ const recommendations = {
     simple: {
       rating:'🔴', tool:'PowerPoint Designer (non-AI layouts)',
       reason:'Built-in SmartArt and design templates handle simple slide visuals with zero AI generation cost.',
-      fallback:{ tool:'Copilot Auto mode (PowerPoint)', reason:'If AI generation is needed, Auto selects the lightest suitable model.' },
+      fallback:{ tool:'M365 Copilot PowerPoint (Auto)', reason:'If AI generation is needed, Auto selects the most efficient eligible model.' },
       lastValidated:'2026-05-01',
     },
     moderate: {
-      rating:'🔴', tool:'Copilot Auto mode (PowerPoint)',
-      reason:'Auto model selection picks the lightest model that meets quality requirements — avoid manually selecting premium models.',
+      rating:'🔴', tool:'M365 Copilot PowerPoint (Auto)',
+      reason:'Auto picks the most efficient eligible model for slide image generation — avoid manually selecting premium models.',
       fallback:{ tool:'Google Slides (Gemini Flash)', reason:'Lightweight generation integrated directly into the presentation tool.' },
       lastValidated:'2026-05-01',
     },
     complex: {
-      rating:'🟣', tool:'Copilot (GPT-Image, standard quality)',
-      reason:'Higher quality for client-facing or printed assets — standard quality only; HD adds cost without proportional benefit.',
+      rating:'🟣', tool:'M365 Copilot PowerPoint (Auto)',
+      reason:'Auto routes complex visual tasks to the most capable eligible model — specify quality requirements in the Copilot prompt rather than selecting a model manually.',
       fallback:{ tool:'Google Slides (Gemini Pro Image)', reason:'Higher fidelity alternative for complex visual compositions.' },
       lastValidated:'2026-05-01',
     },
