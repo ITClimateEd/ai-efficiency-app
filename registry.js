@@ -40,6 +40,21 @@ const ratings = {
   '🟣': { label:'Heaviest', cls:'badge-purple' },
 };
 
+// GitHub Copilot proxy model shortlist — efficiency-first order.
+// multiplier is relative to GPT-5.3-Codex LTS (1.0 = baseline).
+// null = dynamic (Auto) or not yet quantified.
+// TODO (open item 3.3): surface an admin policy warning when a non-base model is selected —
+//   org policy may restrict third-party model routing (Claude Haiku 4.5, Claude Sonnet 4.6)
+//   outside of the Auto / GPT-5.3-Codex LTS path. Wire warning in WI-09 efficiency display.
+const githubCopilotModels = [
+  { id:'auto',          label:'Auto',             multiplier:null, note:'Always the default; system routes to the most efficient eligible model' },
+  { id:'gpt53codex',    label:'GPT-5.3-Codex',    multiplier:1.0,  note:'LTS baseline — predictable cost for production workflows' },
+  { id:'gpt54mini',     label:'GPT-5.4-mini',      multiplier:0.33, note:'Lightest option; best for inline completions and simple tasks' },
+  { id:'claudeHaiku45', label:'Claude Haiku 4.5',  multiplier:0.33, note:'Efficient third-party alternative for fast completions and code explanation' },
+  { id:'claudeSonnet46',label:'Claude Sonnet 4.6', multiplier:null, tier:'mid', note:'Mid-tier third-party; use for moderately complex code tasks' },
+  // GPT-5.5 (7.5x) and Opus variants are excluded — cost too high for standard enterprise use
+];
+
 const recommendations = {
   write: {
     simple: {
@@ -305,7 +320,7 @@ const recommendations = {
     simple: {
       rating:'🔴', tool:'Claude Code (Haiku, agent mode)',
       reason:'Simple automations — file transforms, single-API integrations — are well within Haiku\'s capability range.',
-      fallback:{ tool:'GitHub Copilot (agent mode)', reason:'Inline agent for single-file or simple multi-step automation tasks.' },
+      fallback:{ tool:'GitHub Copilot (Auto)', reason:'Auto mode routes simple agentic tasks to the most efficient eligible model — no manual model selection needed.' },
       lastValidated:'2026-05-01',
     },
     moderate: {
