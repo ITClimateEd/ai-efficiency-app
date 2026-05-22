@@ -285,19 +285,19 @@ const recommendations = {
     simple: {
       rating:'🟠', tool:'Claude Code (Haiku model)',
       reason:'Interactive building with the smallest capable model — review each output step to prevent wasted context accumulation.',
-      fallback:{ tool:'Cursor (Haiku, manual mode)', reason:'Lightweight model with auto-accept off and context scoped to relevant files.' },
+      fallback:{ tool:'Cursor (Auto)', reason:'Auto selects the most efficient Cursor-native model; keep auto-accept off and scope context to relevant files only.' },
       lastValidated:'2026-05-01',
     },
     moderate: {
       rating:'🟠', tool:'Claude Code (Sonnet model)',
       reason:'Standard interactive build sessions — use /clear between unrelated tasks to reset accumulated context.',
-      fallback:{ tool:'Cursor (Sonnet, manual mode)', reason:'Set context to relevant files only; keep auto-accept off.' },
+      fallback:{ tool:'Cursor (Composer 1.5)', reason:'Composer 1.5 is Cursor\'s cost-efficient native model for standard interactive builds — keep auto-accept off.' },
       lastValidated:'2026-05-01',
     },
     complex: {
       rating:'🟠', tool:'Claude Code (Sonnet model)',
       reason:'Complex builds stay within Sonnet\'s range when you review each step — Opus is rarely justified for interactive work.',
-      fallback:{ tool:'Cursor (Sonnet, manual mode)', reason:'Extended context handles complex multi-file tasks without a model upgrade.' },
+      fallback:{ tool:'Cursor (Composer 2)', reason:'Composer 2 handles complex multi-file builds; review each step to prevent context accumulation.' },
       lastValidated:'2026-05-01',
     },
   },
@@ -311,13 +311,13 @@ const recommendations = {
     moderate: {
       rating:'🔴', tool:'Claude Code (Sonnet, agent mode)',
       reason:'Standard automation — use /clear between workflows and run tasks sequentially rather than with parallel agents.',
-      fallback:{ tool:'Cursor (Sonnet, agent mode)', reason:'Set iteration limits; batch related tasks into one session to reduce context overhead.' },
+      fallback:{ tool:'Cursor (Claude Sonnet 4.5)', reason:'Sonnet 4.5 handles writing and documentation automation within Cursor — set iteration limits and batch related tasks into one session.' },
       lastValidated:'2026-05-01',
     },
     complex: {
       rating:'🔴', tool:'Claude Code (Sonnet, agent mode)',
       reason:'Even complex orchestration stays within Sonnet — Opus adds cost without proportional benefit for most agentic workflows.',
-      fallback:{ tool:'Cursor (Sonnet, agent mode)', reason:'Multi-file orchestration is manageable with Sonnet; avoid parallel agents unless tasks are genuinely independent.' },
+      fallback:{ tool:'Cursor (GPT-5.2 Codex)', reason:'GPT-5.2 Codex is an efficient third-party option for complex multi-file agentic workflows; avoid parallel agents unless tasks are genuinely independent.' },
       lastValidated:'2026-05-01',
     },
   },
