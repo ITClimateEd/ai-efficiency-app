@@ -1,17 +1,33 @@
 {
-  "last_checked": "2026-05-23",
+  "last_checked": "2026-05-22",
   "vendors": {
     "anthropic": {
       "models": [
+        "claude-haiku-4-5",
+        "claude-haiku-4-5-20251001",
         "claude-haiku-4-5-20251001-v1",
+        "claude-opus-4-0",
+        "claude-opus-4-1",
+        "claude-opus-4-1-20250805",
+        "claude-opus-4-1-20250805-v1",
+        "claude-opus-4-20250514",
+        "claude-opus-4-20250514-v1",
+        "claude-opus-4-5",
+        "claude-opus-4-5-20251101",
+        "claude-opus-4-5-20251101-v1",
         "claude-opus-4-6",
-        "claude-opus-4-73anthropic",
-        "claude-opus-4-7claude-sonnet-4-6claude-haiku-4-5",
-        "claude-opus-4-7claude-sonnet-4-6claude-haiku-4-5-20251001",
-        "claude-sonnet-4-6anthropic"
+        "claude-opus-4-6-v1",
+        "claude-opus-4-7",
+        "claude-sonnet-4-0",
+        "claude-sonnet-4-20250514",
+        "claude-sonnet-4-20250514-v1",
+        "claude-sonnet-4-5",
+        "claude-sonnet-4-5-20250929",
+        "claude-sonnet-4-5-20250929-v1",
+        "claude-sonnet-4-6"
       ],
       "source": "https://docs.anthropic.com/en/docs/about-claude/models",
-      "last_changed": "2026-05-23"
+      "last_changed": "2026-05-22"
     },
     "openai": {
       "models": [

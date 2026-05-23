@@ -66,25 +66,26 @@ function extractModels(vendor, html) {
 // Extract model names by applying a regex to each matched element individually.
 // Per-element extraction prevents false positives from adjacent elements being
 // concatenated (e.g. "claude-opus-4-7" + "anthropic" → "claude-opus-4-7anthropic").
+// Also strips <sup> elements (footnote refs like ³) that corrupt model IDs.
 function matchFromElements($, selector, pattern) {
   const results = new Set();
   $(selector).each((_, el) => {
-    const text = $(el).text();
+    const $el = $(el).clone();
+    $el.find('sup').remove();
+    const text = $el.text();
     (text.match(pattern) || []).forEach(m => results.add(m));
   });
   return [...results].sort();
 }
 
 function parseAnthropic(html) {
-  const $ = cheerio.load(html);
-  // Prefer <code> elements — they reliably contain isolated API model IDs on Anthropic docs.
-  // Also scan table cells as a fallback (model comparison tables).
-  const pattern = /claude-(?:opus|sonnet|haiku|instant)-?[a-z0-9]+(?:-[a-z0-9]+)*/g;
-  const models  = [
-    ...matchFromElements($, 'code',   pattern),
-    ...matchFromElements($, 'td, th', pattern),
-  ];
-  return [...new Set(models)].filter(m => m.length >= 10).sort();
+  // Anthropic docs is a Next.js SPA — model IDs appear in the React server-component
+  // JSON blob as well as the rendered DOM. Extract from raw HTML for full coverage.
+  //
+  // Pattern requires a dash-delimited version sub-group after the digit so bare
+  // fragments like "claude-opus-4" (from anchor IDs) don't match.
+  const pattern = /claude-(?:opus|sonnet|haiku|instant)-[0-9][a-z0-9]*(?:-[a-z0-9]+)+/g;
+  return [...new Set(html.match(pattern) || [])].sort();
 }
 
 function parseOpenAI(html) {
