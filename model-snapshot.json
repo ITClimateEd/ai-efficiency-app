@@ -38,7 +38,7 @@
     },
     "m365": {
       "models": [],
-      "source": "https://learn.microsoft.com/en-us/microsoft-365/admin/misc/microsoft-365-copilot-release-notes",
+      "source": "https://learn.microsoft.com/en-us/microsoft-365/copilot/release-notes",
       "last_changed": null,
       "note": "Parser not yet implemented — models will be populated on first successful run"
     },

@@ -34,8 +34,9 @@ const FETCH_TIMEOUT_MS = 30_000;
 async function fetchHtml(url) {
   const res = await fetch(url, {
     headers: {
-      'User-Agent': 'AI-Efficiency-Registry-Watch/1.0',
-      'Accept':     'text/html,application/xhtml+xml,*/*;q=0.8',
+      'User-Agent':      'Mozilla/5.0 (compatible; AI-Efficiency-Registry-Watch/1.0; +https://github.com/pascaljoly/ai-efficiency-app)',
+      'Accept':          'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+      'Accept-Language': 'en-US,en;q=0.9',
     },
     signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
   });
@@ -62,24 +63,37 @@ function extractModels(vendor, html) {
   }
 }
 
-// Extract text from content elements and apply a regex.
-function matchFromPage($, pattern) {
-  const text = $('code, td, th, pre, li, p, h1, h2, h3, h4').text();
-  return [...new Set(text.match(pattern) || [])].sort();
+// Extract model names by applying a regex to each matched element individually.
+// Per-element extraction prevents false positives from adjacent elements being
+// concatenated (e.g. "claude-opus-4-7" + "anthropic" → "claude-opus-4-7anthropic").
+function matchFromElements($, selector, pattern) {
+  const results = new Set();
+  $(selector).each((_, el) => {
+    const text = $(el).text();
+    (text.match(pattern) || []).forEach(m => results.add(m));
+  });
+  return [...results].sort();
 }
 
 function parseAnthropic(html) {
   const $ = cheerio.load(html);
-  // Anthropic API model IDs: claude-{family}-{version}[-{date}] or claude-{version}-{family}-{date}
-  const models = matchFromPage($, /claude-(?:opus|sonnet|haiku|instant)-?[a-z0-9]+(?:-[a-z0-9]+)*/g);
-  return models.filter(m => m.length >= 10); // exclude very short false positives
+  // Prefer <code> elements — they reliably contain isolated API model IDs on Anthropic docs.
+  // Also scan table cells as a fallback (model comparison tables).
+  const pattern = /claude-(?:opus|sonnet|haiku|instant)-?[a-z0-9]+(?:-[a-z0-9]+)*/g;
+  const models  = [
+    ...matchFromElements($, 'code',   pattern),
+    ...matchFromElements($, 'td, th', pattern),
+  ];
+  return [...new Set(models)].filter(m => m.length >= 10).sort();
 }
 
 function parseOpenAI(html) {
   const $ = cheerio.load(html);
-  const gpt    = matchFromPage($, /gpt-[a-z0-9]+(?:[.-][a-z0-9]+)*/g);
-  const oSeries = matchFromPage($, /\bo[0-9][a-z0-9-]*/g).filter(m => /^o[0-9]/.test(m));
-  const dalle  = matchFromPage($, /dall-e-[0-9]+/g);
+  // Release notes page uses headings and paragraphs — less structured than the models API page.
+  const gpt     = matchFromElements($, 'code, td, li, p', /gpt-[a-z0-9]+(?:[.-][a-z0-9]+)*/g);
+  const oSeries = matchFromElements($, 'code, td, li, p', /\bo[0-9][a-z0-9-]*/g)
+                    .filter(m => /^o[0-9]/.test(m));
+  const dalle   = matchFromElements($, 'code, td, li, p', /dall-e-[0-9]+/g);
   return [...new Set([...gpt, ...oSeries, ...dalle])].sort();
 }
 

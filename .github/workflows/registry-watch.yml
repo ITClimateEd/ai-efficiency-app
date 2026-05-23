@@ -18,7 +18,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'   # Built-in fetch available; node-fetch not required
+          node-version: '24'   # Built-in fetch available; node-fetch not required
 
       - name: Install dependencies
         run: npm install --no-save cheerio
