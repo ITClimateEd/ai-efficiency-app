@@ -166,6 +166,7 @@
     .badge-orange { background: #FAECE7; color: #993C1D; }
     .badge-red    { background: var(--color-background-danger);  color: var(--color-text-danger);  }
     .badge-purple { background: #EEEDFE; color: #3C3489; }
+    .badge-gray   { background: #F2F2F2; color: #6E6E6E; }
     .tool-row { margin-bottom: .75rem; }
     .tool-name { font-size: 13px; font-weight: 500; margin-bottom: 3px; }
     .tool-tip  { font-size: 13px; color: var(--color-text-secondary); line-height: 1.5; }
@@ -482,6 +483,13 @@
   function safeParam(val, whitelist) { return whitelist.has(val) ? val : null; }
   // GR-12: tasks that require the media-availability gate before model selection
   const MEDIA_GATE_TASKS = new Set(['img_gen_chat','img_gen_slides','img_edit','vid_gen']);
+  // GR-11: proxy tools route through a vendor-managed model picker; default display is "Auto"
+  const PROXY_VENDORS = new Set(['cursor','m365','githubcopilot']);
+  function isProxyNativeTool(toolStr) {
+    // Returns true when the registry string already encodes the chosen proxy mode/model
+    // (e.g. "Cursor (Composer 2)", "M365 Copilot Word (Think Deeper)") so we surface it as-is
+    return /cursor\s*\(|copilot\s*\(|m365\s*\(|composer|think deeper|quick response|powerpoint|excel|stream|github\s+copilot\s*\(/i.test(toolStr);
+  }
 
   // Populate task whitelist from the tasks object (tasks defined in registry.js)
   Object.values(tasks).forEach(arr => arr.forEach(t => KNOWN_TASKS.add(t.id)));
@@ -718,24 +726,83 @@
   function renderResult() {
     const node = recommendations[state.task] && recommendations[state.task][state.complexity];
     if (!node) return;
+
+    // GR-01/GR-03: compute vendor match once — used for gap check, tool label, and GR-11
+    const resolved = state.vendors.size > 0
+      ? resolveToolFromVendors(node.tool, state.vendors, state.task)
+      : null;
+
+    // GR-05: vendor filter active + recommendation has a specific vendor + no vendor match → gap
+    if (state.vendors.size > 0 && node.vendor !== null && resolved === null) {
+      // What the user asked for
+      const gapTaskLabel = (tasks[state.modality] || []).find(t => t.id === state.task);
+      const gapComplexity = state.complexity.charAt(0).toUpperCase() + state.complexity.slice(1);
+      // Best available recommendation (the filtered-out primary)
+      const gapRating = ratings[node.rating];
+      const gapRatingBadge = gapRating
+        ? '<span class="badge ' + gapRating.cls + '" style="font-size:11px;padding:2px 7px;vertical-align:middle">' +
+            node.rating + ' ' + gapRating.label + '</span> '
+        : '';
+      // What requirement it doesn't meet
+      const requiredVendorLabel = vendorLabels[node.vendor] || node.vendor;
+      const activeVendorLabels = [...state.vendors].map(v => vendorLabels[v] || v).join(', ');
+      // Closest alternative within selection (the fallback, if in scope)
+      const gapFbAvailable = !node.fallback.vendor || state.vendors.has(node.fallback.vendor);
+      const gapFallbackHtml = gapFbAvailable
+        ? '<div class="rec-field"><div class="rec-label">Closest alternative in your selection</div>' +
+            '<div class="rec-value">' + node.fallback.tool + '</div>' +
+            '<div class="rec-fallback">' + node.fallback.reason + '</div></div>'
+        : '';
+      document.getElementById('div3').style.display = '';
+      document.getElementById('result-area').innerHTML =
+        '<div class="rec-card">' +
+          '<div class="rec-header">' +
+            '<span class="badge badge-gray">— Gap (GR-05)</span>' +
+            '<span class="rec-title">No matching recommendation</span>' +
+          '</div>' +
+          '<div class="rec-field"><div class="rec-label">You asked for</div>' +
+            '<div class="rec-value">' + (gapTaskLabel ? gapTaskLabel.label : state.task) +
+            ' — ' + gapComplexity + '</div></div>' +
+          '<div class="rec-field"><div class="rec-label">Best available recommendation</div>' +
+            '<div class="rec-value">' + gapRatingBadge + node.tool + '</div></div>' +
+          '<div class="rec-field"><div class="rec-label">What requirement it doesn\'t meet</div>' +
+            '<div class="rec-value" style="color:var(--color-text-secondary)">' +
+            'Requires <strong>' + requiredVendorLabel + '</strong>, which is not in your current ' +
+            'selection (' + activeVendorLabels + '). Add <strong>' + requiredVendorLabel +
+            '</strong> or choose <strong>All tools</strong> to see this recommendation.</div></div>' +
+          gapFallbackHtml +
+          '<div class="rec-actions">' +
+            '<button class="rec-btn" onclick="resetAll()">↺ Start over</button>' +
+          '</div>' +
+        '</div>' +
+        '<p class="global-note">AI model capabilities change frequently. Recommendations are reviewed periodically.</p>';
+      return;
+    }
+
     const rating = ratings[node.rating];
     const d = new Date(node.lastValidated + 'T00:00:00');
     const validatedStr = d.toLocaleDateString('en-US', { month:'long', year:'numeric' });
+
+    // GR-08: registry integrity check — tool name must always be present
+    if (!node.tool || !node.tool.trim()) {
+      console.warn('[GR-08] registry entry missing tool name', { task: state.task, complexity: state.complexity });
+    }
+
     // Resolve Tool / Model display
     let toolFieldHtml;
-    if (state.vendors.size > 0) {
-      const resolved = resolveToolFromVendors(node.tool, state.vendors, state.task);
-      const toolName = resolved ? vendorLabels[resolved] : null;
-      toolFieldHtml = toolName
-        ? '<div class="rec-field"><div class="rec-label">Tool</div>' +
-            '<div class="rec-value">' + toolName + '</div>' +
-            '<div class="rec-label" style="margin-top:.75rem">Model</div>' +
-            '<div class="rec-value">' + node.tool + '</div></div>'
-        : '<div class="rec-field"><div class="rec-label">Tool</div>' +
-            '<div class="rec-value" style="color:var(--color-text-tertiary);font-style:italic">No matching tool in your selection</div>' +
-            '<div class="rec-label" style="margin-top:.75rem">Model</div>' +
-            '<div class="rec-value">' + node.tool + '</div></div>';
+    if (state.vendors.size > 0 && node.vendor !== null && resolved !== null) {
+      // GR-11: proxy vendors show "Auto" unless the registry string already names the chosen mode
+      const modelDisplay = (PROXY_VENDORS.has(resolved) && !isProxyNativeTool(node.tool)) ? 'Auto' : node.tool;
+      // GR-08: both vendor label and model/mode must be non-empty before rendering
+      if (!modelDisplay || !modelDisplay.trim()) {
+        console.warn('[GR-08] recommendation card would show vendor label with no model/mode', { task: state.task, complexity: state.complexity, vendor: resolved });
+      }
+      toolFieldHtml = '<div class="rec-field"><div class="rec-label">Tool</div>' +
+        '<div class="rec-value">' + vendorLabels[resolved] + '</div>' +
+        '<div class="rec-label" style="margin-top:.75rem">Model</div>' +
+        '<div class="rec-value">' + modelDisplay + '</div></div>';
     } else {
+      // All tools selected or null-vendor (platform-agnostic) tool: simple display
       toolFieldHtml = '<div class="rec-field"><div class="rec-label">Tool</div>' +
         '<div class="rec-value">' + node.tool + '</div></div>';
     }
@@ -746,23 +813,11 @@
       ? '<div class="tip-box">💡 <strong>Claude Code vs Claude:</strong> For coding tasks, Claude Code is more efficient than Claude chat — it\'s purpose-built for code, uses less conversational overhead, and keeps context tighter. Prefer Claude Code when both are available.</div>'
       : '';
 
-    // Bug 3: suppress fallback if it doesn't match any selected vendor
+    // GR-01/GR-03: use vendor tag to decide whether fallback is in scope
     let fallbackHtml;
     if (state.vendors.size > 0) {
-      const fallbackLower = node.fallback.tool.toLowerCase();
-      const vendorKeywords = {
-        chatgpt: ['chatgpt', 'gpt', 'openai', 'dall-e', 'codex'],
-        claude:  ['claude'],
-        codex:   ['codex'],
-        claudecode: ['claude code'],
-        cursor:  ['cursor'],
-        m365:    ['m365', 'microsoft', 'copilot', 'stream', 'powerpoint', 'excel'],
-        githubcopilot: ['github copilot', 'github'],
-      };
-      const matches = [...state.vendors].some(v =>
-        (vendorKeywords[v] || []).some(kw => fallbackLower.includes(kw))
-      );
-      fallbackHtml = matches
+      const fbAvailable = !node.fallback.vendor || state.vendors.has(node.fallback.vendor);
+      fallbackHtml = fbAvailable
         ? '<div class="rec-field"><div class="rec-label">If unavailable</div>' +
             '<div class="rec-value">' + node.fallback.tool + '</div>' +
             '<div class="rec-fallback">' + node.fallback.reason + '</div></div>'
@@ -850,18 +905,26 @@
     if (node) {
       const taskLabel = (tasks[state.modality] || []).find(t => t.id === state.task);
       const d = new Date(node.lastValidated + 'T00:00:00');
-      text = [
+      // GR-11: mirror proxy-tool Auto logic from renderResult()
+      const _resolved = resolveToolFromVendors(node.tool, state.vendors, state.task);
+      const modelDisplay = (_resolved && PROXY_VENDORS.has(_resolved) && !isProxyNativeTool(node.tool))
+        ? 'Auto' : node.tool;
+      // GR-01/GR-03: match renderResult() tool-label and fallback suppression
+      const toolLine = (state.vendors.size > 0 && node.vendor !== null && _resolved)
+        ? 'Tool: ' + vendorLabels[_resolved] + '\nModel: ' + modelDisplay
+        : 'Tool: ' + node.tool;
+      const fbAvailable = !node.fallback.vendor || state.vendors.size === 0 || state.vendors.has(node.fallback.vendor);
+      const lines = [
         'AI Model Efficiency Guide',
         'Task: ' + (taskLabel ? taskLabel.label : '') + ' — ' +
           state.complexity.charAt(0).toUpperCase() + state.complexity.slice(1),
         '',
-        'Tool: ' + node.tool,
+        toolLine,
         'Why it\'s efficient: ' + node.reason,
-        'If unavailable: ' + node.fallback.tool + ' — ' + node.fallback.reason,
-        '',
-        'Validated: ' + d.toLocaleDateString('en-US', { month:'long', year:'numeric' }),
-        'Source: ' + window.location.href,
-      ].join('\n');
+      ];
+      if (fbAvailable) lines.push('If unavailable: ' + node.fallback.tool + ' — ' + node.fallback.reason);
+      lines.push('', 'Validated: ' + d.toLocaleDateString('en-US', { month:'long', year:'numeric' }), 'Source: ' + window.location.href);
+      text = lines.join('\n');
     } else {
       const why = document.querySelector('#result-area .rec-value');
       text = 'AI Model Efficiency Guide\n\nRecommendation: No AI tool needed\nWhy: ' +
