@@ -1,0 +1,40 @@
+name: Registry Watch
+
+on:
+  schedule:
+    - cron: '0 8 * * 1'   # Every Monday at 08:00 UTC
+  workflow_dispatch:       # Allow manual trigger for ad-hoc checks
+
+jobs:
+  check-registry:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write      # To commit updated model-snapshot.json
+      issues: write        # To open issues when changes are detected
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'   # Built-in fetch available; node-fetch not required
+
+      - name: Install dependencies
+        run: npm install --no-save cheerio
+        # cheerio: HTML parsing. Built-in fetch (Node 20) used for HTTP requests.
+
+      - name: Run registry watch script
+        id: watch
+        run: node scripts/registry-watch.js
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+
+      - name: Commit updated snapshot
+        run: |
+          git config user.name  'registry-watch[bot]'
+          git config user.email 'registry-watch@noreply'
+          git add model-snapshot.json
+          git diff --staged --quiet || git commit -m 'chore: update model snapshot [skip ci]'
+          git push

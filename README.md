@@ -25,17 +25,18 @@ Supported tools: ChatGPT, Claude, Claude Code, Cursor, GitHub Copilot, M365 Copi
 
 ## Repository structure
 
-index.html        Main application (decision tree, UI, recommendation logic)
+```
+index.html                  Main application (decision tree, UI, recommendation logic)
+registry.js                 Recommendation data — the authoritative model/tool registry
+model-snapshot.json         Baseline model list for the automated registry watch action
+CHANGELOG.md                Registry update history
+README.md                   This file
+scripts/registry-watch.js   Weekly model change detector (run by GitHub Action)
+.github/workflows/
+  registry-watch.yml        GitHub Action — runs every Monday at 08:00 UTC
+```
 
-registry.js       Tool and model registry — the authoritative list of valid recommendations
-
-SPEC.md           Recommendation engine spec (ground rules \+ registry rationale)
-
-CHANGELOG.md      Registry update history
-
-README.md         This file
-
-**Note:** `registry.js` is loaded as a separate script by `index.html`. All recommendation data lives in the registry; UI logic lives in `index.html`.
+`registry.js` is loaded as a separate script by `index.html`. All recommendation data lives in the registry; UI logic lives in `index.html`.
 
 ---
 
@@ -108,6 +109,30 @@ Contributions welcome. The most useful contributions right now:
 - **Bug fixes:** recommendation logic errors, UI issues
 
 Please open an issue before making significant changes to the recommendation logic or ground rules. Changes that affect GR-12 (Non-AI as primary for image/video generation) require explicit sign-off.
+
+---
+
+## Automated Registry Watch
+
+A GitHub Action runs every Monday at 08:00 UTC (and on manual trigger) to detect model changes on vendor documentation pages.
+
+**What it does:**
+- Fetches the documentation page for each monitored vendor
+- Extracts model identifiers using vendor-specific parsers
+- Diffs extracted names against `model-snapshot.json` (the committed baseline)
+- Opens a GitHub issue labelled `registry-update` if new or removed models are detected
+- Commits an updated `model-snapshot.json` after each run
+
+**What it does NOT do:**
+- Never modifies `registry.js`
+- Never opens a PR against the registry
+- Never classifies a model as efficient or inefficient — that is always a human judgment call
+
+**Monitored vendors:** Anthropic, OpenAI. GitHub Copilot, M365 Copilot, Cursor, and Google Gemini parsers are planned — see `scripts/registry-watch.js` for implementation status.
+
+**`model-snapshot.json`** is the baseline model list committed to the repo. It is updated automatically by the action after each successful run. Do not edit it manually — your changes will be overwritten on the next run.
+
+To trigger an ad-hoc check: go to **Actions → Registry Watch → Run workflow**.
 
 ---
 
