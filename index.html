@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="An interactive decision tree to help you choose the most energy-efficient AI tool for your task — from writing and analysis to code, images, audio, and video.">
-  <title>AI Model Efficiency Guide</title>
+  <title>AI Model Efficiency Selector</title>
   <style>
     /* ── Design tokens ──────────────────────────────────────────── */
     :root {
@@ -383,8 +383,8 @@
 
   <!-- Hero / page title -->
   <div class="page-title-block">
-    <h1>AI Model Efficiency Guide</h1>
-    <p>Pick your output type and task — get the right tool and the lighter choice.</p>
+    <h1>AI Model Efficiency Selector</h1>
+    <p>Pick your tools, task, and output — get the lowest-energy choice.</p>
   </div>
 
   <!-- Widget -->
@@ -952,7 +952,7 @@
       if (node) {
         const taskLabel = (tasks[state.modality] || []).find(t => t.id === state.task);
         text = [
-          'AI Model Efficiency Guide',
+          'AI Model Efficiency Selector',
           'Task: ' + (taskLabel ? taskLabel.label : ''),
           '',
           'Recommendation: Non-AI / Use existing media',
@@ -977,7 +977,7 @@
         : 'Tool: ' + node.tool;
       const fbAvailable = !node.fallback.vendor || state.vendors.size === 0 || state.vendors.has(node.fallback.vendor);
       const lines = [
-        'AI Model Efficiency Guide',
+        'AI Model Efficiency Selector',
         'Task: ' + (taskLabel ? taskLabel.label : '') + ' — ' +
           state.complexity.charAt(0).toUpperCase() + state.complexity.slice(1),
         '',
@@ -989,7 +989,7 @@
       text = lines.join('\n');
     } else {
       const why = document.querySelector('#result-area .rec-value');
-      text = 'AI Model Efficiency Guide\n\nRecommendation: No AI tool needed\nWhy: ' +
+      text = 'AI Model Efficiency Selector\n\nRecommendation: No AI tool needed\nWhy: ' +
         (why ? why.textContent : '') + '\n\nSource: ' + window.location.href;
     }
     }
