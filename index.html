@@ -321,6 +321,35 @@
       background: var(--color-background-secondary);
       border-radius: var(--border-radius-md); line-height: 1.6;
     }
+
+    /* ── CTA block ──────────────────────────────────────────────────── */
+    .cta-block {
+      margin-top: 1.25rem;
+      padding: 1.5rem;
+      background: var(--color-background-primary);
+      border: 0.5px solid var(--color-border-secondary);
+      border-radius: var(--border-radius-lg);
+      text-align: center;
+    }
+    .cta-heading {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--color-text-primary);
+      margin-bottom: .4rem;
+    }
+    .cta-body {
+      font-size: 14px;
+      color: var(--color-text-secondary);
+      line-height: 1.55;
+      margin-bottom: 1.1rem;
+    }
+    .cta-attr {
+      font-size: 11px;
+      color: var(--color-text-tertiary);
+      margin-top: .75rem;
+    }
+    .cta-attr a { color: var(--color-text-tertiary); text-decoration: none; }
+    .cta-attr a:hover { text-decoration: underline; }
   </style>
 </head>
 <body>
@@ -454,6 +483,14 @@
       <!-- Result -->
       <div id="result-area"></div>
 
+      <!-- CTA -->
+      <div id="cta-block" class="cta-block" style="display:none">
+        <p class="cta-heading">Want to go deeper?</p>
+        <p class="cta-body">A 30-min call can help you build a practical AI efficiency policy for your organization.</p>
+        <a href="https://calendly.com/pascaljoly/30-min-meeting" class="rec-btn rec-btn-primary" target="_blank" rel="noopener" style="text-decoration:none">Book a free 30-min call</a>
+        <p class="cta-attr">A service by <a href="https://www.itclimateed.com" target="_blank" rel="noopener">IT Climate Ed</a></p>
+      </div>
+
     </div>
   </main>
 
@@ -526,6 +563,7 @@
       document.querySelectorAll('#step1 .chip').forEach(c => c.classList.remove('active'));
       el.classList.add('active');
       document.getElementById('result-area').innerHTML = '';
+      document.getElementById('cta-block').style.display = 'none';
       document.getElementById('step-media-gate').style.display = 'none';
       document.getElementById('div-media-gate').style.display = 'none';
       document.getElementById('div2').style.display = 'none';
@@ -550,6 +588,7 @@
       document.querySelectorAll('#step2 .chip').forEach(c => c.classList.remove('active'));
       el.classList.add('active');
       document.getElementById('result-area').innerHTML = '';
+      document.getElementById('cta-block').style.display = 'none';
       document.getElementById('div3').style.display = 'none';
       if (MEDIA_GATE_TASKS.has(value)) {
         document.querySelectorAll('[data-media-gate]').forEach(c => c.classList.remove('active'));
@@ -628,6 +667,7 @@
         '</div>' +
       '</div>' +
       '<p class="global-note">AI model capabilities change frequently. Recommendations are reviewed periodically.</p>';
+    document.getElementById('cta-block').style.display = '';
   }
 
   // ── No-AI screening ──────────────────────────────────────────────
@@ -676,6 +716,7 @@
         '</div>' +
       '</div>' +
       '<p class="global-note">AI model capabilities change frequently. Recommendations are reviewed periodically.</p>';
+    document.getElementById('cta-block').style.display = '';
   }
 
   function renderNoAiRoute() {
@@ -699,6 +740,7 @@
     document.getElementById('div1').style.display = 'none';
     document.getElementById('div2').style.display = 'none';
     document.getElementById('result-area').innerHTML = '';
+    document.getElementById('cta-block').style.display = 'none';
     encodeHash();
   }
 
@@ -776,6 +818,7 @@
           '</div>' +
         '</div>' +
         '<p class="global-note">AI model capabilities change frequently. Recommendations are reviewed periodically.</p>';
+      document.getElementById('cta-block').style.display = '';
       return;
     }
 
@@ -850,6 +893,7 @@
         '</div>' +
       '</div>' +
       '<p class="global-note">AI model capabilities change frequently. Recommendations are reviewed periodically.</p>';
+    document.getElementById('cta-block').style.display = '';
   }
 
   // ── Copy & share ─────────────────────────────────────────────────
@@ -1073,6 +1117,7 @@
     document.getElementById('div2').style.display = 'none';
     document.getElementById('div3').style.display = 'none';
     document.getElementById('result-area').innerHTML = '';
+    document.getElementById('cta-block').style.display = 'none';
     history.replaceState(null, '', window.location.pathname + window.location.search);
   }
 
