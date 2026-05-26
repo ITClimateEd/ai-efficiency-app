@@ -706,7 +706,11 @@
         document.getElementById('noai-q3').style.display = '';
       }
     } else {
-      renderNoAiResult();
+      if (answer === 'yes') {
+        renderNoAiResult();
+      } else {
+        renderNoAiRoute();
+      }
     }
     encodeHash();
   }
