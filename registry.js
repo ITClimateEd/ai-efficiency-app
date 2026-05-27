@@ -3,8 +3,8 @@
 
 // Bump REGISTRY_VERSION on every registry change (patch = correction, minor = new model/mode, major = structural)
 // Update REGISTRY_LAST_UPDATED and add an entry to CHANGELOG.md at the same time.
-const REGISTRY_VERSION      = '1.6.0';
-const REGISTRY_LAST_UPDATED = '2026-05-27'; // P3/P4 rating corrections
+const REGISTRY_VERSION      = '1.7.0';
+const REGISTRY_LAST_UPDATED = '2026-05-27';
 
 const RESEARCH_NOTES = {
   primarySource: 'Jegham et al. (2025) — How Hungry is AI? Benchmarking Energy, Water, and Carbon Footprint of LLM Inference. arXiv:2505.09598',
@@ -357,18 +357,27 @@ const recommendations = {
       rating:'🟢', tool:'Claude Haiku 4.5', vendor:'claude',
       reason:'Code explanation is read-only text generation — the smallest capable model handles snippet and function-level Q&A well.',
       fallback:{ tool:'ChatGPT Auto', vendor:'chatgpt', reason:'Auto mode routes simple code Q&A to GPT-5.5 Instant automatically.' },
+      vendorAlts:{
+        codex:{ tool:'GPT-5.3-Codex', rating:'🟢', reason:'GPT-5.3-Codex is the LTS base model — routine code Q&A and snippet explanation are well within its range.', fallback:{ tool:'ChatGPT Auto', vendor:'chatgpt', reason:'Auto routes simple code Q&A to the appropriate GPT-5.5 tier.' } },
+      },
       lastValidated:'2026-05-27',
     },
     moderate: {
       rating:'🟡', tool:'Claude Sonnet 4.6', vendor:'claude',
       reason:'Handles architecture explanation and multi-file review without a reasoning model.',
       fallback:{ tool:'ChatGPT Auto', vendor:'chatgpt', reason:'Auto mode is sufficient for architecture explanation and multi-file code review.' },
+      vendorAlts:{
+        codex:{ tool:'GPT-5.3-Codex', rating:'🟡', reason:'Handles architecture explanation and multi-file review at the LTS baseline — no reasoning model needed.', fallback:{ tool:'ChatGPT Auto', vendor:'chatgpt', reason:'Auto mode handles architecture explanation and multi-file code review.' } },
+      },
       lastValidated:'2026-05-27',
     },
     complex: {
       rating:'🟡', tool:'Claude Sonnet 4.6', vendor:'claude',
       reason:'Even complex architecture review is read-only — no reasoning model needed; Sonnet covers large-context code analysis effectively.',
       fallback:{ tool:'ChatGPT Auto', vendor:'chatgpt', reason:'Auto mode handles large-context code review; switch to GPT-5.5 Thinking if reasoning over the architecture is needed.' },
+      vendorAlts:{
+        codex:{ tool:'GPT-5.3-Codex', rating:'🟡', reason:'Even complex architecture review is read-only — GPT-5.3-Codex covers large-context code analysis at the LTS baseline.', fallback:{ tool:'ChatGPT Auto', vendor:'chatgpt', reason:'Auto mode handles large-context code review; escalate to GPT-5.5 Thinking only if reasoning over the architecture is required.' } },
+      },
       lastValidated:'2026-05-27',
     },
   },
@@ -377,18 +386,27 @@ const recommendations = {
       rating:'🟢', tool:'Claude Haiku 4.5', vendor:'claude',
       reason:'Single-function generation and simple bug fixes are within a small model\'s range — inline completion has the lowest context overhead.',
       fallback:{ tool:'ChatGPT Auto', vendor:'chatgpt', reason:'Auto mode routes single-function code tasks to GPT-5.5 Instant.' },
+      vendorAlts:{
+        codex:{ tool:'GPT-5.3-Codex', rating:'🟢', reason:'Single-function generation and simple fixes are within the LTS base model\'s range — inline completion at the lowest available overhead.', fallback:{ tool:'ChatGPT Auto', vendor:'chatgpt', reason:'Auto mode routes single-function code tasks to GPT-5.5 Instant.' } },
+      },
       lastValidated:'2026-05-27',
     },
     moderate: {
       rating:'🟡', tool:'Claude Sonnet 4.6', vendor:'claude',
       reason:'Handles multi-function code, refactoring, and moderate debugging — keep context scoped to relevant files only.',
       fallback:{ tool:'ChatGPT Auto', vendor:'chatgpt', reason:'Auto mode handles multi-function code and refactoring; avoid enabling reasoning mode for standard tasks.' },
+      vendorAlts:{
+        codex:{ tool:'GPT-5.3-Codex', rating:'🟡', reason:'Handles multi-function code and refactoring at the LTS baseline — keep context scoped to relevant files.', fallback:{ tool:'ChatGPT Auto', vendor:'chatgpt', reason:'Auto mode handles multi-function code and refactoring; avoid enabling reasoning mode for standard tasks.' } },
+      },
       lastValidated:'2026-05-27',
     },
     complex: {
       rating:'🟠', tool:'Claude Sonnet 4.6', vendor:'claude',
       reason:'Extended thinking resolves complex cross-system bugs — cheaper and more targeted than defaulting to Opus for difficult tasks. Reasoning models consume significantly more energy per query than standard models — activate only when task complexity justifies it.',
       fallback:{ tool:'GPT-5.5 Thinking', vendor:'chatgpt', reason:'Thinking mode provides targeted reasoning for complex multi-step debugging — lower cost than Pro Reasoning mode. Reasoning models consume significantly more energy per query than standard models — activate only when task complexity justifies it.' },
+      vendorAlts:{
+        codex:{ tool:'GPT-5.3-Codex', rating:'🟠', reason:'Complex cross-system debugging at the LTS baseline — scope context carefully and escalate to extended reasoning only when simpler passes fail.', fallback:{ tool:'ChatGPT Auto', vendor:'chatgpt', reason:'Auto mode handles complex debugging; escalate to GPT-5.5 Thinking only when cross-system reasoning is required.' } },
+      },
       lastValidated:'2026-05-27',
     },
   },
@@ -397,18 +415,27 @@ const recommendations = {
       rating:'🟠', tool:'Claude Code (Haiku model)', vendor:'claudecode',
       reason:'Interactive building with the smallest capable model — review each output step to prevent wasted context accumulation.',
       fallback:{ tool:'Cursor (Auto)', vendor:'cursor', reason:'Auto selects the most efficient Cursor-native model; keep auto-accept off and scope context to relevant files only.' },
+      vendorAlts:{
+        codex:{ tool:'GPT-5.3-Codex', rating:'🟠', reason:'Interactive building with the LTS base Codex model — review each output step to prevent context accumulation.', fallback:{ tool:'ChatGPT Auto', vendor:'chatgpt', reason:'Auto mode routes interactive build tasks to the appropriate model tier.' } },
+      },
       lastValidated:'2026-05-01',
     },
     moderate: {
       rating:'🟠', tool:'Claude Code (Sonnet model)', vendor:'claudecode',
       reason:'Standard interactive build sessions — use /clear between unrelated tasks to reset accumulated context.',
       fallback:{ tool:'Cursor (Composer 1.5)', vendor:'cursor', reason:'Composer 1.5 is Cursor\'s cost-efficient native model for standard interactive builds — keep auto-accept off.' },
+      vendorAlts:{
+        codex:{ tool:'GPT-5.3-Codex', rating:'🟠', reason:'Standard interactive build sessions at the LTS baseline — scope context to relevant files and review outputs before advancing.', fallback:{ tool:'ChatGPT Auto', vendor:'chatgpt', reason:'Auto mode handles standard interactive build sessions.' } },
+      },
       lastValidated:'2026-05-01',
     },
     complex: {
       rating:'🟠', tool:'Claude Code (Sonnet model)', vendor:'claudecode',
       reason:'Complex builds stay within Sonnet\'s range when you review each step — Opus is rarely justified for interactive work.',
       fallback:{ tool:'Cursor (Composer 2)', vendor:'cursor', reason:'Composer 2 handles complex multi-file builds; review each step to prevent context accumulation.' },
+      vendorAlts:{
+        codex:{ tool:'GPT-5.3-Codex', rating:'🟠', reason:'Complex interactive builds stay within the LTS model\'s range when scoped carefully — review each step to prevent wasted context.', fallback:{ tool:'ChatGPT Auto', vendor:'chatgpt', reason:'Auto mode handles complex interactive builds; avoid enabling reasoning mode for incremental work.' } },
+      },
       lastValidated:'2026-05-01',
     },
   },
@@ -417,18 +444,27 @@ const recommendations = {
       rating:'🔴', tool:'Claude Code (Haiku, agent mode)', vendor:'claudecode',
       reason:'Simple automations — file transforms, single-API integrations — are well within Haiku\'s capability range. Agentic workflows accumulate inference cost multiplicatively — each tool call or iteration is a separate model request. Limit parallel agents and batch related tasks to reduce total query count.',
       fallback:{ tool:'GitHub Copilot (Auto)', vendor:'githubcopilot', reason:'Auto mode routes simple agentic tasks to the most efficient eligible model — no manual model selection needed.' },
+      vendorAlts:{
+        codex:{ tool:'GPT-5.3-Codex', rating:'🔴', reason:'Simple automations — file transforms, single-API integrations — are within GPT-5.3-Codex\'s range. Agentic workflows accumulate inference cost multiplicatively — each tool call or iteration is a separate model request. Limit parallel agents and batch related tasks to reduce total query count.', fallback:{ tool:'GitHub Copilot (Auto)', vendor:'githubcopilot', reason:'Auto routes simple agentic tasks to the most efficient eligible model.' } },
+      },
       lastValidated:'2026-05-27',
     },
     moderate: {
       rating:'🔴', tool:'Claude Code (Sonnet, agent mode)', vendor:'claudecode',
       reason:'Standard automation — use /clear between workflows and run tasks sequentially rather than with parallel agents. Agentic workflows accumulate inference cost multiplicatively — each tool call or iteration is a separate model request. Limit parallel agents and batch related tasks to reduce total query count.',
       fallback:{ tool:'Cursor (Claude Sonnet 4.5)', vendor:'cursor', reason:'Sonnet 4.5 handles writing and documentation automation within Cursor — set iteration limits and batch related tasks into one session.' },
+      vendorAlts:{
+        codex:{ tool:'GPT-5.3-Codex', rating:'🔴', reason:'Standard automation at the LTS baseline — run tasks sequentially and use /clear between workflows. Agentic workflows accumulate inference cost multiplicatively — each tool call or iteration is a separate model request. Limit parallel agents and batch related tasks to reduce total query count.', fallback:{ tool:'GitHub Copilot (Auto)', vendor:'githubcopilot', reason:'Auto mode handles moderate agentic workflows; keeps model routing efficient.' } },
+      },
       lastValidated:'2026-05-27',
     },
     complex: {
       rating:'🔴', tool:'Claude Code (Sonnet, agent mode)', vendor:'claudecode',
       reason:'Even complex orchestration stays within Sonnet — Opus adds cost without proportional benefit for most agentic workflows. Agentic workflows accumulate inference cost multiplicatively — each tool call or iteration is a separate model request. Limit parallel agents and batch related tasks to reduce total query count.',
       fallback:{ tool:'Cursor (GPT-5.2 Codex)', vendor:'cursor', reason:'GPT-5.2 Codex is an efficient third-party option for complex multi-file agentic workflows; avoid parallel agents unless tasks are genuinely independent.' },
+      vendorAlts:{
+        codex:{ tool:'GPT-5.3-Codex', rating:'🔴', reason:'Complex orchestration at the LTS baseline — sequence related tasks and avoid parallel agents. Agentic workflows accumulate inference cost multiplicatively — each tool call or iteration is a separate model request. Limit parallel agents and batch related tasks to reduce total query count.', fallback:{ tool:'GitHub Copilot (Auto)', vendor:'githubcopilot', reason:'Auto handles complex multi-file agentic workflows; avoid parallel agents unless tasks are genuinely independent.' } },
+      },
       lastValidated:'2026-05-27',
     },
   },

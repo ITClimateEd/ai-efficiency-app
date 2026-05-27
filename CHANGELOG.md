@@ -5,6 +5,12 @@ Versions follow [Semantic Versioning](https://semver.org): patch for corrections
 
 ---
 
+## [1.7.0] — 2026-05-27
+
+v1.7.0 (2026-05-27) — Add vendorAlts.codex to all 12 code task entries; Codex now resolves correctly for code tasks when selected alongside non-coding vendors
+
+---
+
 ## [1.6.0] — 2026-05-27
 
 v1.6.0 (2026-05-27) — Model versions synced to 4.x; agentic and reasoning warnings strengthened; RESEARCH_NOTES added (Jegham et al. 2025)
