@@ -1,0 +1,368 @@
+
+<style>
+.guide-wrap { padding: 1.5rem 0; }
+.step { margin-bottom: 1.5rem; }
+.step-label { font-size: 12px; font-weight: 500; color: var(--color-text-tertiary); letter-spacing: .06em; text-transform: uppercase; margin-bottom: .5rem; }
+.chip-row { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip {
+  cursor: pointer;
+  border: 0.5px solid var(--color-border-secondary);
+  border-radius: var(--border-radius-md);
+  padding: 8px 14px;
+  font-size: 14px;
+  background: var(--color-background-primary);
+  color: var(--color-text-primary);
+  transition: background .12s, border-color .12s;
+  display: flex; align-items: center; gap: 6px;
+}
+.chip:hover { background: var(--color-background-secondary); border-color: var(--color-border-primary); }
+.chip.active { background: var(--color-background-secondary); border: 1.5px solid var(--color-border-primary); font-weight: 500; }
+.divider { border: none; border-top: 0.5px solid var(--color-border-tertiary); margin: 1.25rem 0; }
+.result-card {
+  border: 0.5px solid var(--color-border-secondary);
+  border-radius: var(--border-radius-lg);
+  padding: 1.25rem;
+  background: var(--color-background-primary);
+  animation: fadeIn .2s ease;
+}
+@keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+.result-header { display: flex; align-items: center; gap: 10px; margin-bottom: 1rem; flex-wrap: wrap; }
+.result-title { font-size: 16px; font-weight: 500; }
+.badge {
+  font-size: 12px; padding: 3px 10px;
+  border-radius: var(--border-radius-md);
+  font-weight: 500;
+  display: inline-flex; align-items: center; gap: 4px;
+  white-space: nowrap;
+}
+.badge-green { background: var(--color-background-success); color: var(--color-text-success); }
+.badge-yellow { background: var(--color-background-warning); color: var(--color-text-warning); }
+.badge-orange { background: #FAECE7; color: #993C1D; }
+.badge-red { background: var(--color-background-danger); color: var(--color-text-danger); }
+.badge-purple { background: #EEEDFE; color: #3C3489; }
+.tool-row { margin-bottom: .75rem; }
+.tool-name { font-size: 13px; font-weight: 500; margin-bottom: 3px; }
+.tool-tip { font-size: 13px; color: var(--color-text-secondary); line-height: 1.5; }
+.tip-box {
+  margin-top: 1rem;
+  padding: .75rem 1rem;
+  background: var(--color-background-secondary);
+  border-radius: var(--border-radius-md);
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  line-height: 1.6;
+}
+.warn-box {
+  margin-top: .75rem;
+  padding: .75rem 1rem;
+  background: #FCEBEB;
+  border-radius: var(--border-radius-md);
+  font-size: 13px;
+  color: #A32D2D;
+  line-height: 1.6;
+}
+.reset-btn {
+  margin-top: 1.25rem;
+  cursor: pointer;
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  background: none;
+  border: none;
+  padding: 0;
+  display: flex; align-items: center; gap: 4px;
+}
+.reset-btn:hover { color: var(--color-text-primary); }
+.updated { font-size: 11px; color: var(--color-text-tertiary); margin-top: 1.5rem; }
+</style>
+
+<div class="guide-wrap">
+<div class="step" id="step1">
+  <div class="step-label">Step 1 — what type of output do you need?</div>
+  <div class="chip-row">
+    <div class="chip" onclick="pick('modality','text',this)">📝 Text</div>
+    <div class="chip" onclick="pick('modality','image',this)">🖼 Image</div>
+    <div class="chip" onclick="pick('modality','audio',this)">🎙 Audio</div>
+    <div class="chip" onclick="pick('modality','video',this)">🎬 Video</div>
+    <div class="chip" onclick="pick('modality','code',this)">💻 Code</div>
+  </div>
+</div>
+
+<hr class="divider" id="div1" style="display:none">
+
+<div class="step" id="step2" style="display:none">
+  <div class="step-label">Step 2 — what are you trying to do?</div>
+  <div class="chip-row" id="task-chips"></div>
+</div>
+
+<hr class="divider" id="div2" style="display:none">
+<div id="result-area"></div>
+</div>
+
+<script>
+const state = { modality: null, task: null };
+
+const tasks = {
+  text: [
+    { id:'write', label:'Write (email, post, summary, draft)' },
+    { id:'analyze', label:'Analyze / research' },
+    { id:'design', label:'Design / prototype (spec, brief, UX flow)' },
+    { id:'image_analyze', label:'Analyze an image (text output)' },
+  ],
+  image: [
+    { id:'img_gen_chat', label:'Generate image in a chatbot' },
+    { id:'img_gen_slides', label:'Generate image in a slide presentation' },
+    { id:'img_edit', label:'Edit / transform existing image' },
+  ],
+  audio: [
+    { id:'transcribe', label:'Transcribe audio or meeting' },
+  ],
+  video: [
+    { id:'vid_caption', label:'Transcribe / caption video' },
+    { id:'vid_gen', label:'Generate video' },
+  ],
+  code: [
+    { id:'code_explain', label:'Explain / review code' },
+    { id:'code_write', label:'Write / debug' },
+    { id:'code_build', label:'Build (interactive — you stay in control)' },
+    { id:'code_automate', label:'Automate / workflow (agentic)' },
+  ],
+};
+
+const ratings = {
+  '🟢': { label:'Lightest', cls:'badge-green' },
+  '🟡': { label:'Light', cls:'badge-yellow' },
+  '🟠': { label:'Moderate', cls:'badge-orange' },
+  '🔴': { label:'Heavy', cls:'badge-red' },
+  '🟣': { label:'Heaviest', cls:'badge-purple' },
+};
+
+const results = {
+  write: {
+    rating:'🟢',
+    title:'Write — short-form text',
+    tools:[
+      { name:'ChatGPT Enterprise', tip:'GPT-5.5 Instant is the current default — use it as-is. No need to switch to Thinking mode for drafts, emails, or summaries.' },
+      { name:'Claude.ai Enterprise', tip:'Sonnet is the default and sufficient. Avoid Opus and Extended Thinking for routine writing.' },
+      { name:'Gemini Enterprise', tip:'Gemini Flash is ideal for short-form text. Avoid Deep Research mode entirely for this use case.' },
+      { name:'M365 Copilot (Word)', tip:'Use the standard Draft or Rewrite features. No model selection is exposed — just avoid triggering Agent Mode. Keep prompts focused to minimise regeneration loops.' },
+      { name:'M365 Copilot Chat', tip:'Choose Quick Response for routine writing tasks. Think Deeper is not justified for drafts or summaries.' },
+    ],
+    tip:'Short-form text is the most energy-efficient AI task. Default models are well-matched — resist the urge to switch to a more powerful mode for simple outputs.',
+  },
+  analyze: {
+    rating:'🟡',
+    title:'Analyze / research',
+    tools:[
+      { name:'ChatGPT Enterprise', tip:'GPT-5.5 Instant for "search on a topic" research. Switch to Thinking: Standard only when the task requires evaluating options and recommending a course of action — not for factual lookups. Deep Research: reserve for academic or R&D work. It runs an agentic loop, not a single query.' },
+      { name:'Claude.ai Enterprise', tip:'Sonnet handles most analysis well. Extended Thinking justified only for complex multi-step reasoning tasks, not standard research.' },
+      { name:'Gemini Enterprise', tip:'Gemini Pro with built-in Search for most research. Deep Research mode: same rule as ChatGPT — use sparingly, only for synthesis-heavy tasks requiring multiple sources.' },
+      { name:'M365 Copilot Chat', tip:'Quick Response for factual queries. Think Deeper for complex synthesis only.' },
+      { name:'M365 Excel (Get Insights)', tip:'Built-in analysis feature for spreadsheet data. Uses AI to surface patterns and trends. Efficient for data already in Excel — no need to export to a chatbot for basic analysis.' },
+    ],
+    warn:'M365 Copilot Researcher agent: this is a full agentic workflow — it searches your org\'s emails, files, meetings, chats, and the web, then generates a structured report. Use only for formal research outputs combining internal and external data. Not for casual research questions. Treat it like commissioning a report, not asking a question.',
+    tip:'Distinguish between two types of research: (1) "find information on a topic" — Instant/Flash mode is sufficient; (2) "analyze options and recommend a course of action" — Thinking/reasoning mode may be justified. Deep Research and Researcher agent consume significantly more energy. Use sparingly.',
+  },
+  design: {
+    rating:'🟡',
+    title:'Design / prototype',
+    tools:[
+      { name:'ChatGPT Enterprise', tip:'GPT-5.5 Instant for specs, briefs, and UX documentation. Thinking: Standard only for complex system architecture.' },
+      { name:'Claude.ai Enterprise', tip:'Sonnet is well-suited for structured specs and product briefs. SVG diagrams and artifacts are text-equivalent in energy — use freely for wireframes and flows.' },
+      { name:'Gemini Enterprise', tip:'Gemini Pro for research-heavy design work. Flash for quick ideation and drafting.' },
+      { name:'Claude Code (non-agent)', tip:'Interactive prototyping with human review at each step. Keep agent mode off — you retain control and energy stays manageable.' },
+      { name:'Codex (supervised)', tip:'Good for generating prototype code iteratively. Review each output before proceeding.' },
+      { name:'M365 Copilot (Word / PowerPoint)', tip:'Useful for PRDs, stakeholder presentations, and design briefs. Standard Copilot only — avoid Agent Mode for document drafting.' },
+    ],
+    tip:'Design and prototyping often combines research, writing, and light coding. Energy stays moderate as long as you remain in the loop at each step. It rises sharply if you add raster image generation or switch to autonomous agent mode.',
+  },
+  image_analyze: {
+    rating:'🟠',
+    title:'Analyze an image (text output)',
+    tools:[
+      { name:'ChatGPT Enterprise', tip:'GPT-5.5 Instant handles image analysis well. No need for Thinking mode.' },
+      { name:'Claude.ai Enterprise', tip:'Sonnet supports vision input. Haiku also capable for simple image Q&A.' },
+      { name:'Gemini Enterprise', tip:'Strong multimodal understanding. Flash model sufficient for most image analysis tasks.' },
+    ],
+    tip:'Multimodal input adds overhead vs. pure text, but the output is still text — no generation cost. Use the smallest model that handles your image complexity.',
+  },
+  img_gen_chat: {
+    rating:'🔴',
+    title:'Generate image — chatbot',
+    tools:[
+      { name:'ChatGPT Enterprise', tip:'Uses GPT Image 2 (gpt-image-2). If you must generate, use the standard quality setting — high resolution multiplies energy use significantly. Start with the lowest resolution that meets your need.' },
+      { name:'Gemini Enterprise', tip:'Gemini Flash Image for speed and efficiency. Gemini Pro Image for higher quality. Always start with Flash.' },
+      { name:'Claude.ai Enterprise', tip:'Cannot generate raster images. For diagrams, flowcharts, and structured visuals, use Claude\'s SVG/artifact generation — energy equivalent to text.' },
+    ],
+    tip:'Try to avoid image generation if possible — a well-described text slide, icon, or stock image often serves the same purpose. If you must generate: start with the lowest resolution and quality setting, and iterate only if needed. Each regeneration adds cost.',
+  },
+  img_gen_slides: {
+    rating:'🔴',
+    title:'Generate image — slide presentations',
+    tools:[
+      { name:'M365 Copilot (PowerPoint)', tip:'Model selector available: GPT-Image, Flux, or Auto. Use Auto — it picks the most efficient model for the request. If selecting manually, prefer the smallest available option. Microsoft AI Image 2 Efficient is available for editing tasks.' },
+      { name:'Google Slides (Gemini)', tip:'Gemini-powered image generation in Slides. Use for simple visuals. Prefer stock images or icons from the built-in library when they suffice.' },
+    ],
+    tip:'Only generate images in slides when a visual genuinely adds value. Text-based slides are significantly lighter. Stock images, icons, and brand library assets are always more efficient than AI-generated visuals.',
+  },
+  img_edit: {
+    rating:'🟣',
+    title:'Edit / transform existing image',
+    tools:[
+      { name:'ChatGPT Enterprise', tip:'GPT Image 2 supports inpainting and outpainting. Each iteration is a new generation — keep iterations minimal and be specific in your prompt to reduce passes.' },
+      { name:'Gemini Enterprise', tip:'Use Gemini Flash model for image edits. Avoid Pro unless quality is insufficient after Flash.' },
+      { name:'M365 Copilot (PowerPoint)', tip:'Microsoft AI Image 2 Efficient model is the lighter option — select it explicitly for editing tasks rather than defaulting to the premium model.' },
+    ],
+    tip:'Image editing is the heaviest image task — it often requires multiple generation passes. Use only when a crop, resize, recolor, or template edit cannot achieve the result. Be as specific as possible in your first prompt to reduce iterations.',
+  },
+  transcribe: {
+    rating:'🟢',
+    title:'Transcribe audio or meeting',
+    tools:[
+      { name:'M365 Copilot (Teams)', tip:'Automatic transcription embedded in meetings. Most efficient option — no separate tool or upload needed.' },
+      { name:'Microsoft Stream', tip:'For recorded video files — upload and transcribe directly. Efficient dedicated pipeline.' },
+      { name:'Zoom', tip:'Built-in cloud transcription available with Business and Enterprise plans. Enable in admin settings.' },
+      { name:'Google Meet', tip:'Built-in transcription available on Google Workspace Business Standard and higher. Transcripts saved automatically to Google Drive.' },
+      { name:'ChatGPT Enterprise', tip:'Whisper-based transcription for uploaded audio files. Use only when platform-embedded tools are unavailable.' },
+    ],
+    tip:'Audio transcription is one of the lightest AI tasks. Always prefer dedicated transcription tools or embedded platform features over general-purpose LLMs. Meeting transcription is typically already embedded in your platform — no extra step needed.',
+  },
+  vid_caption: {
+    rating:'🟡',
+    title:'Transcribe / caption video',
+    tools:[
+      { name:'M365 Copilot (Teams)', tip:'Automatic live captions in meetings — most efficient, no extra step.' },
+      { name:'Microsoft Stream', tip:'For recorded videos — built-in transcription and captioning. Use before reaching for a general LLM.' },
+      { name:'Zoom', tip:'Built-in cloud transcription for recorded meetings. More efficient than uploading to a chatbot.' },
+      { name:'Google Meet', tip:'Built-in transcription on Workspace Business Standard and higher. Summaries auto-saved to Google Drive.' },
+    ],
+    tip:'Always prefer platform-embedded captioning over general LLMs. Uploading a video file to a chatbot for transcription is significantly more token-intensive than using a dedicated tool. Heavier than audio-only transcription due to video processing overhead.',
+  },
+  vid_gen: {
+    rating:'🟣',
+    title:'Generate video',
+    tools:[
+      { name:'Gemini Enterprise', tip:'Veo 3.1 via Google Vids — currently the primary enterprise option. Reserve for final production assets, not drafts or internal use.' },
+      { name:'ChatGPT Enterprise', tip:'No video generation available. Sora was discontinued in April 2026 and was never included in Enterprise plans.' },
+      { name:'Dedicated platforms (Kling, Runway)', tip:'External platforms, not integrated into enterprise tooling. Require separate accounts and data governance review before use.' },
+    ],
+    tip:'Video generation is the heaviest AI task across all modalities. OpenAI discontinued Sora citing $1M/day compute costs — itself a signal about the sustainability of AI video at scale. Use only when essential and no alternative (screen recording, stock footage, existing assets) exists.',
+  },
+  code_explain: {
+    rating:'🟡',
+    title:'Explain / review code',
+    tools:[
+      { name:'ChatGPT Enterprise', tip:'GPT-5.5 Instant sufficient for most code review and explanation.' },
+      { name:'Claude.ai Enterprise', tip:'Sonnet performs well. Haiku also capable for simple snippets.' },
+      { name:'GitHub Copilot (chat)', tip:'Chat mode with model selector — efficient for inline review within the IDE.' },
+      { name:'Gemini Enterprise', tip:'Flash for quick explanations. Pro for complex architecture review.' },
+      { name:'Claude Code / Codex (non-agent)', tip:'Use chat or review mode only — no need to invoke agent mode for read-only tasks.' },
+    ],
+    tip:'Code explanation is text-in, text-out. Treat it like an analysis task — no reasoning models or agentic tools needed. The smallest capable model is the right choice.',
+  },
+  code_write: {
+    rating:'🟠',
+    title:'Write / debug code',
+    tools:[
+      { name:'ChatGPT Enterprise', tip:'GPT-5.5 Instant for most coding. Thinking: Standard for complex multi-step debugging only.' },
+      { name:'Claude.ai Enterprise', tip:'Sonnet is the sweet spot for coding tasks.' },
+      { name:'GitHub Copilot', tip:'Inline completion is efficient. Limit context to relevant files. Use agent mode only for genuine multi-file tasks.' },
+      { name:'Cursor (manual mode)', tip:'Use Sonnet, not Opus. Set context to relevant files only. Auto-accept off — review each change before proceeding.' },
+    ],
+    tip:'Keep sessions focused and short. Start a new session when switching to an unrelated task — accumulated context is a major energy driver. Energy is similar to interactive Build sessions; the distinction is scope, not intensity.',
+  },
+  code_build: {
+    rating:'🟠',
+    title:'Build — interactive (you stay in control)',
+    tools:[
+      { name:'Claude Code (non-agent)', tip:'Match model to complexity: Haiku for simple tasks, Sonnet for standard work. Review each output before proceeding. Use /clear between unrelated tasks to reset context.' },
+      { name:'Cursor (manual mode)', tip:'Keep auto-accept OFF. Set context to relevant files only — avoid loading the full codebase for scoped tasks. Use Sonnet as your default model.' },
+      { name:'Codex (supervised)', tip:'Review each generated output. Avoid triggering parallel sessions for tasks that can run sequentially.' },
+      { name:'GitHub Copilot (chat)', tip:'Good for interactive building within the IDE. Human reviews each suggestion before applying.' },
+    ],
+    warn:'If you turn on auto-accept in Cursor, or stop reviewing each change in Claude Code or Codex, you have crossed into Automate / Workflow territory — energy consumption rises sharply from that point.',
+    tip:'Interactive building keeps energy comparable to Write/Debug sessions. The key lever is staying in the loop: reviewing each step, clearing context between tasks, and using the smallest model that produces acceptable output.',
+  },
+  code_automate: {
+    rating:'🔴',
+    title:'Automate / workflow (agentic)',
+    tools:[
+      { name:'Claude Code (agent mode)', tip:'Match model to task: Haiku for simple automations, Sonnet for standard, Opus only for genuinely complex multi-file orchestration. Use /clear between unrelated workflows. Avoid Agent Teams (parallel agents) unless tasks are truly independent — sequential execution reaches the same result at a fraction of the energy.' },
+      { name:'Cursor (agent mode / auto-accept on)', tip:'Once auto-accept is enabled, the agent runs without human review. Set strict iteration limits. Use Auto model selection. Batch related work into single sessions.' },
+      { name:'Codex (parallel agents)', tip:'Use parallel agents only when tasks are genuinely independent and time-sensitive. A 3-agent team consumes roughly 3x the tokens of a single session.' },
+      { name:'GitHub Copilot (agent mode)', tip:'Agent mode is significantly heavier than inline completion. Use only for genuine multi-file autonomous tasks.' },
+      { name:'M365 Excel (Agent Mode)', tip:'Appropriate for complex multi-step workbook tasks — formulas, projections, dashboards. Not justified for single-cell edits or simple formatting.' },
+    ],
+    warn:'Avoid parallel agents unless tasks are truly independent and time-sensitive. A 3-agent team consumes roughly 3x the energy of a single session. Sequential execution is almost always sufficient.',
+    tip:'Agentic sessions accumulate context across every turn — the full conversation history is re-sent at each step. The two biggest energy levers are session length and model choice. A Haiku/Sonnet mix costs 5–10x less per session than Opus for equivalent automation tasks.',
+  },
+};
+
+function pick(type, value, el) {
+  if(type === 'modality') {
+    state.modality = value;
+    state.task = null;
+    document.querySelectorAll('#step1 .chip').forEach(c => c.classList.remove('active'));
+    el.classList.add('active');
+    renderTaskStep();
+    document.getElementById('result-area').innerHTML = '';
+    document.getElementById('div2').style.display = 'none';
+  } else {
+    state.task = value;
+    document.querySelectorAll('#step2 .chip').forEach(c => c.classList.remove('active'));
+    el.classList.add('active');
+    renderResult();
+  }
+}
+
+function renderTaskStep() {
+  const list = tasks[state.modality] || [];
+  const chips = list.map(t =>
+    `<div class="chip" onclick="pick('task','${t.id}',this)">${t.label}</div>`
+  ).join('');
+  document.getElementById('task-chips').innerHTML = chips;
+  document.getElementById('step2').style.display = '';
+  document.getElementById('div1').style.display = '';
+}
+
+function renderResult() {
+  const r = results[state.task];
+  if(!r) return;
+  const rating = ratings[r.rating];
+
+  const toolsHtml = r.tools.map((t, i) =>
+    `<div class="tool-row">
+      <div class="tool-name">${t.name}</div>
+      <div class="tool-tip">${t.tip}</div>
+    </div>${i < r.tools.length-1 ? '<hr class="divider" style="margin:.5rem 0">' : ''}`
+  ).join('');
+
+  const warnHtml = r.warn
+    ? `<div class="warn-box">⚠️ ${r.warn}</div>`
+    : '';
+
+  document.getElementById('div2').style.display = '';
+  document.getElementById('result-area').innerHTML = `
+    <div class="result-card">
+      <div class="result-header">
+        <span class="badge ${rating.cls}">${r.rating} ${rating.label}</span>
+        <span class="result-title">${r.title}</span>
+      </div>
+      <hr class="divider" style="margin:.5rem 0 1rem">
+      ${toolsHtml}
+      ${warnHtml}
+      <div class="tip-box">💡 ${r.tip}</div>
+      <button class="reset-btn" onclick="resetAll()">↺ Start over</button>
+    </div>
+    <p class="updated">Last updated: May 2026 · Sources: OpenAI, Anthropic, Google, Microsoft documentation</p>
+  `;
+}
+
+function resetAll() {
+  state.modality = null; state.task = null;
+  document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+  document.getElementById('step2').style.display = 'none';
+  document.getElementById('div1').style.display = 'none';
+  document.getElementById('div2').style.display = 'none';
+  document.getElementById('result-area').innerHTML = '';
+}
+</script>
