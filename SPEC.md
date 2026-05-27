@@ -244,4 +244,4 @@ The registry is versioned in `registry.js` using `REGISTRY_VERSION` (semver) and
 ---
 
 *Spec version: 3 — May 2026*
-*Registry version: 1.3.0*
+*Registry version: 1.6.0*

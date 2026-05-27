@@ -3,8 +3,8 @@
 
 // Bump REGISTRY_VERSION on every registry change (patch = correction, minor = new model/mode, major = structural)
 // Update REGISTRY_LAST_UPDATED and add an entry to CHANGELOG.md at the same time.
-const REGISTRY_VERSION      = '1.5.0';
-const REGISTRY_LAST_UPDATED = '2026-05-27';
+const REGISTRY_VERSION      = '1.6.0';
+const REGISTRY_LAST_UPDATED = '2026-05-27'; // P3/P4 rating corrections
 
 const vendorLabels = {
   chatgpt: 'ChatGPT', claude: 'Claude', codex: 'Codex',
@@ -105,7 +105,7 @@ const recommendations = {
       },
     },
     complex: {
-      rating:'🟡', tool:'Claude Sonnet 3.7', vendor:'claude',
+      rating:'🟠', tool:'Claude Sonnet 3.7', vendor:'claude',
       reason:'Extended thinking activates only for nuanced judgment — avoids the energy cost of a full frontier reasoning model.',
       fallback:{ tool:'M365 Copilot Word (Think Deeper)', vendor:'m365', reason:'Think Deeper applies extended reasoning for complex drafts requiring nuanced judgment — no manual model selection.' },
       lastValidated:'2026-05-01',
@@ -163,7 +163,7 @@ const recommendations = {
       },
     },
     complex: {
-      rating:'🟡', tool:'Claude Sonnet 3.7', vendor:'claude',
+      rating:'🟠', tool:'Claude Sonnet 3.7', vendor:'claude',
       reason:'Extended thinking supports multi-system design with interdependencies — no need for a frontier model.',
       fallback:{ tool:'M365 Copilot Word (Think Deeper)', vendor:'m365', reason:'Think Deeper supports complex multi-system design with interdependencies — use for documents requiring structured reasoning.' },
       lastValidated:'2026-05-01',
@@ -295,19 +295,19 @@ const recommendations = {
   },
   vid_caption: {
     simple: {
-      rating:'🟡', tool:'Platform-embedded captioning (Teams / Zoom)', vendor:null,
+      rating:'🟢', tool:'Platform-embedded captioning (Teams / Zoom)', vendor:null,
       reason:'Auto-captioning runs inside your meeting tool — no additional model call or file upload required.',
       fallback:{ tool:'Zoom or Meet closed captions', vendor:null, reason:'Platform-native captioning runs inside the tool — no external model or file upload required.' },
       lastValidated:'2026-05-01',
     },
     moderate: {
-      rating:'🟡', tool:'Microsoft Stream (auto-transcription)', vendor:null,
+      rating:'🟢', tool:'Microsoft Stream (auto-transcription)', vendor:null,
       reason:'Handles recorded content natively — no external upload or separate service required.',
       fallback:{ tool:'Microsoft Stream enhanced transcription', vendor:null, reason:'Handles recorded content natively with improved accuracy — no external service required.' },
       lastValidated:'2026-05-01',
     },
     complex: {
-      rating:'🟡', tool:'Microsoft Stream (auto-transcription) + manual review', vendor:null,
+      rating:'🟢', tool:'Microsoft Stream (auto-transcription) + manual review', vendor:null,
       reason:'Platform-native transcription for multi-speaker or multilingual content — manual review keeps errors from the final output without routing to an out-of-scope service.',
       fallback:{ tool:'Teams Premium transcription + manual review', vendor:null, reason:'Enhanced diarisation within the Microsoft ecosystem for long-form or complex video.' },
       lastValidated:'2026-05-01',
@@ -342,7 +342,7 @@ const recommendations = {
   },
   code_explain: {
     simple: {
-      rating:'🟡', tool:'Claude Haiku 3.5', vendor:'claude',
+      rating:'🟢', tool:'Claude Haiku 3.5', vendor:'claude',
       reason:'Code explanation is read-only text generation — the smallest capable model handles snippet and function-level Q&A well.',
       fallback:{ tool:'ChatGPT Auto', vendor:'chatgpt', reason:'Auto mode routes simple code Q&A to GPT-5.5 Instant automatically.' },
       lastValidated:'2026-05-01',
@@ -368,7 +368,7 @@ const recommendations = {
       lastValidated:'2026-05-01',
     },
     moderate: {
-      rating:'🟠', tool:'Claude Sonnet 3.5', vendor:'claude',
+      rating:'🟡', tool:'Claude Sonnet 3.5', vendor:'claude',
       reason:'Handles multi-function code, refactoring, and moderate debugging — keep context scoped to relevant files only.',
       fallback:{ tool:'ChatGPT Auto', vendor:'chatgpt', reason:'Auto mode handles multi-function code and refactoring; avoid enabling reasoning mode for standard tasks.' },
       lastValidated:'2026-05-01',
