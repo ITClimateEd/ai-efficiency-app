@@ -787,8 +787,22 @@
     return order.find(v => vendors.has(v) && patterns[v] && patterns[v]()) || null;
   }
 
+  // When vendor filter is active and the primary vendor isn't selected, check vendorAlts for a match
+  function resolveNode(taskId, complexity) {
+    let node = recommendations[taskId] && recommendations[taskId][complexity];
+    if (!node) return null;
+    if (state.vendors.size > 0 && node.vendor && !state.vendors.has(node.vendor) && node.vendorAlts) {
+      const ALT_ORDER = ['chatgpt','m365','claudecode','cursor','githubcopilot','codex'];
+      const altVendor = ALT_ORDER.find(v => state.vendors.has(v) && node.vendorAlts[v]);
+      if (altVendor) {
+        node = Object.assign({ lastValidated: node.lastValidated }, node.vendorAlts[altVendor], { vendor: altVendor });
+      }
+    }
+    return node;
+  }
+
   function renderResult() {
-    const node = recommendations[state.task] && recommendations[state.task][state.complexity];
+    const node = resolveNode(state.task, state.complexity);
     if (!node) return;
 
     // GR-01/GR-03: compute vendor match once — used for gap check, tool label, and GR-11
@@ -967,7 +981,7 @@
         ].join('\n');
       }
     } else {
-    const node = recommendations[state.task] && recommendations[state.task][state.complexity];
+    const node = resolveNode(state.task, state.complexity);
     if (node) {
       const taskLabel = (tasks[state.modality] || []).find(t => t.id === state.task);
       const d = new Date(node.lastValidated + 'T00:00:00');

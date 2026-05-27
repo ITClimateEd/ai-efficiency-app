@@ -3,8 +3,8 @@
 
 // Bump REGISTRY_VERSION on every registry change (patch = correction, minor = new model/mode, major = structural)
 // Update REGISTRY_LAST_UPDATED and add an entry to CHANGELOG.md at the same time.
-const REGISTRY_VERSION      = '1.3.0';
-const REGISTRY_LAST_UPDATED = '2026-05-22';
+const REGISTRY_VERSION      = '1.5.0';
+const REGISTRY_LAST_UPDATED = '2026-05-27';
 
 const vendorLabels = {
   chatgpt: 'ChatGPT', claude: 'Claude', codex: 'Codex',
@@ -91,18 +91,27 @@ const recommendations = {
       reason:'Lightweight model purpose-built for short, clear text — no reasoning overhead needed for emails, summaries, or label generation.',
       fallback:{ tool:'M365 Copilot Word (Auto)', vendor:'m365', reason:'Auto selects the most efficient Word mode for short drafts, emails, and summaries — no model configuration needed.' },
       lastValidated:'2026-05-01',
+      vendorAlts:{
+        chatgpt:{ tool:'ChatGPT Auto', rating:'🟢', reason:'Auto routing selects the efficient tier for short text — no manual model configuration required.', fallback:{ tool:'M365 Copilot Word (Auto)', vendor:'m365', reason:'Auto selects the most efficient Word mode for short drafts, emails, and summaries — no model configuration needed.' } },
+      },
     },
     moderate: {
       rating:'🟡', tool:'Claude Sonnet 3.5', vendor:'claude',
       reason:'Mid-tier model handles multi-step drafts and tone adjustment without reaching for a reasoning model.',
       fallback:{ tool:'M365 Copilot Word (Quick Response)', vendor:'m365', reason:'Quick Response handles multi-step drafts and tone adjustments with minimal processing overhead.' },
       lastValidated:'2026-05-01',
+      vendorAlts:{
+        chatgpt:{ tool:'ChatGPT Auto', rating:'🟡', reason:'Auto handles multi-step drafts and tone adjustments — reasoning mode activates only when needed.', fallback:{ tool:'M365 Copilot Word (Quick Response)', vendor:'m365', reason:'Quick Response handles multi-step drafts and tone adjustments with minimal processing overhead.' } },
+      },
     },
     complex: {
       rating:'🟡', tool:'Claude Sonnet 3.7', vendor:'claude',
       reason:'Extended thinking activates only for nuanced judgment — avoids the energy cost of a full frontier reasoning model.',
       fallback:{ tool:'M365 Copilot Word (Think Deeper)', vendor:'m365', reason:'Think Deeper applies extended reasoning for complex drafts requiring nuanced judgment — no manual model selection.' },
       lastValidated:'2026-05-01',
+      vendorAlts:{
+        chatgpt:{ tool:'GPT-5.5 Thinking', rating:'🟡', reason:'Thinking mode provides targeted reasoning for complex drafts with nuanced judgment — lower overhead than always-on reasoning.', fallback:{ tool:'M365 Copilot Word (Think Deeper)', vendor:'m365', reason:'Think Deeper applies extended reasoning for complex drafts requiring nuanced judgment — no manual model selection.' } },
+      },
     },
   },
   analyze: {
@@ -111,18 +120,27 @@ const recommendations = {
       reason:'Factual lookups and single-source summaries are well within a small model\'s capability — no reasoning loop needed.',
       fallback:{ tool:'M365 Copilot Word (Auto)', vendor:'m365', reason:'Auto mode handles factual lookups and single-source summaries efficiently within Word.' },
       lastValidated:'2026-05-01',
+      vendorAlts:{
+        chatgpt:{ tool:'ChatGPT Auto', rating:'🟢', reason:'Auto routes simple factual lookups and single-source summaries to the fast tier automatically.', fallback:{ tool:'M365 Copilot Word (Auto)', vendor:'m365', reason:'Auto mode handles factual lookups and single-source summaries efficiently within Word.' } },
+      },
     },
     moderate: {
       rating:'🟡', tool:'Claude Sonnet 3.5', vendor:'claude',
       reason:'Handles multi-source synthesis and structured comparison without triggering a reasoning loop.',
       fallback:{ tool:'M365 Copilot Word (Quick Response)', vendor:'m365', reason:'Quick Response covers multi-source synthesis and structured comparison within Word.' },
       lastValidated:'2026-05-01',
+      vendorAlts:{
+        chatgpt:{ tool:'ChatGPT Auto', rating:'🟡', reason:'Auto handles multi-source synthesis and structured comparison without overprovisioning.', fallback:{ tool:'M365 Copilot Word (Quick Response)', vendor:'m365', reason:'Quick Response covers multi-source synthesis and structured comparison within Word.' } },
+      },
     },
     complex: {
       rating:'🟠', tool:'Claude Sonnet 3.7 (Extended Thinking)', vendor:'claude',
       reason:'Reasoning activates on demand for deep synthesis — more efficient than routing a standard query to a frontier model by default.',
       fallback:{ tool:'M365 Copilot Word (Think Deeper)', vendor:'m365', reason:'Think Deeper applies extended reasoning for deep synthesis — no manual model selection required.' },
       lastValidated:'2026-05-01',
+      vendorAlts:{
+        chatgpt:{ tool:'GPT-5.5 Thinking', rating:'🟠', reason:'Thinking mode activates on demand for deep synthesis — more efficient than routing every query to a frontier model by default.', fallback:{ tool:'M365 Copilot Word (Think Deeper)', vendor:'m365', reason:'Think Deeper applies extended reasoning for deep synthesis — no manual model selection required.' } },
+      },
     },
   },
   design: {
@@ -131,18 +149,27 @@ const recommendations = {
       reason:'Spec writing and design briefs are structured text tasks — a small model handles them without overprovisioning.',
       fallback:{ tool:'M365 Copilot Word (Auto)', vendor:'m365', reason:'Auto mode handles simple specs and design briefs within Word.' },
       lastValidated:'2026-05-01',
+      vendorAlts:{
+        chatgpt:{ tool:'ChatGPT Auto', rating:'🟢', reason:'Auto handles simple specs and design briefs without reasoning overhead.', fallback:{ tool:'M365 Copilot Word (Auto)', vendor:'m365', reason:'Auto mode handles simple specs and design briefs within Word.' } },
+      },
     },
     moderate: {
       rating:'🟡', tool:'Claude Sonnet 3.5', vendor:'claude',
       reason:'Handles iterative design documents and system specs efficiently — mid-tier is well matched for this output type.',
       fallback:{ tool:'M365 Copilot Word (Quick Response)', vendor:'m365', reason:'Quick Response handles iterative design documents and system specs efficiently.' },
       lastValidated:'2026-05-01',
+      vendorAlts:{
+        chatgpt:{ tool:'ChatGPT Auto', rating:'🟡', reason:'Auto handles iterative design documents and system specs without overprovisioning.', fallback:{ tool:'M365 Copilot Word (Quick Response)', vendor:'m365', reason:'Quick Response handles iterative design documents and system specs efficiently.' } },
+      },
     },
     complex: {
       rating:'🟡', tool:'Claude Sonnet 3.7', vendor:'claude',
       reason:'Extended thinking supports multi-system design with interdependencies — no need for a frontier model.',
       fallback:{ tool:'M365 Copilot Word (Think Deeper)', vendor:'m365', reason:'Think Deeper supports complex multi-system design with interdependencies — use for documents requiring structured reasoning.' },
       lastValidated:'2026-05-01',
+      vendorAlts:{
+        chatgpt:{ tool:'GPT-5.5 Thinking', rating:'🟡', reason:'Thinking mode supports multi-system design with interdependencies — no need for a full frontier model.', fallback:{ tool:'M365 Copilot Word (Think Deeper)', vendor:'m365', reason:'Think Deeper supports complex multi-system design with interdependencies — use for documents requiring structured reasoning.' } },
+      },
     },
   },
   image_analyze: {
@@ -186,8 +213,8 @@ const recommendations = {
       lastValidated:'2026-05-01',
     },
     complex: {
-      rating:'🔴', tool:'DALL-E 3 (HD)', vendor:'chatgpt',
-      reason:'HD image generation has high compute cost and should be reserved only for production-bound, high-detail visuals with no stock alternative. Minimise iteration with precise prompts from the start.',
+      rating:'🟣', tool:'DALL-E 3 (HD)', vendor:'chatgpt',
+      reason:'HD image generation has very high compute cost and should be reserved only for production-bound, high-detail visuals with no stock alternative. Minimise iteration with precise prompts from the start.',
       fallback:{ tool:'Gemini Pro (Image)', vendor:null, reason:'Alternative for high-detail generation with broader style control.' },
       lastValidated:'2026-05-01',
     },
@@ -201,7 +228,7 @@ const recommendations = {
     },
     // simple/moderate/complex = GR-12 No path: no existing assets; explicit energy cost below
     simple: {
-      rating:'🔴', tool:'PowerPoint Designer (non-AI layouts)', vendor:null,
+      rating:'🟢', tool:'PowerPoint Designer (non-AI layouts)', vendor:null,
       reason:'Built-in SmartArt and design templates handle simple slide visuals with zero AI generation cost.',
       fallback:{ tool:'M365 Copilot PowerPoint (Auto)', vendor:'m365', reason:'If AI generation is needed, Auto selects the most efficient eligible model.' },
       lastValidated:'2026-05-01',
@@ -228,21 +255,21 @@ const recommendations = {
     },
     // simple/moderate/complex = GR-12 No path: native tools insufficient; explicit energy cost below
     simple: {
-      rating:'🟣', tool:'Microsoft AI Image 2 Efficient', vendor:'m365',
-      reason:'AI image editing carries high compute cost even for simple transforms. The efficient model tier minimises this overhead — use only when native editing tools cannot achieve the desired result.',
-      fallback:{ tool:'Gemini Flash (Image edit)', vendor:null, reason:'Fast edits for non-critical, simple modifications.' },
+      rating:'🟣', tool:'DALL-E 3 (inpainting, standard quality)', vendor:'chatgpt',
+      reason:'AI image editing carries high compute cost even for simple adjustments. Inpainting at standard quality keeps overhead as low as possible — write a precise prompt to minimise retries.',
+      fallback:{ tool:'Gemini Flash (Image)', vendor:null, reason:'Lighter alternative for low-stakes, non-critical image edits.' },
       lastValidated:'2026-05-01',
     },
     moderate: {
       rating:'🟣', tool:'DALL-E 3 (inpainting, standard quality)', vendor:'chatgpt',
       reason:'AI inpainting is energy-intensive — each failed pass is a full generation. Standard quality reduces overhead; write a precise prompt before starting to minimise iteration count.',
-      fallback:{ tool:'Gemini Pro (Image edit)', vendor:null, reason:'Good quality for structured content replacement and inpainting.' },
+      fallback:{ tool:'Gemini Pro (Image)', vendor:null, reason:'Higher fidelity for structured content replacement and complex inpainting.' },
       lastValidated:'2026-05-01',
     },
     complex: {
-      rating:'🟣', tool:'DALL-E 3 (outpainting / multi-pass)', vendor:'chatgpt',
-      reason:'Multi-pass AI image transforms have high cumulative compute cost. Each additional pass multiplies the energy overhead — start with the most precise prompt possible to minimise iterations.',
-      fallback:{ tool:'Gemini Pro (Image edit)', vendor:null, reason:'Handles transformations requiring compositional understanding.' },
+      rating:'🟣', tool:'DALL-E 3 (HD)', vendor:'chatgpt',
+      reason:'Complex AI image editing at high quality carries significant compute cost. HD tier provides the fidelity needed for detailed transforms — minimise iterations with a precise prompt before starting.',
+      fallback:{ tool:'Gemini Pro (Image)', vendor:null, reason:'Handles complex transformations requiring compositional understanding.' },
       lastValidated:'2026-05-01',
     },
   },
@@ -295,21 +322,21 @@ const recommendations = {
     },
     // simple/moderate/complex = GR-12 No path: no existing media, explicit energy cost stated
     simple: {
-      rating:'🟣', tool:'Slide-based animation (PowerPoint / Canva)', vendor:null,
-      reason:'AI video generation carries among the highest compute costs of any enterprise AI task — a short clip consumes 10–50× the energy of a text request. Slide-based animations achieve comparable results for most internal and training content at a fraction of the energy cost.',
+      rating:'🟢', tool:'Slide-based animation (PowerPoint / Keynote)', vendor:null,
+      reason:'AI video generation carries among the highest compute costs of any enterprise AI task — a short clip consumes 10–50× the energy of a text request. Slide-based animations achieve comparable results for most internal and training content at zero AI cost.',
       fallback:{ tool:'Screen recording with voiceover', vendor:null, reason:'Record a narrated walkthrough — no AI generation cost, immediate output, fully controllable.' },
       lastValidated:'2026-05-01',
     },
     moderate: {
-      rating:'🟣', tool:'Professional video production', vendor:null,
+      rating:'🟢', tool:'Professional video production', vendor:null,
       reason:'AI video generation at this scale consumes extreme compute resources — among the highest of any enterprise AI task. No approved AI video tool is in the current shortlist. Professional production delivers better quality control and is typically more cost-effective than iterative AI generation.',
-      fallback:{ tool:'Motion graphics (Canva / After Effects)', vendor:null, reason:'Purpose-built animation tools avoid AI overhead while producing high-quality results for training and marketing content.' },
+      fallback:{ tool:'Stock footage + motion graphics', vendor:null, reason:'Combine licensed stock footage with motion graphics tools — zero AI cost and immediate output for training and marketing content.' },
       lastValidated:'2026-05-01',
     },
     complex: {
-      rating:'🟣', tool:'Professional video production', vendor:null,
+      rating:'🟢', tool:'Professional video production', vendor:null,
       reason:'Complex AI video generation has extreme energy overhead and no approved AI video tool exists in the current shortlist. Professional human production provides full creative control without the environmental and cost trade-offs of iterative AI generation.',
-      fallback:{ tool:'Specialized AI video service (evaluate with IT)', vendor:null, reason:'If AI generation is required, evaluate dedicated enterprise video tools with IT and sustainability teams before proceeding.' },
+      fallback:{ tool:'Stock footage + motion graphics', vendor:null, reason:'If budget or timeline limits professional production, combine licensed stock footage with motion graphics tools — zero AI cost, immediate output.' },
       lastValidated:'2026-05-01',
     },
   },
