@@ -6,6 +6,18 @@
 const REGISTRY_VERSION      = '1.6.0';
 const REGISTRY_LAST_UPDATED = '2026-05-27'; // P3/P4 rating corrections
 
+const RESEARCH_NOTES = {
+  primarySource: 'Jegham et al. (2025) — How Hungry is AI? Benchmarking Energy, Water, and Carbon Footprint of LLM Inference. arXiv:2505.09598',
+  keyFindings: [
+    'Most energy-intensive models exceed 29 Wh per long prompt — 65x the most efficient systems',
+    'Inference accounts for up to 90% of total AI lifecycle energy — model selection at query time is the highest-leverage intervention',
+    'Prompt length is a primary cost driver — short queries at scale aggregate to significant annual consumption',
+    'Reasoning models cost disproportionately more — activate only when task complexity justifies it',
+    'Agentic workflows multiply inference cost — each tool call or loop iteration is a separate model request',
+  ],
+  limitation: 'Energy ratings in this registry reflect relative compute cost (model size + reasoning overhead). Water and carbon footprints vary by provider datacenter and are not currently surfaced per recommendation.',
+};
+
 const vendorLabels = {
   chatgpt: 'ChatGPT', claude: 'Claude', codex: 'Codex',
   claudecode: 'Claude Code', cursor: 'Cursor',
@@ -87,109 +99,109 @@ const m365OfficeModels = [
 const recommendations = {
   write: {
     simple: {
-      rating:'🟢', tool:'Claude Haiku 3.5', vendor:'claude',
+      rating:'🟢', tool:'Claude Haiku 4.5', vendor:'claude',
       reason:'Lightweight model purpose-built for short, clear text — no reasoning overhead needed for emails, summaries, or label generation.',
       fallback:{ tool:'M365 Copilot Word (Auto)', vendor:'m365', reason:'Auto selects the most efficient Word mode for short drafts, emails, and summaries — no model configuration needed.' },
-      lastValidated:'2026-05-01',
+      lastValidated:'2026-05-27',
       vendorAlts:{
         chatgpt:{ tool:'ChatGPT Auto', rating:'🟢', reason:'Auto routing selects the efficient tier for short text — no manual model configuration required.', fallback:{ tool:'M365 Copilot Word (Auto)', vendor:'m365', reason:'Auto selects the most efficient Word mode for short drafts, emails, and summaries — no model configuration needed.' } },
       },
     },
     moderate: {
-      rating:'🟡', tool:'Claude Sonnet 3.5', vendor:'claude',
+      rating:'🟡', tool:'Claude Sonnet 4.6', vendor:'claude',
       reason:'Mid-tier model handles multi-step drafts and tone adjustment without reaching for a reasoning model.',
       fallback:{ tool:'M365 Copilot Word (Quick Response)', vendor:'m365', reason:'Quick Response handles multi-step drafts and tone adjustments with minimal processing overhead.' },
-      lastValidated:'2026-05-01',
+      lastValidated:'2026-05-27',
       vendorAlts:{
         chatgpt:{ tool:'ChatGPT Auto', rating:'🟡', reason:'Auto handles multi-step drafts and tone adjustments — reasoning mode activates only when needed.', fallback:{ tool:'M365 Copilot Word (Quick Response)', vendor:'m365', reason:'Quick Response handles multi-step drafts and tone adjustments with minimal processing overhead.' } },
       },
     },
     complex: {
-      rating:'🟠', tool:'Claude Sonnet 3.7', vendor:'claude',
-      reason:'Extended thinking activates only for nuanced judgment — avoids the energy cost of a full frontier reasoning model.',
-      fallback:{ tool:'M365 Copilot Word (Think Deeper)', vendor:'m365', reason:'Think Deeper applies extended reasoning for complex drafts requiring nuanced judgment — no manual model selection.' },
-      lastValidated:'2026-05-01',
+      rating:'🟠', tool:'Claude Sonnet 4.6', vendor:'claude',
+      reason:'Extended thinking activates only for nuanced judgment — avoids the energy cost of a full frontier reasoning model. Reasoning models consume significantly more energy per query than standard models — activate only when task complexity justifies it.',
+      fallback:{ tool:'M365 Copilot Word (Think Deeper)', vendor:'m365', reason:'Think Deeper applies extended reasoning for complex drafts requiring nuanced judgment — no manual model selection. Reasoning models consume significantly more energy per query than standard models — activate only when task complexity justifies it.' },
+      lastValidated:'2026-05-27',
       vendorAlts:{
-        chatgpt:{ tool:'GPT-5.5 Thinking', rating:'🟡', reason:'Thinking mode provides targeted reasoning for complex drafts with nuanced judgment — lower overhead than always-on reasoning.', fallback:{ tool:'M365 Copilot Word (Think Deeper)', vendor:'m365', reason:'Think Deeper applies extended reasoning for complex drafts requiring nuanced judgment — no manual model selection.' } },
+        chatgpt:{ tool:'GPT-5.5 Thinking', rating:'🟡', reason:'Thinking mode provides targeted reasoning for complex drafts with nuanced judgment — lower overhead than always-on reasoning. Reasoning models consume significantly more energy per query than standard models — activate only when task complexity justifies it.', fallback:{ tool:'M365 Copilot Word (Think Deeper)', vendor:'m365', reason:'Think Deeper applies extended reasoning for complex drafts requiring nuanced judgment — no manual model selection. Reasoning models consume significantly more energy per query than standard models — activate only when task complexity justifies it.' } },
       },
     },
   },
   analyze: {
     simple: {
-      rating:'🟢', tool:'Claude Haiku 3.5', vendor:'claude',
+      rating:'🟢', tool:'Claude Haiku 4.5', vendor:'claude',
       reason:'Factual lookups and single-source summaries are well within a small model\'s capability — no reasoning loop needed.',
       fallback:{ tool:'M365 Copilot Word (Auto)', vendor:'m365', reason:'Auto mode handles factual lookups and single-source summaries efficiently within Word.' },
-      lastValidated:'2026-05-01',
+      lastValidated:'2026-05-27',
       vendorAlts:{
         chatgpt:{ tool:'ChatGPT Auto', rating:'🟢', reason:'Auto routes simple factual lookups and single-source summaries to the fast tier automatically.', fallback:{ tool:'M365 Copilot Word (Auto)', vendor:'m365', reason:'Auto mode handles factual lookups and single-source summaries efficiently within Word.' } },
       },
     },
     moderate: {
-      rating:'🟡', tool:'Claude Sonnet 3.5', vendor:'claude',
+      rating:'🟡', tool:'Claude Sonnet 4.6', vendor:'claude',
       reason:'Handles multi-source synthesis and structured comparison without triggering a reasoning loop.',
       fallback:{ tool:'M365 Copilot Word (Quick Response)', vendor:'m365', reason:'Quick Response covers multi-source synthesis and structured comparison within Word.' },
-      lastValidated:'2026-05-01',
+      lastValidated:'2026-05-27',
       vendorAlts:{
         chatgpt:{ tool:'ChatGPT Auto', rating:'🟡', reason:'Auto handles multi-source synthesis and structured comparison without overprovisioning.', fallback:{ tool:'M365 Copilot Word (Quick Response)', vendor:'m365', reason:'Quick Response covers multi-source synthesis and structured comparison within Word.' } },
       },
     },
     complex: {
-      rating:'🟠', tool:'Claude Sonnet 3.7 (Extended Thinking)', vendor:'claude',
-      reason:'Reasoning activates on demand for deep synthesis — more efficient than routing a standard query to a frontier model by default.',
-      fallback:{ tool:'M365 Copilot Word (Think Deeper)', vendor:'m365', reason:'Think Deeper applies extended reasoning for deep synthesis — no manual model selection required.' },
-      lastValidated:'2026-05-01',
+      rating:'🟠', tool:'Claude Sonnet 4.6 (Extended Thinking)', vendor:'claude',
+      reason:'Reasoning activates on demand for deep synthesis — more efficient than routing a standard query to a frontier model by default. Reasoning models consume significantly more energy per query than standard models — activate only when task complexity justifies it.',
+      fallback:{ tool:'M365 Copilot Word (Think Deeper)', vendor:'m365', reason:'Think Deeper applies extended reasoning for deep synthesis — no manual model selection required. Reasoning models consume significantly more energy per query than standard models — activate only when task complexity justifies it.' },
+      lastValidated:'2026-05-27',
       vendorAlts:{
-        chatgpt:{ tool:'GPT-5.5 Thinking', rating:'🟠', reason:'Thinking mode activates on demand for deep synthesis — more efficient than routing every query to a frontier model by default.', fallback:{ tool:'M365 Copilot Word (Think Deeper)', vendor:'m365', reason:'Think Deeper applies extended reasoning for deep synthesis — no manual model selection required.' } },
+        chatgpt:{ tool:'GPT-5.5 Thinking', rating:'🟠', reason:'Thinking mode activates on demand for deep synthesis — more efficient than routing every query to a frontier model by default. Reasoning models consume significantly more energy per query than standard models — activate only when task complexity justifies it.', fallback:{ tool:'M365 Copilot Word (Think Deeper)', vendor:'m365', reason:'Think Deeper applies extended reasoning for deep synthesis — no manual model selection required. Reasoning models consume significantly more energy per query than standard models — activate only when task complexity justifies it.' } },
       },
     },
   },
   design: {
     simple: {
-      rating:'🟢', tool:'Claude Haiku 3.5', vendor:'claude',
+      rating:'🟢', tool:'Claude Haiku 4.5', vendor:'claude',
       reason:'Spec writing and design briefs are structured text tasks — a small model handles them without overprovisioning.',
       fallback:{ tool:'M365 Copilot Word (Auto)', vendor:'m365', reason:'Auto mode handles simple specs and design briefs within Word.' },
-      lastValidated:'2026-05-01',
+      lastValidated:'2026-05-27',
       vendorAlts:{
         chatgpt:{ tool:'ChatGPT Auto', rating:'🟢', reason:'Auto handles simple specs and design briefs without reasoning overhead.', fallback:{ tool:'M365 Copilot Word (Auto)', vendor:'m365', reason:'Auto mode handles simple specs and design briefs within Word.' } },
       },
     },
     moderate: {
-      rating:'🟡', tool:'Claude Sonnet 3.5', vendor:'claude',
+      rating:'🟡', tool:'Claude Sonnet 4.6', vendor:'claude',
       reason:'Handles iterative design documents and system specs efficiently — mid-tier is well matched for this output type.',
       fallback:{ tool:'M365 Copilot Word (Quick Response)', vendor:'m365', reason:'Quick Response handles iterative design documents and system specs efficiently.' },
-      lastValidated:'2026-05-01',
+      lastValidated:'2026-05-27',
       vendorAlts:{
         chatgpt:{ tool:'ChatGPT Auto', rating:'🟡', reason:'Auto handles iterative design documents and system specs without overprovisioning.', fallback:{ tool:'M365 Copilot Word (Quick Response)', vendor:'m365', reason:'Quick Response handles iterative design documents and system specs efficiently.' } },
       },
     },
     complex: {
-      rating:'🟠', tool:'Claude Sonnet 3.7', vendor:'claude',
-      reason:'Extended thinking supports multi-system design with interdependencies — no need for a frontier model.',
-      fallback:{ tool:'M365 Copilot Word (Think Deeper)', vendor:'m365', reason:'Think Deeper supports complex multi-system design with interdependencies — use for documents requiring structured reasoning.' },
-      lastValidated:'2026-05-01',
+      rating:'🟠', tool:'Claude Sonnet 4.6', vendor:'claude',
+      reason:'Extended thinking supports multi-system design with interdependencies — no need for a frontier model. Reasoning models consume significantly more energy per query than standard models — activate only when task complexity justifies it.',
+      fallback:{ tool:'M365 Copilot Word (Think Deeper)', vendor:'m365', reason:'Think Deeper supports complex multi-system design with interdependencies — use for documents requiring structured reasoning. Reasoning models consume significantly more energy per query than standard models — activate only when task complexity justifies it.' },
+      lastValidated:'2026-05-27',
       vendorAlts:{
-        chatgpt:{ tool:'GPT-5.5 Thinking', rating:'🟡', reason:'Thinking mode supports multi-system design with interdependencies — no need for a full frontier model.', fallback:{ tool:'M365 Copilot Word (Think Deeper)', vendor:'m365', reason:'Think Deeper supports complex multi-system design with interdependencies — use for documents requiring structured reasoning.' } },
+        chatgpt:{ tool:'GPT-5.5 Thinking', rating:'🟡', reason:'Thinking mode supports multi-system design with interdependencies — no need for a full frontier model. Reasoning models consume significantly more energy per query than standard models — activate only when task complexity justifies it.', fallback:{ tool:'M365 Copilot Word (Think Deeper)', vendor:'m365', reason:'Think Deeper supports complex multi-system design with interdependencies — use for documents requiring structured reasoning. Reasoning models consume significantly more energy per query than standard models — activate only when task complexity justifies it.' } },
       },
     },
   },
   image_analyze: {
     simple: {
-      rating:'🟠', tool:'Claude Haiku 3.5 (vision)', vendor:'claude',
+      rating:'🟠', tool:'Claude Haiku 4.5 (vision)', vendor:'claude',
       reason:'Small vision-capable model handles clear image Q&A and object classification without a heavyweight multimodal pipeline.',
       fallback:{ tool:'ChatGPT Auto', vendor:'chatgpt', reason:'Auto mode routes simple image Q&A to the appropriate GPT-5.5 tier — vision is built into the family.' },
-      lastValidated:'2026-05-01',
+      lastValidated:'2026-05-27',
     },
     moderate: {
-      rating:'🟠', tool:'Claude Sonnet 3.5 (vision)', vendor:'claude',
+      rating:'🟠', tool:'Claude Sonnet 4.6 (vision)', vendor:'claude',
       reason:'Mid-tier multimodal model for structured image analysis, chart reading, and detailed descriptions.',
       fallback:{ tool:'ChatGPT Auto', vendor:'chatgpt', reason:'Auto mode handles document and chart analysis; vision capability is standard across the GPT-5.5 family.' },
-      lastValidated:'2026-05-01',
+      lastValidated:'2026-05-27',
     },
     complex: {
-      rating:'🟠', tool:'Claude Sonnet 3.5 (vision)', vendor:'claude',
+      rating:'🟠', tool:'Claude Sonnet 4.6 (vision)', vendor:'claude',
       reason:'Even complex tasks — multi-image comparison, dense diagram reading — stay within Sonnet\'s range; no frontier model needed.',
       fallback:{ tool:'ChatGPT Auto', vendor:'chatgpt', reason:'Auto mode manages complex visual inputs; upgrade to GPT-5.5 Thinking only if analytical reasoning over the image is required.' },
-      lastValidated:'2026-05-01',
+      lastValidated:'2026-05-27',
     },
   },
   img_gen_chat: {
@@ -342,42 +354,42 @@ const recommendations = {
   },
   code_explain: {
     simple: {
-      rating:'🟢', tool:'Claude Haiku 3.5', vendor:'claude',
+      rating:'🟢', tool:'Claude Haiku 4.5', vendor:'claude',
       reason:'Code explanation is read-only text generation — the smallest capable model handles snippet and function-level Q&A well.',
       fallback:{ tool:'ChatGPT Auto', vendor:'chatgpt', reason:'Auto mode routes simple code Q&A to GPT-5.5 Instant automatically.' },
-      lastValidated:'2026-05-01',
+      lastValidated:'2026-05-27',
     },
     moderate: {
-      rating:'🟡', tool:'Claude Sonnet 3.5', vendor:'claude',
+      rating:'🟡', tool:'Claude Sonnet 4.6', vendor:'claude',
       reason:'Handles architecture explanation and multi-file review without a reasoning model.',
       fallback:{ tool:'ChatGPT Auto', vendor:'chatgpt', reason:'Auto mode is sufficient for architecture explanation and multi-file code review.' },
-      lastValidated:'2026-05-01',
+      lastValidated:'2026-05-27',
     },
     complex: {
-      rating:'🟡', tool:'Claude Sonnet 3.5', vendor:'claude',
+      rating:'🟡', tool:'Claude Sonnet 4.6', vendor:'claude',
       reason:'Even complex architecture review is read-only — no reasoning model needed; Sonnet covers large-context code analysis effectively.',
       fallback:{ tool:'ChatGPT Auto', vendor:'chatgpt', reason:'Auto mode handles large-context code review; switch to GPT-5.5 Thinking if reasoning over the architecture is needed.' },
-      lastValidated:'2026-05-01',
+      lastValidated:'2026-05-27',
     },
   },
   code_write: {
     simple: {
-      rating:'🟢', tool:'Claude Haiku 3.5', vendor:'claude',
+      rating:'🟢', tool:'Claude Haiku 4.5', vendor:'claude',
       reason:'Single-function generation and simple bug fixes are within a small model\'s range — inline completion has the lowest context overhead.',
       fallback:{ tool:'ChatGPT Auto', vendor:'chatgpt', reason:'Auto mode routes single-function code tasks to GPT-5.5 Instant.' },
-      lastValidated:'2026-05-01',
+      lastValidated:'2026-05-27',
     },
     moderate: {
-      rating:'🟡', tool:'Claude Sonnet 3.5', vendor:'claude',
+      rating:'🟡', tool:'Claude Sonnet 4.6', vendor:'claude',
       reason:'Handles multi-function code, refactoring, and moderate debugging — keep context scoped to relevant files only.',
       fallback:{ tool:'ChatGPT Auto', vendor:'chatgpt', reason:'Auto mode handles multi-function code and refactoring; avoid enabling reasoning mode for standard tasks.' },
-      lastValidated:'2026-05-01',
+      lastValidated:'2026-05-27',
     },
     complex: {
-      rating:'🟠', tool:'Claude Sonnet 3.7', vendor:'claude',
-      reason:'Extended thinking resolves complex cross-system bugs — cheaper and more targeted than defaulting to Opus for difficult tasks.',
-      fallback:{ tool:'GPT-5.5 Thinking', vendor:'chatgpt', reason:'Thinking mode provides targeted reasoning for complex multi-step debugging — lower cost than Pro Reasoning mode.' },
-      lastValidated:'2026-05-01',
+      rating:'🟠', tool:'Claude Sonnet 4.6', vendor:'claude',
+      reason:'Extended thinking resolves complex cross-system bugs — cheaper and more targeted than defaulting to Opus for difficult tasks. Reasoning models consume significantly more energy per query than standard models — activate only when task complexity justifies it.',
+      fallback:{ tool:'GPT-5.5 Thinking', vendor:'chatgpt', reason:'Thinking mode provides targeted reasoning for complex multi-step debugging — lower cost than Pro Reasoning mode. Reasoning models consume significantly more energy per query than standard models — activate only when task complexity justifies it.' },
+      lastValidated:'2026-05-27',
     },
   },
   code_build: {
@@ -403,21 +415,21 @@ const recommendations = {
   code_automate: {
     simple: {
       rating:'🔴', tool:'Claude Code (Haiku, agent mode)', vendor:'claudecode',
-      reason:'Simple automations — file transforms, single-API integrations — are well within Haiku\'s capability range.',
+      reason:'Simple automations — file transforms, single-API integrations — are well within Haiku\'s capability range. Agentic workflows accumulate inference cost multiplicatively — each tool call or iteration is a separate model request. Limit parallel agents and batch related tasks to reduce total query count.',
       fallback:{ tool:'GitHub Copilot (Auto)', vendor:'githubcopilot', reason:'Auto mode routes simple agentic tasks to the most efficient eligible model — no manual model selection needed.' },
-      lastValidated:'2026-05-01',
+      lastValidated:'2026-05-27',
     },
     moderate: {
       rating:'🔴', tool:'Claude Code (Sonnet, agent mode)', vendor:'claudecode',
-      reason:'Standard automation — use /clear between workflows and run tasks sequentially rather than with parallel agents.',
+      reason:'Standard automation — use /clear between workflows and run tasks sequentially rather than with parallel agents. Agentic workflows accumulate inference cost multiplicatively — each tool call or iteration is a separate model request. Limit parallel agents and batch related tasks to reduce total query count.',
       fallback:{ tool:'Cursor (Claude Sonnet 4.5)', vendor:'cursor', reason:'Sonnet 4.5 handles writing and documentation automation within Cursor — set iteration limits and batch related tasks into one session.' },
-      lastValidated:'2026-05-01',
+      lastValidated:'2026-05-27',
     },
     complex: {
       rating:'🔴', tool:'Claude Code (Sonnet, agent mode)', vendor:'claudecode',
-      reason:'Even complex orchestration stays within Sonnet — Opus adds cost without proportional benefit for most agentic workflows.',
+      reason:'Even complex orchestration stays within Sonnet — Opus adds cost without proportional benefit for most agentic workflows. Agentic workflows accumulate inference cost multiplicatively — each tool call or iteration is a separate model request. Limit parallel agents and batch related tasks to reduce total query count.',
       fallback:{ tool:'Cursor (GPT-5.2 Codex)', vendor:'cursor', reason:'GPT-5.2 Codex is an efficient third-party option for complex multi-file agentic workflows; avoid parallel agents unless tasks are genuinely independent.' },
-      lastValidated:'2026-05-01',
+      lastValidated:'2026-05-27',
     },
   },
 };
