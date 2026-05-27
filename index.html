@@ -768,10 +768,12 @@
 
   // ── Result card ──────────────────────────────────────────────────
 
-  // Resolve which selected vendor best matches the recommended model
+  // Resolve which selected vendor best matches the recommended model.
+  // Code-only vendors (cursor, claudecode, codex) are never matched for non-code tasks.
   function resolveToolFromVendors(modelStr, vendors, taskId) {
     const s = modelStr.toLowerCase();
     const isCode = taskId && taskId.startsWith('code_');
+    const CODE_ONLY_VENDORS = new Set(['codex','claudecode','cursor']);
     const patterns = {
       chatgpt:       () => /gpt|dall-e/.test(s),
       claude:        () => /^claude/i.test(s),
@@ -784,15 +786,22 @@
     const codePriority    = ['cursor','claudecode','claude','chatgpt','githubcopilot','codex','m365'];
     const nonCodePriority = ['claude','claudecode','cursor','chatgpt','m365','githubcopilot','codex'];
     const order = isCode ? codePriority : nonCodePriority;
-    return order.find(v => vendors.has(v) && patterns[v] && patterns[v]()) || null;
+    return order.find(v => {
+      if (!isCode && CODE_ONLY_VENDORS.has(v)) return false;
+      return vendors.has(v) && patterns[v] && patterns[v]();
+    }) || null;
   }
 
-  // When vendor filter is active and the primary vendor isn't selected, check vendorAlts for a match
+  // When vendor filter is active and the primary vendor isn't selected, check vendorAlts for a match.
+  // Code-only vendors are excluded from the alt lookup for non-code tasks.
   function resolveNode(taskId, complexity) {
     let node = recommendations[taskId] && recommendations[taskId][complexity];
     if (!node) return null;
     if (state.vendors.size > 0 && node.vendor && !state.vendors.has(node.vendor) && node.vendorAlts) {
-      const ALT_ORDER = ['chatgpt','m365','claudecode','cursor','githubcopilot','codex'];
+      const isCode = taskId && taskId.startsWith('code_');
+      const ALT_ORDER = isCode
+        ? ['chatgpt','m365','claudecode','cursor','githubcopilot','codex']
+        : ['chatgpt','m365'];
       const altVendor = ALT_ORDER.find(v => state.vendors.has(v) && node.vendorAlts[v]);
       if (altVendor) {
         node = Object.assign({ lastValidated: node.lastValidated }, node.vendorAlts[altVendor], { vendor: altVendor });
