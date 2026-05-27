@@ -24,6 +24,10 @@ const vendorLabels = {
   m365: 'M365 Copilot', githubcopilot: 'GitHub Copilot',
 };
 
+// Vendors that are only valid for code output tasks.
+// These are excluded from vendor resolution for text/image/audio/video tasks (GR-01/GR-03).
+const codeOnlyVendors = ['codex', 'claudecode', 'cursor'];
+
 const tasks = {
   text: [
     { id:'write',         label:'Write (email, post, summary, draft)' },

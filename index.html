@@ -769,11 +769,12 @@
   // ── Result card ──────────────────────────────────────────────────
 
   // Resolve which selected vendor best matches the recommended model.
-  // Code-only vendors (cursor, claudecode, codex) are never matched for non-code tasks.
+  // Code-only vendors are never matched for non-code tasks (sourced from registry.js codeOnlyVendors).
+  const CODE_ONLY_VENDORS = new Set(codeOnlyVendors);
+
   function resolveToolFromVendors(modelStr, vendors, taskId) {
     const s = modelStr.toLowerCase();
     const isCode = taskId && taskId.startsWith('code_');
-    const CODE_ONLY_VENDORS = new Set(['codex','claudecode','cursor']);
     const patterns = {
       chatgpt:       () => /gpt|dall-e/.test(s),
       claude:        () => /^claude/i.test(s),
