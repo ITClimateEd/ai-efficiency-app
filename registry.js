@@ -3,7 +3,7 @@
 
 // Bump REGISTRY_VERSION on every registry change (patch = correction, minor = new model/mode, major = structural)
 // Update REGISTRY_LAST_UPDATED and add an entry to CHANGELOG.md at the same time.
-const REGISTRY_VERSION      = '1.7.0';
+const REGISTRY_VERSION      = '1.7.1';
 const REGISTRY_LAST_UPDATED = '2026-05-27';
 
 const RESEARCH_NOTES = {
@@ -126,7 +126,7 @@ const recommendations = {
       fallback:{ tool:'M365 Copilot Word (Think Deeper)', vendor:'m365', reason:'Think Deeper applies extended reasoning for complex drafts requiring nuanced judgment — no manual model selection. Reasoning models consume significantly more energy per query than standard models — activate only when task complexity justifies it.' },
       lastValidated:'2026-05-27',
       vendorAlts:{
-        chatgpt:{ tool:'GPT-5.5 Thinking', rating:'🟡', reason:'Thinking mode provides targeted reasoning for complex drafts with nuanced judgment — lower overhead than always-on reasoning. Reasoning models consume significantly more energy per query than standard models — activate only when task complexity justifies it.', fallback:{ tool:'M365 Copilot Word (Think Deeper)', vendor:'m365', reason:'Think Deeper applies extended reasoning for complex drafts requiring nuanced judgment — no manual model selection. Reasoning models consume significantly more energy per query than standard models — activate only when task complexity justifies it.' } },
+        chatgpt:{ tool:'GPT-5.5 Thinking', rating:'🔴', reason:'Thinking mode provides targeted reasoning for complex drafts with nuanced judgment — lower overhead than always-on reasoning. Reasoning models consume significantly more energy per query than standard models — activate only when task complexity justifies it.', fallback:{ tool:'M365 Copilot Word (Think Deeper)', vendor:'m365', reason:'Think Deeper applies extended reasoning for complex drafts requiring nuanced judgment — no manual model selection. Reasoning models consume significantly more energy per query than standard models — activate only when task complexity justifies it.' } },
       },
     },
   },
@@ -150,12 +150,12 @@ const recommendations = {
       },
     },
     complex: {
-      rating:'🟠', tool:'Claude Sonnet 4.6 (Extended Thinking)', vendor:'claude',
+      rating:'🔴', tool:'Claude Sonnet 4.6 (Extended Thinking)', vendor:'claude',
       reason:'Reasoning activates on demand for deep synthesis — more efficient than routing a standard query to a frontier model by default. Reasoning models consume significantly more energy per query than standard models — activate only when task complexity justifies it.',
       fallback:{ tool:'M365 Copilot Word (Think Deeper)', vendor:'m365', reason:'Think Deeper applies extended reasoning for deep synthesis — no manual model selection required. Reasoning models consume significantly more energy per query than standard models — activate only when task complexity justifies it.' },
       lastValidated:'2026-05-27',
       vendorAlts:{
-        chatgpt:{ tool:'GPT-5.5 Thinking', rating:'🟠', reason:'Thinking mode activates on demand for deep synthesis — more efficient than routing every query to a frontier model by default. Reasoning models consume significantly more energy per query than standard models — activate only when task complexity justifies it.', fallback:{ tool:'M365 Copilot Word (Think Deeper)', vendor:'m365', reason:'Think Deeper applies extended reasoning for deep synthesis — no manual model selection required. Reasoning models consume significantly more energy per query than standard models — activate only when task complexity justifies it.' } },
+        chatgpt:{ tool:'GPT-5.5 Thinking', rating:'🔴', reason:'Thinking mode activates on demand for deep synthesis — more efficient than routing every query to a frontier model by default. Reasoning models consume significantly more energy per query than standard models — activate only when task complexity justifies it.', fallback:{ tool:'M365 Copilot Word (Think Deeper)', vendor:'m365', reason:'Think Deeper applies extended reasoning for deep synthesis — no manual model selection required. Reasoning models consume significantly more energy per query than standard models — activate only when task complexity justifies it.' } },
       },
     },
   },
@@ -184,7 +184,7 @@ const recommendations = {
       fallback:{ tool:'M365 Copilot Word (Think Deeper)', vendor:'m365', reason:'Think Deeper supports complex multi-system design with interdependencies — use for documents requiring structured reasoning. Reasoning models consume significantly more energy per query than standard models — activate only when task complexity justifies it.' },
       lastValidated:'2026-05-27',
       vendorAlts:{
-        chatgpt:{ tool:'GPT-5.5 Thinking', rating:'🟡', reason:'Thinking mode supports multi-system design with interdependencies — no need for a full frontier model. Reasoning models consume significantly more energy per query than standard models — activate only when task complexity justifies it.', fallback:{ tool:'M365 Copilot Word (Think Deeper)', vendor:'m365', reason:'Think Deeper supports complex multi-system design with interdependencies — use for documents requiring structured reasoning. Reasoning models consume significantly more energy per query than standard models — activate only when task complexity justifies it.' } },
+        chatgpt:{ tool:'GPT-5.5 Thinking', rating:'🔴', reason:'Thinking mode supports multi-system design with interdependencies — no need for a full frontier model. Reasoning models consume significantly more energy per query than standard models — activate only when task complexity justifies it.', fallback:{ tool:'M365 Copilot Word (Think Deeper)', vendor:'m365', reason:'Think Deeper supports complex multi-system design with interdependencies — use for documents requiring structured reasoning. Reasoning models consume significantly more energy per query than standard models — activate only when task complexity justifies it.' } },
       },
     },
   },
