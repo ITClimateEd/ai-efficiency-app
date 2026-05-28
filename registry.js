@@ -3,7 +3,7 @@
 
 // Bump REGISTRY_VERSION on every registry change (patch = correction, minor = new model/mode, major = structural)
 // Update REGISTRY_LAST_UPDATED and add an entry to CHANGELOG.md at the same time.
-const REGISTRY_VERSION      = '2.2.1';
+const REGISTRY_VERSION      = '2.3.0';
 const REGISTRY_LAST_UPDATED = '2026-05-28';
 
 const RESEARCH_NOTES = {
@@ -30,7 +30,8 @@ const codeOnlyVendors = ['codex', 'claudecode', 'cursor'];
 
 const tasks = {
   text: [
-    { id:'write',         label:'Write (email, post, summary, draft)' },
+    { id:'email',         label:'Write an email' },
+    { id:'write',         label:'Write (post, summary, report, draft)' },
     { id:'analyze',       label:'Analyze / research' },
     { id:'design',        label:'Design / prototype (spec, brief, UX flow)' },
     { id:'image_analyze', label:'Analyze an image (text output)' },
@@ -101,6 +102,35 @@ const m365OfficeModels = [
 // vendor: one of the KNOWN_VENDORS ids, or null for platform-agnostic / non-AI tools.
 // null = always show regardless of vendor filter (GR-01/GR-03).
 const recommendations = {
+  email: {
+    simple: {
+      rating:'🟢', tool:'Standard email client (Outlook / Gmail / Mail)', vendor:null,
+      reason:'Routine emails don\'t require AI — your email client handles this at zero energy cost. Reserve AI assistance for tasks where it genuinely changes the output.',
+      lastValidated:'2026-05-28',
+    },
+    moderate: {
+      rating:'🟡', tool:'Claude Sonnet 4.6', vendor:'claude',
+      reason:'Multi-step drafts and tone adjustment without reaching for a reasoning model.',
+      fallback:{ tool:'M365 Copilot Word (Quick Response)', vendor:'m365', reason:'Quick Response handles multi-step drafts and tone adjustments with minimal processing overhead.' },
+      lastValidated:'2026-05-28',
+      vendorAlts:{
+        chatgpt:{ tool:'ChatGPT Auto', rating:'🟡', reason:'Auto handles multi-step drafts and tone adjustments — reasoning mode activates only when needed.', fallback:{ tool:'M365 Copilot Word (Quick Response)', vendor:'m365', reason:'Quick Response handles multi-step drafts and tone adjustments with minimal processing overhead.' } },
+        gemini: { tool:'Gemini 2.5 Flash', rating:'🟢', reason:'Handles multi-step drafts and tone adjustments without reaching for a reasoning model.' },
+        m365: { tool:'M365 Copilot Word (Quick Response)', rating:'🟡', reason:'Quick Response handles multi-step drafts and tone adjustments with minimal processing overhead.' },
+      },
+    },
+    complex: {
+      rating:'🟠', tool:'Claude Sonnet 4.6', vendor:'claude',
+      reason:'Extended thinking activates only for nuanced judgment — avoids the energy cost of a full frontier reasoning model. Reasoning models consume significantly more energy per query than standard models — activate only when task complexity justifies it.',
+      fallback:{ tool:'M365 Copilot Word (Think Deeper)', vendor:'m365', reason:'Think Deeper applies extended reasoning for complex drafts requiring nuanced judgment — no manual model selection. Reasoning models consume significantly more energy per query than standard models — activate only when task complexity justifies it.' },
+      lastValidated:'2026-05-28',
+      vendorAlts:{
+        chatgpt:{ tool:'GPT-5.5 Thinking', rating:'🔴', reason:'Thinking mode provides targeted reasoning for complex drafts with nuanced judgment — lower overhead than always-on reasoning. Reasoning models consume significantly more energy per query than standard models — activate only when task complexity justifies it.', fallback:{ tool:'M365 Copilot Word (Think Deeper)', vendor:'m365', reason:'Think Deeper applies extended reasoning for complex drafts requiring nuanced judgment — no manual model selection.' } },
+        gemini: { tool:'Gemini 2.5 Thinking', rating:'🔴', reason:'Extended thinking activates on demand for nuanced, long-form drafts. Reasoning models consume significantly more energy per query than standard models — activate only when task complexity justifies it.' },
+        m365: { tool:'M365 Copilot Word (Think Deeper)', rating:'🟠', reason:'Think Deeper applies extended reasoning for complex drafts requiring nuanced judgment — no manual model selection. Reasoning models consume significantly more energy per query — activate only when task complexity justifies it.' },
+      },
+    },
+  },
   write: {
     simple: {
       rating:'🟢', tool:'Claude Haiku 4.5', vendor:'claude',

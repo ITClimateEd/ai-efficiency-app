@@ -208,6 +208,7 @@ All valid recommendation outputs. `registry.js` is the implementation of this re
 
 | Tool / Mode | Cost tier | When to use |
 |---|---|---|
+| Standard email client (Outlook / Gmail / Mail) | Zero | Routine, simple emails — no AI generation cost. Primary recommendation for straightforward email writing tasks. |
 | Platform-embedded transcription (Teams / Zoom / Meet) | Zero | No additional model call. Always prefer over standalone tools when available. |
 | Platform-embedded captioning (Teams / Zoom) | Zero | Native captioning. No file upload or extra model required. |
 | PowerPoint Designer (non-AI layouts) | Zero | Zero AI cost. Use for layout when content is ready. |

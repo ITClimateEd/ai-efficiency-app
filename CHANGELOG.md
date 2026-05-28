@@ -5,6 +5,21 @@ Versions follow [Semantic Versioning](https://semver.org): patch for corrections
 
 ---
 
+## [2.3.0] — 2026-05-28
+
+### Added
+
+- `tasks.text`: new `email` task — "Write an email" — appears before the general `write` task.
+- `recommendations.email.simple`: non-AI primary recommendation (`Standard email client (Outlook / Gmail / Mail)`, 🟢 Lightest). Routine emails don't require AI — tool picker is skipped for this path (GR-04).
+- `recommendations.email.moderate` / `email.complex`: AI paths copied from `write.moderate` / `write.complex` for cases where AI assistance is genuinely warranted.
+- `registry spec`: `Standard email client (Outlook / Gmail / Mail)` added to Section 2.12 (Platform-Native, Zero AI Cost).
+
+### Changed
+
+- `tasks.text.write` label updated from `'Write (email, post, summary, draft)'` to `'Write (post, summary, report, draft)'` — email now has its own task entry.
+
+---
+
 ## [2.2.1] — 2026-05-28
 
 ### Removed
