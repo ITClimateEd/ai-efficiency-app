@@ -92,8 +92,9 @@ All valid recommendation outputs. `registry.js` is the implementation of this re
 | **Auto** | — | Always the preferred default. Cursor's router selects the cheapest model capable of handling the task. Effectively unlimited on paid plans. |
 | Composer 1.5 | Native / Low | Cursor's own model. Fast, accurate, generous usage allocation. Best starting point when a specific model is needed. |
 | Composer 2 | Low (~1/10 Opus) | Frontier-level coding at ~$0.50/M input tokens. Use for complex multi-file tasks when Composer 1.5 is insufficient. |
-| GPT-5.2 Codex | Low-mid | Efficient third-party alternative when a different model perspective is needed. |
-| Claude Sonnet 4.5 / 4.6 | Mid | Best option for writing and documentation tasks within Cursor. Also strong for mixed code+prose work. |
+| Cursor (GPT-5.2 Codex) | Low-mid | Efficient third-party alternative when a different model perspective is needed. |
+| Cursor (Claude Sonnet 4.5) | Mid | Best option for writing and documentation tasks within Cursor. Also strong for mixed code+prose work. |
+| Cursor (Claude Sonnet 4.6) | Mid | Latest Sonnet in Cursor. Preferred over 4.5 for new workflows. |
 
 ---
 

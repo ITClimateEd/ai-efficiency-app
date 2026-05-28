@@ -82,7 +82,7 @@ const SPEC_TOOLS = new Set([
   'Claude Code (Sonnet model)', 'Claude Code (Sonnet, agent mode)',
   // 2.4 Cursor
   'Cursor (Auto)', 'Cursor (Composer 1.5)', 'Cursor (Composer 2)',
-  'GPT-5.2 Codex', 'Claude Sonnet 4.5', 'Claude Sonnet 4.6',
+  'Cursor (GPT-5.2 Codex)', 'Cursor (Claude Sonnet 4.5)', 'Cursor (Claude Sonnet 4.6)',
   // 2.5 GitHub Copilot
   'GitHub Copilot (Auto)', 'GPT-5.3-Codex', 'GPT-5.4-mini',
   'Claude Haiku 4.5', 'Claude Sonnet 4.6',
