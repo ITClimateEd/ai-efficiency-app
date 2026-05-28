@@ -46,7 +46,7 @@ README.md               This file
 No build step required. The tool is a single HTML file with an external registry.
 
 ```bash
-git clone https://github.com/pascaljoly/ai-efficiency-app.git
+git clone https://github.com/ITClimateEd/ai-efficiency-app.git
 cd ai-efficiency-app
 open index.html   # or serve with any static server
 ```
