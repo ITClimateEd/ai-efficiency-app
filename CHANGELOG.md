@@ -5,6 +5,42 @@ Versions follow [Semantic Versioning](https://semver.org): patch for corrections
 
 ---
 
+## [2.0.0] — 2026-05-28
+
+### Changed (major — structural refactor)
+
+**User flow**: replaced the optional vendor filter (step 0) with a mandatory single-tool picker (step 3) inserted between use case and complexity. Users now explicitly select which tool they are using before complexity, enabling accurate per-tool recommendations and greener-alternative comparisons.
+
+**State machine** (`decision-tree.js`):
+- `state.vendors` (Set) → `state.vendor` (single string, e.g. `'claude'`, `'gemini'`)
+- Removed multi-vendor logic, gap logic (GR-05), and `isFallbackInScope()`
+- Tool picker resets when use case changes
+- Hash routing updated: `vendors=…` → `vendor=…` (single value)
+- Added `KNOWN_VENDORS` entry for `gemini`
+
+**Rules** (`rules.js`):
+- `resolveToolFromVendors()` → `resolveToolFromVendor(vendor, task)` — single vendor lookup
+- Added `getAvailableVendors(task)` — returns vendor keys with entries for a given task
+- Added `isGreenestOption(vendor, task, complexity)` — GR-04 comparison
+- Added `getGreenestAlternative(vendor, task, complexity)` — finds the greenest option to display
+- Added `RATING_ORDER` constant for numeric energy-tier comparisons
+- Removed `isFallbackInScope()`
+
+**UI** (`index.html`):
+- Removed vendor filter chips (step 0)
+- Added step 3 (tool picker) with single-select chips between use case and complexity; complexity relabelled step 4
+- Result card: always shows usage tip for selected tool+task+complexity; shows "Greener alternative" section only when the selected tool's rating is worse than the best available for that task+complexity
+- Removed gap card (GR-05) — no longer needed with single-tool selection
+
+### Added (registry)
+
+**`gemini` vendor** (`registry.js`):
+- Added `gemini: 'Google Gemini'` to `vendorLabels`
+- Added `gemini` vendorAlts to 8 tasks: `write`, `analyze`, `design`, `image_analyze`, `code_explain`, `code_write`, `code_build`, `code_automate`
+- Complexity mapping: simple/moderate → Gemini 2.5 Flash (🟢); complex (general) → Gemini 2.5 Thinking (🔴); complex (code/math) → Gemini 2.1 Pro (🔴)
+
+---
+
 ## [1.7.4] — 2026-05-27
 
 ### Added

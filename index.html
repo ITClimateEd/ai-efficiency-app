@@ -401,22 +401,6 @@
         <span class="legend-item"><span class="badge badge-purple">🟣 Heaviest</span></span>
       </div>
 
-      <!-- Vendor filter -->
-      <div class="step" id="step0">
-        <div class="step-label">Filter by vendor — optional</div>
-        <div class="chip-row">
-          <div class="chip active" data-vendor="all" onclick="pickVendor('all',this)">All tools</div>
-          <div class="chip" data-vendor="chatgpt" onclick="pickVendor('chatgpt',this)">ChatGPT</div>
-          <div class="chip" data-vendor="claude" onclick="pickVendor('claude',this)">Claude</div>
-          <div class="chip" data-vendor="codex" onclick="pickVendor('codex',this)">Codex</div>
-          <div class="chip" data-vendor="claudecode" onclick="pickVendor('claudecode',this)">Claude Code</div>
-          <div class="chip" data-vendor="cursor" onclick="pickVendor('cursor',this)">Cursor</div>
-          <div class="chip" data-vendor="m365" onclick="pickVendor('m365',this)">M365 Copilot</div>
-          <div class="chip" data-vendor="githubcopilot" onclick="pickVendor('githubcopilot',this)">GitHub Copilot</div>
-        </div>
-      </div>
-      <hr class="divider">
-
       <!-- Step 1: Modality -->
       <div class="step" id="step1">
         <div class="step-label">Step 1 — what type of output do you need?</div>
@@ -478,11 +462,19 @@
         </div>
       </div>
 
+      <hr class="divider" id="div-tool" style="display:none">
+
+      <!-- Step 3: Tool picker -->
+      <div class="step" id="step-tool" style="display:none">
+        <div class="step-label">Step 3 — which tool are you using?</div>
+        <div class="chip-row" id="tool-chips"></div>
+      </div>
+
       <hr class="divider" id="div2" style="display:none">
 
-      <!-- Step 3: Complexity -->
+      <!-- Step 4: Complexity -->
       <div class="step" id="step-complexity" style="display:none">
-        <div class="step-label">Step 3 — how complex is this task?</div>
+        <div class="step-label">Step 4 — how complex is this task?</div>
         <div class="chip-row">
           <div class="chip complexity-chip" data-complexity="simple" onclick="pickComplexity('simple',this)">
             Simple<span class="chip-sub">Short output, clear instructions, no reasoning needed</span>
@@ -537,6 +529,22 @@
     document.querySelectorAll('#step-complexity .chip').forEach(c => c.classList.remove('active'));
     document.getElementById('step-complexity').style.display = '';
     document.getElementById('div2').style.display = '';
+  }
+
+  function renderToolStep() {
+    const vendors = getAvailableVendors(state.task);
+    if (vendors.length === 0) {
+      document.getElementById('step-tool').style.display = 'none';
+      document.getElementById('div-tool').style.display = 'none';
+      renderComplexityStep();
+      return;
+    }
+    document.getElementById('tool-chips').innerHTML = vendors.map(v =>
+      '<div class="chip" data-tool="' + v + '" onclick="pickTool(\'' + v + '\',this)">' +
+      (vendorLabels[v] || v) + '</div>'
+    ).join('');
+    document.getElementById('step-tool').style.display = '';
+    document.getElementById('div-tool').style.display = '';
   }
 
   function renderMediaResult() {
@@ -609,59 +617,6 @@
     const node = resolveNode(state.task, state.complexity);
     if (!node) return;
 
-    // GR-01/GR-03: compute vendor match once — used for gap check, tool label, and GR-11
-    const resolved = state.vendors.size > 0
-      ? resolveToolFromVendors(node.tool, state.vendors, state.task)
-      : null;
-
-    // GR-05: vendor filter active + recommendation has a specific vendor + no vendor match → gap
-    if (state.vendors.size > 0 && node.vendor !== null && resolved === null) {
-      // What the user asked for
-      const gapTaskLabel = (tasks[state.modality] || []).find(t => t.id === state.task);
-      const gapComplexity = state.complexity.charAt(0).toUpperCase() + state.complexity.slice(1);
-      // Best available recommendation (the filtered-out primary)
-      const gapRating = ratings[node.rating];
-      const gapRatingBadge = gapRating
-        ? '<span class="badge ' + gapRating.cls + '" style="font-size:11px;padding:2px 7px;vertical-align:middle">' +
-            node.rating + ' ' + gapRating.label + '</span> '
-        : '';
-      // What requirement it doesn't meet
-      const requiredVendorLabel = vendorLabels[node.vendor] || node.vendor;
-      const activeVendorLabels = [...state.vendors].map(v => vendorLabels[v] || v).join(', ');
-      // Closest alternative within selection (the fallback, if in scope)
-      const gapFallbackHtml = isFallbackInScope(node, state.vendors)
-        ? '<div class="rec-field"><div class="rec-label">Closest alternative in your selection</div>' +
-            '<div class="rec-value">' + node.fallback.tool + '</div>' +
-            '<div class="rec-fallback">' + node.fallback.reason + '</div></div>'
-        : '';
-      document.getElementById('div3').style.display = '';
-      document.getElementById('result-area').innerHTML =
-        '<div class="rec-card">' +
-          '<div class="rec-header">' +
-            '<span class="badge badge-gray">— Gap (GR-05)</span>' +
-            '<span class="rec-title">No matching recommendation</span>' +
-          '</div>' +
-          '<div class="rec-field"><div class="rec-label">You asked for</div>' +
-            '<div class="rec-value">' + (gapTaskLabel ? gapTaskLabel.label : state.task) +
-            ' — ' + gapComplexity + '</div></div>' +
-          '<div class="rec-field"><div class="rec-label">Best available recommendation</div>' +
-            '<div class="rec-value">' + gapRatingBadge + node.tool + '</div></div>' +
-          '<div class="rec-field"><div class="rec-label">What requirement it doesn\'t meet</div>' +
-            '<div class="rec-value" style="color:var(--color-text-secondary)">' +
-            'Requires <strong>' + requiredVendorLabel + '</strong>, which is not in your current ' +
-            'selection (' + activeVendorLabels + '). Add <strong>' + requiredVendorLabel +
-            '</strong> or choose <strong>All tools</strong> to see this recommendation.</div></div>' +
-          gapFallbackHtml +
-          '<div class="rec-actions">' +
-            '<button class="rec-btn" onclick="resetAll()">↺ Start over</button>' +
-            '<button class="rec-btn" onclick="reportBug()">🐛 Report a bug</button>' +
-          '</div>' +
-        '</div>' +
-        '<p class="global-note">AI model capabilities change frequently. Recommendations are reviewed periodically.</p>';
-      document.getElementById('cta-block').style.display = '';
-      return;
-    }
-
     const rating = ratings[node.rating];
     const d = new Date(node.lastValidated + 'T00:00:00');
     const validatedStr = d.toLocaleDateString('en-US', { month:'long', year:'numeric' });
@@ -671,45 +626,36 @@
       console.warn('[GR-08] registry entry missing tool name', { task: state.task, complexity: state.complexity });
     }
 
-    // Resolve Tool / Model display
+    // Tool / Model display
     let toolFieldHtml;
-    if (state.vendors.size > 0 && node.vendor !== null && resolved !== null) {
+    if (state.vendor && node.vendor !== null) {
       // GR-11: proxy vendors show "Auto" unless the registry string already names the chosen mode
-      const modelDisplay = (PROXY_VENDORS.has(resolved) && !isProxyNativeTool(node.tool)) ? 'Auto' : node.tool;
-      // GR-08: both vendor label and model/mode must be non-empty before rendering
+      const modelDisplay = (PROXY_VENDORS.has(state.vendor) && !isProxyNativeTool(node.tool)) ? 'Auto' : node.tool;
       if (!modelDisplay || !modelDisplay.trim()) {
-        console.warn('[GR-08] recommendation card would show vendor label with no model/mode', { task: state.task, complexity: state.complexity, vendor: resolved });
+        console.warn('[GR-08] recommendation card would show vendor label with no model/mode', { task: state.task, complexity: state.complexity, vendor: state.vendor });
       }
       toolFieldHtml = '<div class="rec-field"><div class="rec-label">Tool</div>' +
-        '<div class="rec-value">' + vendorLabels[resolved] + '</div>' +
+        '<div class="rec-value">' + (vendorLabels[state.vendor] || state.vendor) + '</div>' +
         '<div class="rec-label" style="margin-top:.75rem">Model</div>' +
         '<div class="rec-value">' + modelDisplay + '</div></div>';
     } else {
-      // All tools selected or null-vendor (platform-agnostic) tool: simple display
       toolFieldHtml = '<div class="rec-field"><div class="rec-label">Tool</div>' +
         '<div class="rec-value">' + node.tool + '</div></div>';
     }
 
-    // Bug 2: Claude vs Claude Code tip for coding tasks
-    const codeVendorTip = (state.task && state.task.startsWith('code_') &&
-      state.vendors.has('claude') && state.vendors.has('claudecode'))
-      ? '<div class="tip-box">💡 <strong>Claude Code vs Claude:</strong> For coding tasks, Claude Code is more efficient than Claude chat — it\'s purpose-built for code, uses less conversational overhead, and keeps context tighter. Prefer Claude Code when both are available.</div>'
-      : '';
-
-    // GR-01/GR-03: use vendor tag to decide whether fallback is in scope
-    let fallbackHtml;
-    if (state.vendors.size > 0) {
-      fallbackHtml = isFallbackInScope(node, state.vendors)
-        ? '<div class="rec-field"><div class="rec-label">If unavailable</div>' +
-            '<div class="rec-value">' + node.fallback.tool + '</div>' +
-            '<div class="rec-fallback">' + node.fallback.reason + '</div></div>'
-        : '<div class="rec-field"><div class="rec-label">If unavailable</div>' +
-            '<div class="rec-value" style="color:var(--color-text-tertiary);font-style:italic">No fallback available within your selected tools.</div></div>';
-    } else {
-      fallbackHtml =
-        '<div class="rec-field"><div class="rec-label">If unavailable</div>' +
-        '<div class="rec-value">' + node.fallback.tool + '</div>' +
-        '<div class="rec-fallback">' + node.fallback.reason + '</div></div>';
+    // GR-04: greener alternative — show only when selected tool is not the greenest option
+    let greenerHtml = '';
+    if (state.vendor && !isGreenestOption(state.vendor, state.task, state.complexity)) {
+      const alt = getGreenestAlternative(state.vendor, state.task, state.complexity);
+      if (alt) {
+        const altRating = ratings[alt.rating];
+        const altBadge = altRating
+          ? '<span class="badge ' + altRating.cls + '" style="font-size:11px;padding:2px 7px;vertical-align:middle">' + alt.rating + ' ' + altRating.label + '</span> '
+          : '';
+        greenerHtml = '<div class="rec-field"><div class="rec-label">Greener alternative</div>' +
+          '<div class="rec-value">' + altBadge + (vendorLabels[alt.vendor] || alt.vendor) + '</div>' +
+          '<div class="rec-fallback">' + alt.tool + ' — ' + alt.reason + '</div></div>';
+      }
     }
 
     document.getElementById('div3').style.display = '';
@@ -722,8 +668,7 @@
         toolFieldHtml +
         '<div class="rec-field"><div class="rec-label">Why it\'s efficient</div>' +
           '<div class="rec-value">' + node.reason + '</div></div>' +
-        fallbackHtml +
-        codeVendorTip +
+        greenerHtml +
         '<div class="rec-validated">Validated: ' + validatedStr + '</div>' +
         '<div class="rec-actions">' +
           '<button class="rec-btn rec-btn-primary" onclick="copyRec()">📋 Copy recommendation</button>' +
@@ -785,35 +730,39 @@
         ].join('\n');
       }
     } else {
-    const node = resolveNode(state.task, state.complexity);
-    if (node) {
-      const taskLabel = (tasks[state.modality] || []).find(t => t.id === state.task);
-      const d = new Date(node.lastValidated + 'T00:00:00');
-      // GR-11: mirror proxy-tool Auto logic from renderResult()
-      const _resolved = resolveToolFromVendors(node.tool, state.vendors, state.task);
-      const modelDisplay = (_resolved && PROXY_VENDORS.has(_resolved) && !isProxyNativeTool(node.tool))
-        ? 'Auto' : node.tool;
-      // GR-01/GR-03: match renderResult() tool-label and fallback suppression
-      const toolLine = (state.vendors.size > 0 && node.vendor !== null && _resolved)
-        ? 'Tool: ' + vendorLabels[_resolved] + '\nModel: ' + modelDisplay
-        : 'Tool: ' + node.tool;
-      const fbAvailable = isFallbackInScope(node, state.vendors);
-      const lines = [
-        'AI Model Efficiency Selector',
-        'Task: ' + (taskLabel ? taskLabel.label : '') + ' — ' +
-          state.complexity.charAt(0).toUpperCase() + state.complexity.slice(1),
-        '',
-        toolLine,
-        'Why it\'s efficient: ' + node.reason,
-      ];
-      if (fbAvailable) lines.push('If unavailable: ' + node.fallback.tool + ' — ' + node.fallback.reason);
-      lines.push('', 'Validated: ' + d.toLocaleDateString('en-US', { month:'long', year:'numeric' }), 'Source: ' + window.location.href);
-      text = lines.join('\n');
-    } else {
-      const why = document.querySelector('#result-area .rec-value');
-      text = 'AI Model Efficiency Selector\n\nRecommendation: No AI tool needed\nWhy: ' +
-        (why ? why.textContent : '') + '\n\nSource: ' + window.location.href;
-    }
+      const node = resolveNode(state.task, state.complexity);
+      if (node) {
+        const taskLabel = (tasks[state.modality] || []).find(t => t.id === state.task);
+        const d = new Date(node.lastValidated + 'T00:00:00');
+        // GR-11: mirror proxy-tool Auto logic from renderResult()
+        const modelDisplay = (state.vendor && PROXY_VENDORS.has(state.vendor) && !isProxyNativeTool(node.tool))
+          ? 'Auto' : node.tool;
+        const toolLine = (state.vendor && node.vendor !== null)
+          ? 'Tool: ' + (vendorLabels[state.vendor] || state.vendor) + '\nModel: ' + modelDisplay
+          : 'Tool: ' + node.tool;
+        const lines = [
+          'AI Model Efficiency Selector',
+          'Task: ' + (taskLabel ? taskLabel.label : '') + ' — ' +
+            state.complexity.charAt(0).toUpperCase() + state.complexity.slice(1),
+          '',
+          toolLine,
+          'Why it\'s efficient: ' + node.reason,
+        ];
+        if (state.vendor && !isGreenestOption(state.vendor, state.task, state.complexity)) {
+          const alt = getGreenestAlternative(state.vendor, state.task, state.complexity);
+          if (alt) {
+            const altR = ratings[alt.rating];
+            lines.push('Greener alternative: ' + (vendorLabels[alt.vendor] || alt.vendor) +
+              ' — ' + alt.tool + (altR ? ' (' + alt.rating + ' ' + altR.label + ')' : ''));
+          }
+        }
+        lines.push('', 'Validated: ' + d.toLocaleDateString('en-US', { month:'long', year:'numeric' }), 'Source: ' + window.location.href);
+        text = lines.join('\n');
+      } else {
+        const why = document.querySelector('#result-area .rec-value');
+        text = 'AI Model Efficiency Selector\n\nRecommendation: No AI tool needed\nWhy: ' +
+          (why ? why.textContent : '') + '\n\nSource: ' + window.location.href;
+      }
     }
     copyToClipboard(text, () => flashBtn('.rec-btn-primary', '✓ Copied!'));
   }

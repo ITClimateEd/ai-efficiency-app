@@ -1,7 +1,7 @@
 // decision-tree.js — State management, input handlers, and hash routing
 
 const state = {
-  vendors: new Set(),
+  vendor: null,
   modality: null,
   task: null,
   complexity: null,
@@ -10,7 +10,7 @@ const state = {
 };
 
 // Known-good value whitelists for hash param sanitisation
-const KNOWN_VENDORS     = new Set(['chatgpt','claude','codex','claudecode','cursor','m365','githubcopilot']);
+const KNOWN_VENDORS     = new Set(['chatgpt','claude','gemini','codex','claudecode','cursor','m365','githubcopilot']);
 const KNOWN_MODALITIES  = new Set(['text','image','audio','video','code','noai']);
 const KNOWN_COMPLEXITIES= new Set(['simple','moderate','complex']);
 const KNOWN_ANSWERS     = new Set(['yes','no']);
@@ -22,33 +22,21 @@ const MEDIA_GATE_TASKS = new Set(['img_gen_chat','img_gen_slides','img_edit','vi
 const PROXY_VENDORS = new Set(['cursor','m365','githubcopilot']);
 function isProxyNativeTool(toolStr) {
   // Returns true when the registry string already encodes the chosen proxy mode/model
-  // (e.g. "Cursor (Composer 2)", "M365 Copilot Word (Think Deeper)") so we surface it as-is
   return /cursor\s*\(|copilot\s*\(|m365\s*\(|composer|think deeper|quick response|powerpoint|excel|stream|github\s+copilot\s*\(/i.test(toolStr);
 }
 
 // Populate task whitelist from the tasks object (tasks defined in registry.js)
 Object.values(tasks).forEach(arr => arr.forEach(t => KNOWN_TASKS.add(t.id)));
 
-const CODE_ONLY_VENDORS = new Set(codeOnlyVendors);
-
-// ── Vendor filter ────────────────────────────────────────────────
-function pickVendor(vendor, el) {
-  if (vendor === 'all') {
-    state.vendors.clear();
-    document.querySelectorAll('#step0 .chip').forEach(c => c.classList.remove('active'));
-    el.classList.add('active');
-  } else {
-    if (state.vendors.has(vendor)) {
-      state.vendors.delete(vendor);
-      el.classList.remove('active');
-    } else {
-      state.vendors.add(vendor);
-      el.classList.add('active');
-    }
-    const allChip = document.querySelector('[data-vendor="all"]');
-    allChip.classList.toggle('active', state.vendors.size === 0);
-  }
-  if (state.complexity) renderResult();
+// ── Tool picker (step 3) ─────────────────────────────────────────
+function pickTool(vendor, el) {
+  state.vendor = vendor;
+  state.complexity = null;
+  document.querySelectorAll('#step-tool .chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('result-area').innerHTML = '';
+  document.getElementById('cta-block').style.display = 'none';
+  renderComplexityStep();
   encodeHash();
 }
 
@@ -56,6 +44,7 @@ function pickVendor(vendor, el) {
 function pick(type, value, el) {
   if (type === 'modality') {
     state.modality = value;
+    state.vendor = null;
     state.task = null;
     state.complexity = null;
     state.hasMedia = null;
@@ -66,6 +55,8 @@ function pick(type, value, el) {
     document.getElementById('cta-block').style.display = 'none';
     document.getElementById('step-media-gate').style.display = 'none';
     document.getElementById('div-media-gate').style.display = 'none';
+    document.getElementById('step-tool').style.display = 'none';
+    document.getElementById('div-tool').style.display = 'none';
     document.getElementById('div2').style.display = 'none';
     document.getElementById('step-complexity').style.display = 'none';
     document.getElementById('div3').style.display = 'none';
@@ -82,7 +73,9 @@ function pick(type, value, el) {
     }
     encodeHash();
   } else {
+    // Task selection
     state.task = value;
+    state.vendor = null;
     state.complexity = null;
     state.hasMedia = null;
     document.querySelectorAll('#step2 .chip').forEach(c => c.classList.remove('active'));
@@ -90,22 +83,24 @@ function pick(type, value, el) {
     document.getElementById('result-area').innerHTML = '';
     document.getElementById('cta-block').style.display = 'none';
     document.getElementById('div3').style.display = 'none';
+    document.getElementById('step-tool').style.display = 'none';
+    document.getElementById('div-tool').style.display = 'none';
+    document.getElementById('div2').style.display = 'none';
+    document.getElementById('step-complexity').style.display = 'none';
     if (MEDIA_GATE_TASKS.has(value)) {
       document.querySelectorAll('[data-media-gate]').forEach(c => c.classList.remove('active'));
       document.getElementById('div-media-gate').style.display = '';
       document.getElementById('step-media-gate').style.display = '';
-      document.getElementById('div2').style.display = 'none';
-      document.getElementById('step-complexity').style.display = 'none';
     } else {
       document.getElementById('div-media-gate').style.display = 'none';
       document.getElementById('step-media-gate').style.display = 'none';
-      renderComplexityStep();
+      renderToolStep();
     }
     encodeHash();
   }
 }
 
-// ── Step 3: complexity ───────────────────────────────────────────
+// ── Step 4: complexity ───────────────────────────────────────────
 function pickComplexity(complexity, el) {
   state.complexity = complexity;
   document.querySelectorAll('#step-complexity .chip').forEach(c => c.classList.remove('active'));
@@ -114,18 +109,20 @@ function pickComplexity(complexity, el) {
   encodeHash();
 }
 
-// ── GR-12: media gate ──────────────────────────────────────────────
+// ── GR-12: media gate ────────────────────────────────────────────
 function pickMediaGate(answer, el) {
   state.hasMedia = answer;
   document.querySelectorAll('[data-media-gate]').forEach(c => c.classList.remove('active'));
   el.classList.add('active');
   if (answer === 'yes') {
+    document.getElementById('step-tool').style.display = 'none';
+    document.getElementById('div-tool').style.display = 'none';
     document.getElementById('div2').style.display = 'none';
     document.getElementById('step-complexity').style.display = 'none';
     document.getElementById('div3').style.display = '';
     renderMediaResult();
   } else {
-    renderComplexityStep();
+    renderToolStep();
   }
   encodeHash();
 }
@@ -172,7 +169,7 @@ function routeToMain() {
 // ── Hash routing ─────────────────────────────────────────────────
 function encodeHash() {
   const p = {};
-  if (state.vendors.size > 0) p.vendors = [...state.vendors].join(',');
+  if (state.vendor) p.vendor = state.vendor;
   if (state.modality) p.modality = state.modality;
   if (state.task) p.task = state.task;
   if (state.hasMedia && MEDIA_GATE_TASKS.has(state.task)) p.hasMedia = state.hasMedia;
@@ -198,17 +195,6 @@ function decodeHash() {
       })
     );
   } catch(e) { return; }
-
-  // Restore vendors — whitelist each value
-  if (p.vendors) {
-    p.vendors.split(',').forEach(v => {
-      if (!safeParam(v, KNOWN_VENDORS)) return;
-      state.vendors.add(v);
-      const c = document.querySelector('[data-vendor="' + v + '"]');
-      if (c) c.classList.add('active');
-    });
-    if (state.vendors.size > 0) document.querySelector('[data-vendor="all"]').classList.remove('active');
-  }
 
   const modality = safeParam(p.modality, KNOWN_MODALITIES);
   if (!modality) return;
@@ -261,10 +247,24 @@ function decodeHash() {
       const mgEl = document.querySelector('[data-media-gate="' + hasMedia + '"]');
       if (mgEl) mgEl.classList.add('active');
       if (hasMedia === 'yes') { renderMediaResult(); return; }
-      renderComplexityStep();
+      renderToolStep();
     } else { return; }
   } else {
+    renderToolStep();
+  }
+
+  // Restore vendor — only if the task has vendor options
+  const availableVendors = getAvailableVendors(task);
+  const vendor = safeParam(p.vendor, KNOWN_VENDORS);
+  if (availableVendors.length === 0) {
+    // Null-vendor task: renderToolStep already called renderComplexityStep
+  } else if (vendor && availableVendors.includes(vendor)) {
+    state.vendor = vendor;
+    const vc = document.querySelector('[data-tool="' + vendor + '"]');
+    if (vc) vc.classList.add('active');
     renderComplexityStep();
+  } else {
+    return; // tool step visible but no valid vendor
   }
 
   const complexity = safeParam(p.complexity, KNOWN_COMPLEXITIES);
@@ -277,20 +277,21 @@ function decodeHash() {
 
 // ── Reset ────────────────────────────────────────────────────────
 function resetAll() {
-  state.vendors = new Set();
+  state.vendor = null;
   state.modality = null;
   state.task = null;
   state.complexity = null;
   state.hasMedia = null;
   state.noai = { q1: null, q2: null, q3: null };
   document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
-  document.querySelector('[data-vendor="all"]').classList.add('active');
   document.getElementById('noai-flow').style.display = 'none';
   document.getElementById('noai-q2').style.display = 'none';
   document.getElementById('noai-q3').style.display = 'none';
   document.getElementById('step-media-gate').style.display = 'none';
   document.getElementById('div-media-gate').style.display = 'none';
   document.getElementById('step2').style.display = 'none';
+  document.getElementById('step-tool').style.display = 'none';
+  document.getElementById('div-tool').style.display = 'none';
   document.getElementById('step-complexity').style.display = 'none';
   document.getElementById('div1').style.display = 'none';
   document.getElementById('div2').style.display = 'none';

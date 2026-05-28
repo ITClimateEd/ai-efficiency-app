@@ -1,48 +1,94 @@
 // rules.js — Ground rule enforcement (GR-01 through GR-12)
 
-// GR-01/GR-03: resolve which selected vendor best matches the recommended model.
-// Code-only vendors are never matched for non-code tasks (sourced from registry.js codeOnlyVendors).
-function resolveToolFromVendors(modelStr, vendors, taskId) {
-  const s = modelStr.toLowerCase();
-  const isCode = taskId && taskId.startsWith('code_');
-  const patterns = {
-    chatgpt:       () => /gpt|dall-e/.test(s),
-    claude:        () => /^claude/i.test(s),
-    codex:         () => /codex/.test(s),
-    claudecode:    () => /claude code/.test(s),
-    cursor:        () => /cursor/.test(s) || /claude (haiku|sonnet|opus)/.test(s),
-    m365:          () => /m365|microsoft|copilot|powerpoint|excel|stream/.test(s),
-    githubcopilot: () => /github copilot/.test(s),
-  };
-  const codePriority    = ['cursor','claudecode','claude','chatgpt','githubcopilot','codex','m365'];
-  const nonCodePriority = ['claude','claudecode','cursor','chatgpt','m365','githubcopilot','codex'];
-  const order = isCode ? codePriority : nonCodePriority;
-  return order.find(v => {
-    if (!isCode && CODE_ONLY_VENDORS.has(v)) return false;
-    return vendors.has(v) && patterns[v] && patterns[v]();
-  }) || null;
+const RATING_ORDER = { '🟢': 1, '🟡': 2, '🟠': 3, '🔴': 4, '🟣': 5 };
+
+// GR-01/GR-03: single vendor lookup — returns the tool name for this vendor+task (any complexity), or null.
+function resolveToolFromVendor(vendor, task) {
+  const taskRecs = recommendations[task];
+  if (!taskRecs || !vendor) return null;
+  const complexities = ['simple', 'moderate', 'complex'];
+  for (const c of complexities) {
+    const node = taskRecs[c];
+    if (!node) continue;
+    if (node.vendor === vendor) return node.tool;
+    if (node.vendorAlts && node.vendorAlts[vendor]) return node.vendorAlts[vendor].tool;
+  }
+  return null;
+}
+
+// Returns array of vendor keys that have entries for a given task (across all complexities).
+// Excludes null-vendor entries (platform-agnostic recommendations).
+function getAvailableVendors(task) {
+  const taskRecs = recommendations[task];
+  if (!taskRecs) return [];
+  const vendorSet = new Set();
+  const complexities = ['simple', 'moderate', 'complex'];
+  for (const c of complexities) {
+    const node = taskRecs[c];
+    if (!node) continue;
+    if (node.vendor) vendorSet.add(node.vendor);
+    if (node.vendorAlts) Object.keys(node.vendorAlts).forEach(v => vendorSet.add(v));
+  }
+  return [...vendorSet];
+}
+
+// GR-04: returns true when the selected vendor's rating matches the best available for task+complexity.
+function isGreenestOption(vendor, task, complexity) {
+  const taskRecs = recommendations[task];
+  if (!taskRecs || !taskRecs[complexity] || !vendor) return true;
+  const primary = taskRecs[complexity];
+
+  let currentRating;
+  if (vendor === primary.vendor) {
+    currentRating = primary.rating;
+  } else if (primary.vendorAlts && primary.vendorAlts[vendor]) {
+    currentRating = primary.vendorAlts[vendor].rating;
+  } else {
+    return true;
+  }
+  const currentOrder = RATING_ORDER[currentRating] || 99;
+
+  let bestOrder = primary.rating ? (RATING_ORDER[primary.rating] || 99) : 99;
+  if (primary.vendorAlts) {
+    Object.values(primary.vendorAlts).forEach(alt => {
+      const order = RATING_ORDER[alt.rating] || 99;
+      if (order < bestOrder) bestOrder = order;
+    });
+  }
+
+  return currentOrder <= bestOrder;
+}
+
+// Returns the best alternative option for a given vendor+task+complexity, or null if vendor is greenest.
+// Used to populate the "Greener alternative" section in the result card.
+function getGreenestAlternative(vendor, task, complexity) {
+  const taskRecs = recommendations[task];
+  if (!taskRecs || !taskRecs[complexity]) return null;
+  const primary = taskRecs[complexity];
+
+  const candidates = [];
+  if (primary.vendor && primary.vendor !== vendor) {
+    candidates.push({ vendor: primary.vendor, tool: primary.tool, rating: primary.rating, reason: primary.reason });
+  }
+  if (primary.vendorAlts) {
+    Object.entries(primary.vendorAlts).forEach(([v, alt]) => {
+      if (v !== vendor) {
+        candidates.push({ vendor: v, tool: alt.tool, rating: alt.rating, reason: alt.reason });
+      }
+    });
+  }
+  if (!candidates.length) return null;
+  candidates.sort((a, b) => (RATING_ORDER[a.rating] || 99) - (RATING_ORDER[b.rating] || 99));
+  return candidates[0];
 }
 
 // GR-01/GR-02/GR-06: resolve the registry node for the given task and complexity.
-// When vendor filter is active and the primary vendor isn't selected, check vendorAlts for a match.
-// Code-only vendors are excluded from the alt lookup for non-code tasks.
+// When a vendor is selected and differs from the primary, returns the matching vendorAlt entry.
 function resolveNode(taskId, complexity) {
-  let node = recommendations[taskId] && recommendations[taskId][complexity];
-  if (!node) return null;
-  if (state.vendors.size > 0 && node.vendor && !state.vendors.has(node.vendor) && node.vendorAlts) {
-    const isCode = taskId && taskId.startsWith('code_');
-    const ALT_ORDER = isCode
-      ? ['chatgpt','m365','claudecode','cursor','githubcopilot','codex']
-      : ['chatgpt','m365'];
-    const altVendor = ALT_ORDER.find(v => state.vendors.has(v) && node.vendorAlts[v]);
-    if (altVendor) {
-      node = Object.assign({ lastValidated: node.lastValidated }, node.vendorAlts[altVendor], { vendor: altVendor });
-    }
+  const entry = recommendations[taskId] && recommendations[taskId][complexity];
+  if (!entry) return null;
+  if (state.vendor && state.vendor !== entry.vendor && entry.vendorAlts && entry.vendorAlts[state.vendor]) {
+    return Object.assign({ lastValidated: entry.lastValidated }, entry.vendorAlts[state.vendor], { vendor: state.vendor });
   }
-  return node;
-}
-
-// GR-01/GR-03: returns true when the fallback recommendation passes the active vendor filter.
-function isFallbackInScope(node, vendors) {
-  return !node.fallback.vendor || vendors.size === 0 || vendors.has(node.fallback.vendor);
+  return entry;
 }
