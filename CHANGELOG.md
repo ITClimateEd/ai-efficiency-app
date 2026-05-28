@@ -5,6 +5,47 @@ Versions follow [Semantic Versioning](https://semver.org): patch for corrections
 
 ---
 
+## [1.7.3] — 2026-05-27
+
+### Fixed
+- `vid_gen.nonai.tool`: `"Screen recording or stock footage"` → `"Screen recording"` — matches SPEC 2.10 canonical entry (GR-02).
+- `vid_gen.simple.tool`: `"Slide-based animation (PowerPoint / Keynote)"` → `"Slide animation (PowerPoint / Keynote)"` — matches SPEC 2.10 (GR-02).
+- Added `"Screen recording with voiceover"` to SPEC 2.10 — already used as `vid_gen.simple` fallback but missing from the spec table.
+
+---
+
+## [1.7.2] — 2026-05-27
+
+### Fixed
+- `img_gen_chat.nonai.tool`: `"Your existing images or photos"` → `"Personal or client-provided photos"` — matches SPEC 2.9 (GR-02).
+- `img_gen_slides.nonai.tool`: `"Stock images or personal photos"` → `"Stock image library"` — matches SPEC 2.9 (GR-02).
+- Added `"Built-in image editing (Photos / Snip & Sketch / Preview)"` to SPEC 2.9 — already used as `img_edit.nonai` primary but missing from the spec table.
+
+---
+
+## [1.7.1] — 2026-05-27
+
+### Fixed
+- Reasoning-mode entries re-rated to 🔴 Heavy: `GPT-5.5 Thinking` and `Claude Sonnet 4.6 (Extended Thinking)` were rated 🟡/🟠 in several nodes. Reasoning mode always carries the highest cost tier and must be 🔴 regardless of context.
+- Affected nodes: `write.complex` (vendorAlts.chatgpt), `analyze.complex` (primary and vendorAlts.chatgpt), `design.complex` (vendorAlts.chatgpt).
+
+---
+
+## [2026-05-27] — Structural changes (no registry version bump)
+
+### Added
+- `rules.js` — GR enforcement functions extracted from `index.html`: `resolveToolFromVendors`, `resolveNode`, `isFallbackInScope`. No logic changed.
+- `decision-tree.js` — State management, input handlers, and hash routing extracted from `index.html`. No logic changed.
+- `tests/gr-rules.test.js` — Rule validation test suite for GR-01 through GR-12. Run with `node tests/gr-rules.test.js`. 35 assertions; flags known violations without failing the exit code.
+
+### Changed
+- `index.html` inline script reduced to UI rendering only (`renderTaskStep`, `renderComplexityStep`, `renderResult`, etc.). Script load order: `registry.js` → `rules.js` → `decision-tree.js` → inline render script.
+- SPEC 2.2 updated to Claude 4.x model names (Haiku 4.5, Sonnet 4.6, Sonnet 4.6 Extended Thinking). Open item 3.1 closed.
+- SPEC 2.4 Cursor entries updated to use `Cursor (Model)` prefix format, matching registry strings.
+- SPEC 2.12 platform-native entries updated: "Platform transcription" → "Platform-embedded transcription"; "Platform captioning" → "Platform-embedded captioning". Seven additional Teams Premium and Stream variant entries added to cover all registry fallback strings.
+
+---
+
 ## [1.7.0] — 2026-05-27
 
 v1.7.0 (2026-05-27) — Add vendorAlts.codex to all 12 code task entries; Codex now resolves correctly for code tasks when selected alongside non-coding vendors
