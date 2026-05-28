@@ -5,6 +5,17 @@ Versions follow [Semantic Versioning](https://semver.org): patch for corrections
 
 ---
 
+## [1.7.4] — 2026-05-27
+
+### Added
+- `image_analyze.*.vendorAlts.chatgpt`: when the ChatGPT vendor filter is active, all three complexity levels now resolve to `ChatGPT Auto (vision)` instead of falling through to the claude primary. Fallbacks point back to the claude vision equivalents (Haiku 4.5 for simple, Sonnet 4.6 for moderate/complex).
+- `ChatGPT Auto (vision)` added to SPEC 2.1 — vision is native to the GPT-5.5 family and requires no mode change; the entry clarifies its scope (image Q&A, chart reading, visual analysis).
+
+### Notes
+- No rendering logic changes. `resolveNode` already checks `vendorAlts['chatgpt']` for non-code tasks via `ALT_ORDER`.
+
+---
+
 ## [1.7.3] — 2026-05-27
 
 ### Fixed
