@@ -149,4 +149,4 @@ Enterprise teams looking to go deeper can reach out at [itclimateed.com](https:/
 
 ---
 
-*Registry version: 1.3.0 — last updated May 22, 2026 — see [CHANGELOG.md](CHANGELOG.md)*
+*Registry version: 1.3.0 — last updated May 22, 2026 — see [CHANGELOG.md](CHANGELOG.md) · [Releases](https://github.com/ITClimateEd/ai-efficiency-app/releases)*
