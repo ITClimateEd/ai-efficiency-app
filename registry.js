@@ -3,7 +3,7 @@
 
 // Bump REGISTRY_VERSION on every registry change (patch = correction, minor = new model/mode, major = structural)
 // Update REGISTRY_LAST_UPDATED and add an entry to CHANGELOG.md at the same time.
-const REGISTRY_VERSION      = '2.0.0';
+const REGISTRY_VERSION      = '2.1.0';
 const REGISTRY_LAST_UPDATED = '2026-05-28';
 
 const RESEARCH_NOTES = {
@@ -110,6 +110,7 @@ const recommendations = {
       vendorAlts:{
         chatgpt:{ tool:'ChatGPT Auto', rating:'🟢', reason:'Auto routing selects the efficient tier for short text — no manual model configuration required.', fallback:{ tool:'M365 Copilot Word (Auto)', vendor:'m365', reason:'Auto selects the most efficient Word mode for short drafts, emails, and summaries — no model configuration needed.' } },
         gemini: { tool:'Gemini 2.5 Flash', rating:'🟢', reason:'Lightweight and fast for short, clear text — no reasoning overhead for emails, summaries, or brief drafts.' },
+        m365: { tool:'M365 Copilot Word (Auto)', rating:'🟢', reason:'Auto selects the most efficient Word mode for short drafts, emails, and summaries — no model configuration needed.' },
       },
     },
     moderate: {
@@ -120,6 +121,7 @@ const recommendations = {
       vendorAlts:{
         chatgpt:{ tool:'ChatGPT Auto', rating:'🟡', reason:'Auto handles multi-step drafts and tone adjustments — reasoning mode activates only when needed.', fallback:{ tool:'M365 Copilot Word (Quick Response)', vendor:'m365', reason:'Quick Response handles multi-step drafts and tone adjustments with minimal processing overhead.' } },
         gemini: { tool:'Gemini 2.5 Flash', rating:'🟢', reason:'Handles multi-step drafts and tone adjustments without reaching for a reasoning model.' },
+        m365: { tool:'M365 Copilot Word (Quick Response)', rating:'🟡', reason:'Quick Response handles multi-step drafts and tone adjustments with minimal processing overhead.' },
       },
     },
     complex: {
@@ -130,6 +132,7 @@ const recommendations = {
       vendorAlts:{
         chatgpt:{ tool:'GPT-5.5 Thinking', rating:'🔴', reason:'Thinking mode provides targeted reasoning for complex drafts with nuanced judgment — lower overhead than always-on reasoning. Reasoning models consume significantly more energy per query than standard models — activate only when task complexity justifies it.', fallback:{ tool:'M365 Copilot Word (Think Deeper)', vendor:'m365', reason:'Think Deeper applies extended reasoning for complex drafts requiring nuanced judgment — no manual model selection. Reasoning models consume significantly more energy per query than standard models — activate only when task complexity justifies it.' } },
         gemini: { tool:'Gemini 2.5 Thinking', rating:'🔴', reason:'Extended thinking activates on demand for nuanced, long-form drafts — more targeted than always-on reasoning. Reasoning models consume significantly more energy per query than standard models — activate only when task complexity justifies it.' },
+        m365: { tool:'M365 Copilot Word (Think Deeper)', rating:'🟠', reason:'Think Deeper applies extended reasoning for complex drafts requiring nuanced judgment — no manual model selection. Reasoning models consume significantly more energy per query — activate only when task complexity justifies it.' },
       },
     },
   },
@@ -142,6 +145,7 @@ const recommendations = {
       vendorAlts:{
         chatgpt:{ tool:'ChatGPT Auto', rating:'🟢', reason:'Auto routes simple factual lookups and single-source summaries to the fast tier automatically.', fallback:{ tool:'M365 Copilot Word (Auto)', vendor:'m365', reason:'Auto mode handles factual lookups and single-source summaries efficiently within Word.' } },
         gemini: { tool:'Gemini 2.5 Flash', rating:'🟢', reason:'Handles factual lookups and single-source summaries efficiently — no reasoning loop needed.' },
+        m365: { tool:'M365 Copilot Word (Auto)', rating:'🟢', reason:'Auto mode handles factual lookups and single-source summaries efficiently within Word.' },
       },
     },
     moderate: {
@@ -152,6 +156,7 @@ const recommendations = {
       vendorAlts:{
         chatgpt:{ tool:'ChatGPT Auto', rating:'🟡', reason:'Auto handles multi-source synthesis and structured comparison without overprovisioning.', fallback:{ tool:'M365 Copilot Word (Quick Response)', vendor:'m365', reason:'Quick Response covers multi-source synthesis and structured comparison within Word.' } },
         gemini: { tool:'Gemini 2.5 Flash', rating:'🟢', reason:'Covers multi-source synthesis and structured comparison without overprovisioning.' },
+        m365: { tool:'M365 Copilot Word (Quick Response)', rating:'🟡', reason:'Quick Response covers multi-source synthesis and structured comparison within Word.' },
       },
     },
     complex: {
@@ -162,6 +167,7 @@ const recommendations = {
       vendorAlts:{
         chatgpt:{ tool:'GPT-5.5 Thinking', rating:'🔴', reason:'Thinking mode activates on demand for deep synthesis — more efficient than routing every query to a frontier model by default. Reasoning models consume significantly more energy per query than standard models — activate only when task complexity justifies it.', fallback:{ tool:'M365 Copilot Word (Think Deeper)', vendor:'m365', reason:'Think Deeper applies extended reasoning for deep synthesis — no manual model selection required. Reasoning models consume significantly more energy per query than standard models — activate only when task complexity justifies it.' } },
         gemini: { tool:'Gemini 2.5 Thinking', rating:'🔴', reason:'Extended thinking activates on demand for deep synthesis — more efficient than always routing to a frontier model. Reasoning models consume significantly more energy per query than standard models — activate only when task complexity justifies it.' },
+        m365: { tool:'M365 Copilot Word (Think Deeper)', rating:'🔴', reason:'Think Deeper applies extended reasoning for deep synthesis — no manual model selection required. Reasoning models consume significantly more energy per query — activate only when task complexity justifies it.' },
       },
     },
   },
@@ -174,6 +180,7 @@ const recommendations = {
       vendorAlts:{
         chatgpt:{ tool:'ChatGPT Auto', rating:'🟢', reason:'Auto handles simple specs and design briefs without reasoning overhead.', fallback:{ tool:'M365 Copilot Word (Auto)', vendor:'m365', reason:'Auto mode handles simple specs and design briefs within Word.' } },
         gemini: { tool:'Gemini 2.5 Flash', rating:'🟢', reason:'Handles simple specs and design briefs efficiently — no reasoning overhead for structured text.' },
+        m365: { tool:'M365 Copilot Word (Auto)', rating:'🟢', reason:'Auto mode handles simple specs and design briefs within Word — no model configuration needed.' },
       },
     },
     moderate: {
@@ -184,6 +191,7 @@ const recommendations = {
       vendorAlts:{
         chatgpt:{ tool:'ChatGPT Auto', rating:'🟡', reason:'Auto handles iterative design documents and system specs without overprovisioning.', fallback:{ tool:'M365 Copilot Word (Quick Response)', vendor:'m365', reason:'Quick Response handles iterative design documents and system specs efficiently.' } },
         gemini: { tool:'Gemini 2.5 Flash', rating:'🟢', reason:'Handles iterative design documents and system specs efficiently at minimal compute cost.' },
+        m365: { tool:'M365 Copilot Word (Quick Response)', rating:'🟡', reason:'Quick Response handles iterative design documents and system specs efficiently within M365.' },
       },
     },
     complex: {
@@ -194,6 +202,7 @@ const recommendations = {
       vendorAlts:{
         chatgpt:{ tool:'GPT-5.5 Thinking', rating:'🔴', reason:'Thinking mode supports multi-system design with interdependencies — no need for a full frontier model. Reasoning models consume significantly more energy per query than standard models — activate only when task complexity justifies it.', fallback:{ tool:'M365 Copilot Word (Think Deeper)', vendor:'m365', reason:'Think Deeper supports complex multi-system design with interdependencies — use for documents requiring structured reasoning. Reasoning models consume significantly more energy per query than standard models — activate only when task complexity justifies it.' } },
         gemini: { tool:'Gemini 2.5 Thinking', rating:'🔴', reason:'Extended thinking supports multi-system design with interdependencies. Reasoning models consume significantly more energy per query than standard models — activate only when task complexity justifies it.' },
+        m365: { tool:'M365 Copilot Word (Think Deeper)', rating:'🟠', reason:'Think Deeper supports complex multi-system design with interdependencies — structured reasoning without manual model selection. Reasoning models consume significantly more energy per query — activate only when task complexity justifies it.' },
       },
     },
   },
@@ -385,6 +394,9 @@ const recommendations = {
       vendorAlts:{
         codex:{ tool:'GPT-5.3-Codex', rating:'🟢', reason:'GPT-5.3-Codex is the LTS base model — routine code Q&A and snippet explanation are well within its range.', fallback:{ tool:'ChatGPT Auto', vendor:'chatgpt', reason:'Auto routes simple code Q&A to the appropriate GPT-5.5 tier.' } },
         gemini: { tool:'Gemini 2.5 Flash', rating:'🟢', reason:'Code explanation is read-only — Gemini 2.5 Flash handles snippet and function-level Q&A at minimal overhead.' },
+        claudecode: { tool:'Claude Code (Haiku model)', rating:'🟢', reason:'Code explanation within Claude Code — Haiku handles snippet and function-level Q&A at minimal overhead in the editor context.' },
+        cursor: { tool:'Cursor (Auto)', rating:'🟢', reason:'Inline code Q&A within your editor — no context switching or separate chat session needed.' },
+        githubcopilot: { tool:'GitHub Copilot (Auto)', rating:'🟢', reason:'Auto routes simple code Q&A to the most efficient eligible model — no manual selection needed.' },
       },
       lastValidated:'2026-05-27',
     },
@@ -395,6 +407,9 @@ const recommendations = {
       vendorAlts:{
         codex:{ tool:'GPT-5.3-Codex', rating:'🟡', reason:'Handles architecture explanation and multi-file review at the LTS baseline — no reasoning model needed.', fallback:{ tool:'ChatGPT Auto', vendor:'chatgpt', reason:'Auto mode handles architecture explanation and multi-file code review.' } },
         gemini: { tool:'Gemini 2.5 Flash', rating:'🟢', reason:'Handles architecture explanation and multi-file review without a reasoning model.' },
+        claudecode: { tool:'Claude Code (Sonnet model)', rating:'🟡', reason:'Handles architecture explanation and multi-file review within Claude Code\'s context window without a reasoning model.' },
+        cursor: { tool:'Cursor (Auto)', rating:'🟡', reason:'Handles architecture explanation and multi-file review inline — scope context to relevant files to minimise overhead.' },
+        githubcopilot: { tool:'GitHub Copilot (Auto)', rating:'🟡', reason:'Auto handles architecture explanation and multi-file review efficiently — model routing stays optimal without manual configuration.' },
       },
       lastValidated:'2026-05-27',
     },
@@ -405,6 +420,9 @@ const recommendations = {
       vendorAlts:{
         codex:{ tool:'GPT-5.3-Codex', rating:'🟡', reason:'Even complex architecture review is read-only — GPT-5.3-Codex covers large-context code analysis at the LTS baseline.', fallback:{ tool:'ChatGPT Auto', vendor:'chatgpt', reason:'Auto mode handles large-context code review; escalate to GPT-5.5 Thinking only if reasoning over the architecture is required.' } },
         gemini: { tool:'Gemini 2.1 Pro', rating:'🔴', reason:'Handles large-context code analysis and complex architecture review — read-only tasks stay within its efficient range.' },
+        claudecode: { tool:'Claude Code (Sonnet model)', rating:'🟡', reason:'Even complex architecture review is read-only — Claude Code (Sonnet) covers large-context code analysis effectively within the editor.' },
+        cursor: { tool:'Cursor (Auto)', rating:'🟡', reason:'Even complex architecture analysis stays read-only — scope context to relevant files and escalate to Composer only if generation is needed.' },
+        githubcopilot: { tool:'GitHub Copilot (Auto)', rating:'🟡', reason:'Even complex architecture review stays within Auto\'s range — escalate to Claude Sonnet 4.6 only when deep reasoning over the codebase is required.' },
       },
       lastValidated:'2026-05-27',
     },
@@ -417,6 +435,9 @@ const recommendations = {
       vendorAlts:{
         codex:{ tool:'GPT-5.3-Codex', rating:'🟢', reason:'Single-function generation and simple fixes are within the LTS base model\'s range — inline completion at the lowest available overhead.', fallback:{ tool:'ChatGPT Auto', vendor:'chatgpt', reason:'Auto mode routes single-function code tasks to GPT-5.5 Instant.' } },
         gemini: { tool:'Gemini 2.5 Flash', rating:'🟢', reason:'Single-function generation and simple bug fixes are within Gemini 2.5 Flash\'s range — low context overhead for inline tasks.' },
+        claudecode: { tool:'Claude Code (Haiku model)', rating:'🟢', reason:'Single-function generation and simple fixes within Claude Code — Haiku provides minimal context overhead for inline tasks.' },
+        cursor: { tool:'Cursor (Auto)', rating:'🟢', reason:'Auto selects the most efficient Cursor-native model for single-function completions — no manual model selection needed.' },
+        githubcopilot: { tool:'GitHub Copilot (Auto)', rating:'🟢', reason:'Auto routes single-function code tasks and inline completions to the lightest eligible model automatically.' },
       },
       lastValidated:'2026-05-27',
     },
@@ -427,6 +448,9 @@ const recommendations = {
       vendorAlts:{
         codex:{ tool:'GPT-5.3-Codex', rating:'🟡', reason:'Handles multi-function code and refactoring at the LTS baseline — keep context scoped to relevant files.', fallback:{ tool:'ChatGPT Auto', vendor:'chatgpt', reason:'Auto mode handles multi-function code and refactoring; avoid enabling reasoning mode for standard tasks.' } },
         gemini: { tool:'Gemini 2.5 Flash', rating:'🟢', reason:'Handles multi-function code and moderate refactoring — keep context scoped to relevant files.' },
+        claudecode: { tool:'Claude Code (Sonnet model)', rating:'🟡', reason:'Handles multi-function code and refactoring within Claude Code — use /clear between unrelated tasks to reset accumulated context.' },
+        cursor: { tool:'Cursor (Composer 1.5)', rating:'🟡', reason:'Composer 1.5 handles multi-function code and moderate refactoring efficiently — keep auto-accept off and scope context to relevant files.' },
+        githubcopilot: { tool:'GitHub Copilot (Auto)', rating:'🟡', reason:'Auto handles multi-function code and refactoring — avoid manually enabling reasoning mode for standard tasks.' },
       },
       lastValidated:'2026-05-27',
     },
@@ -437,6 +461,9 @@ const recommendations = {
       vendorAlts:{
         codex:{ tool:'GPT-5.3-Codex', rating:'🟠', reason:'Complex cross-system debugging at the LTS baseline — scope context carefully and escalate to extended reasoning only when simpler passes fail.', fallback:{ tool:'ChatGPT Auto', vendor:'chatgpt', reason:'Auto mode handles complex debugging; escalate to GPT-5.5 Thinking only when cross-system reasoning is required.' } },
         gemini: { tool:'Gemini 2.1 Pro', rating:'🔴', reason:'Optimized for complex code and cross-system debugging. Reasoning models consume significantly more energy per query — activate only when task complexity justifies it.' },
+        claudecode: { tool:'Claude Code (Sonnet model)', rating:'🟠', reason:'Extended thinking resolves complex cross-system bugs within Claude Code — more targeted than defaulting to Opus. Reasoning models consume significantly more energy per query — activate only when task complexity justifies it.' },
+        cursor: { tool:'Cursor (Composer 2)', rating:'🟠', reason:'Composer 2 handles complex cross-file code generation — review each step and scope context carefully to avoid accumulation.' },
+        githubcopilot: { tool:'GitHub Copilot (Claude Sonnet 4.6)', rating:'🔴', reason:'Claude Sonnet 4.6 handles complex cross-file code generation within GitHub Copilot. Reasoning models consume significantly more energy per query — activate only when task complexity justifies it.' },
       },
       lastValidated:'2026-05-27',
     },
@@ -449,6 +476,8 @@ const recommendations = {
       vendorAlts:{
         codex:{ tool:'GPT-5.3-Codex', rating:'🟠', reason:'Interactive building with the LTS base Codex model — review each output step to prevent context accumulation.', fallback:{ tool:'ChatGPT Auto', vendor:'chatgpt', reason:'Auto mode routes interactive build tasks to the appropriate model tier.' } },
         gemini: { tool:'Gemini 2.5 Flash', rating:'🟢', reason:'Interactive building with a lightweight model — review each output step to prevent wasted context accumulation.' },
+        cursor: { tool:'Cursor (Auto)', rating:'🟠', reason:'Auto selects the most efficient Cursor-native model — keep auto-accept off and scope context to relevant files only.' },
+        githubcopilot: { tool:'GitHub Copilot (Auto)', rating:'🟠', reason:'Auto selects the most efficient eligible model for interactive building — keep auto-accept off and scope context to relevant files.' },
       },
       lastValidated:'2026-05-01',
     },
@@ -459,6 +488,8 @@ const recommendations = {
       vendorAlts:{
         codex:{ tool:'GPT-5.3-Codex', rating:'🟠', reason:'Standard interactive build sessions at the LTS baseline — scope context to relevant files and review outputs before advancing.', fallback:{ tool:'ChatGPT Auto', vendor:'chatgpt', reason:'Auto mode handles standard interactive build sessions.' } },
         gemini: { tool:'Gemini 2.5 Flash', rating:'🟢', reason:'Standard interactive build sessions — scope context to relevant files and clear between unrelated tasks.' },
+        cursor: { tool:'Cursor (Composer 1.5)', rating:'🟠', reason:'Composer 1.5 is Cursor\'s cost-efficient native model for standard interactive builds — keep auto-accept off.' },
+        githubcopilot: { tool:'GitHub Copilot (Auto)', rating:'🟠', reason:'Auto handles standard interactive build sessions — scope context to relevant files and review outputs before advancing.' },
       },
       lastValidated:'2026-05-01',
     },
@@ -469,6 +500,8 @@ const recommendations = {
       vendorAlts:{
         codex:{ tool:'GPT-5.3-Codex', rating:'🟠', reason:'Complex interactive builds stay within the LTS model\'s range when scoped carefully — review each step to prevent wasted context.', fallback:{ tool:'ChatGPT Auto', vendor:'chatgpt', reason:'Auto mode handles complex interactive builds; avoid enabling reasoning mode for incremental work.' } },
         gemini: { tool:'Gemini 2.1 Pro', rating:'🔴', reason:'Complex interactive builds stay efficient when you scope context carefully and review each step.' },
+        cursor: { tool:'Cursor (Composer 2)', rating:'🟠', reason:'Composer 2 handles complex multi-file builds — review each step to prevent context accumulation.' },
+        githubcopilot: { tool:'GitHub Copilot (Auto)', rating:'🟠', reason:'Auto handles complex interactive builds — avoid enabling reasoning mode for incremental work and review each step.' },
       },
       lastValidated:'2026-05-01',
     },
@@ -481,6 +514,8 @@ const recommendations = {
       vendorAlts:{
         codex:{ tool:'GPT-5.3-Codex', rating:'🔴', reason:'Simple automations — file transforms, single-API integrations — are within GPT-5.3-Codex\'s range. Agentic workflows accumulate inference cost multiplicatively — each tool call or iteration is a separate model request. Limit parallel agents and batch related tasks to reduce total query count.', fallback:{ tool:'GitHub Copilot (Auto)', vendor:'githubcopilot', reason:'Auto routes simple agentic tasks to the most efficient eligible model.' } },
         gemini: { tool:'Gemini 2.5 Flash', rating:'🟢', reason:'Simple automations — file transforms, single-API integrations — are within Gemini 2.5 Flash\'s capability. Agentic workflows accumulate inference cost multiplicatively — batch related tasks and limit parallel agents.' },
+        cursor: { tool:'Cursor (Auto)', rating:'🔴', reason:'Auto selects the most efficient model for simple automation tasks. Agentic workflows accumulate inference cost multiplicatively — batch related tasks and limit parallel agents.' },
+        githubcopilot: { tool:'GitHub Copilot (Auto)', rating:'🔴', reason:'Auto routes simple agentic tasks to the most efficient eligible model. Agentic workflows accumulate inference cost multiplicatively — batch related tasks and limit parallel agents.' },
       },
       lastValidated:'2026-05-27',
     },
@@ -491,6 +526,8 @@ const recommendations = {
       vendorAlts:{
         codex:{ tool:'GPT-5.3-Codex', rating:'🔴', reason:'Standard automation at the LTS baseline — run tasks sequentially and use /clear between workflows. Agentic workflows accumulate inference cost multiplicatively — each tool call or iteration is a separate model request. Limit parallel agents and batch related tasks to reduce total query count.', fallback:{ tool:'GitHub Copilot (Auto)', vendor:'githubcopilot', reason:'Auto mode handles moderate agentic workflows; keeps model routing efficient.' } },
         gemini: { tool:'Gemini 2.5 Flash', rating:'🟢', reason:'Standard automations handled efficiently — run tasks sequentially and clear context between workflows. Agentic workflows accumulate inference cost multiplicatively — limit parallel agents and batch related tasks.' },
+        cursor: { tool:'Cursor (Claude Sonnet 4.5)', rating:'🔴', reason:'Handles writing and documentation automation within Cursor — set iteration limits and batch related tasks into one session. Agentic workflows accumulate inference cost multiplicatively.' },
+        githubcopilot: { tool:'GitHub Copilot (Auto)', rating:'🔴', reason:'Auto keeps model routing efficient for standard agentic workflows. Agentic workflows accumulate inference cost multiplicatively — run tasks sequentially and limit parallel agents.' },
       },
       lastValidated:'2026-05-27',
     },
@@ -501,6 +538,8 @@ const recommendations = {
       vendorAlts:{
         codex:{ tool:'GPT-5.3-Codex', rating:'🔴', reason:'Complex orchestration at the LTS baseline — sequence related tasks and avoid parallel agents. Agentic workflows accumulate inference cost multiplicatively — each tool call or iteration is a separate model request. Limit parallel agents and batch related tasks to reduce total query count.', fallback:{ tool:'GitHub Copilot (Auto)', vendor:'githubcopilot', reason:'Auto handles complex multi-file agentic workflows; avoid parallel agents unless tasks are genuinely independent.' } },
         gemini: { tool:'Gemini 2.1 Pro', rating:'🔴', reason:'Complex orchestration with Gemini 2.1 Pro — sequence related tasks and avoid parallel agents. Agentic workflows accumulate inference cost multiplicatively — limit parallel agents and batch related tasks.' },
+        cursor: { tool:'Cursor (GPT-5.2 Codex)', rating:'🔴', reason:'Efficient third-party option for complex multi-file agentic workflows — avoid parallel agents unless tasks are genuinely independent. Agentic workflows accumulate inference cost multiplicatively.' },
+        githubcopilot: { tool:'GitHub Copilot (Auto)', rating:'🔴', reason:'Auto handles complex multi-file agentic workflows — avoid parallel agents unless tasks are genuinely independent. Agentic workflows accumulate inference cost multiplicatively.' },
       },
       lastValidated:'2026-05-27',
     },

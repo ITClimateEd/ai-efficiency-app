@@ -5,6 +5,22 @@ Versions follow [Semantic Versioning](https://semver.org): patch for corrections
 
 ---
 
+## [2.1.0] — 2026-05-28
+
+### Added
+
+**Expanded tool picker coverage** — five additional tools now appear as selectable options across applicable tasks:
+
+- **Cursor** (`cursor`): added to `code_explain`, `code_write`, `code_build`, `code_automate` (all complexities)
+- **Claude Code** (`claudecode`): added to `code_explain`, `code_write` (already primary for `code_build` / `code_automate`)
+- **GitHub Copilot** (`githubcopilot`): added to `code_explain`, `code_write`, `code_build`, `code_automate` (all complexities)
+- **M365 Copilot** (`m365`): added to `write`, `analyze`, `design` (all complexities; was previously only surfaced as a fallback)
+- **OpenAI Codex** (`codex`): already present in all four code tasks — no change needed
+
+Tool strings and ratings per task/complexity are consistent with existing proxy-vendor patterns (Cursor, M365, GitHub Copilot use `isProxyNativeTool` to display specific mode names as-is).
+
+---
+
 ## [2.0.0] — 2026-05-28
 
 ### Changed (major — structural refactor)
