@@ -5,6 +5,19 @@ Versions follow [Semantic Versioning](https://semver.org): patch for corrections
 
 ---
 
+## [2.2.0] — 2026-05-28
+
+### Added
+
+- `vid_gen.*.vendorAlts`: added `chatgpt` (Sora) and `gemini` (Google Veo 2) vendor options for the generate-new-content path. Simple → standard quality (🔴); moderate/complex → HD quality (🟣). The tool picker now appears after "No — I need to generate new content" for video generation tasks.
+
+### Fixed
+
+- `rules.js / isGreenestOption`: null-vendor primary recommendations (non-AI alternatives, e.g. professional production) are no longer included in the "best available" energy-tier comparison. They are not selectable in the tool picker and must not skew the greener-alternative benchmark.
+- `rules.js / getGreenestAlternative`: now returns null when the best candidate is the same tier as the current vendor — previously it would surface an equally-heavy tool as a "greener" option.
+
+---
+
 ## [2.1.0] — 2026-05-28
 
 ### Added

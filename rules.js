@@ -33,6 +33,8 @@ function getAvailableVendors(task) {
 }
 
 // GR-04: returns true when the selected vendor's rating matches the best available for task+complexity.
+// Only named (non-null) vendors are included in the comparison — null-vendor primaries represent
+// non-AI alternatives that are not selectable in the tool picker and must not skew the benchmark.
 function isGreenestOption(vendor, task, complexity) {
   const taskRecs = recommendations[task];
   if (!taskRecs || !taskRecs[complexity] || !vendor) return true;
@@ -48,7 +50,8 @@ function isGreenestOption(vendor, task, complexity) {
   }
   const currentOrder = RATING_ORDER[currentRating] || 99;
 
-  let bestOrder = primary.rating ? (RATING_ORDER[primary.rating] || 99) : 99;
+  // Exclude null-vendor primary from comparison — it is not in the tool picker
+  let bestOrder = (primary.vendor && primary.rating) ? (RATING_ORDER[primary.rating] || 99) : 99;
   if (primary.vendorAlts) {
     Object.values(primary.vendorAlts).forEach(alt => {
       const order = RATING_ORDER[alt.rating] || 99;
@@ -59,8 +62,8 @@ function isGreenestOption(vendor, task, complexity) {
   return currentOrder <= bestOrder;
 }
 
-// Returns the best alternative option for a given vendor+task+complexity, or null if vendor is greenest.
-// Used to populate the "Greener alternative" section in the result card.
+// Returns the best alternative option strictly greener than the current vendor for task+complexity.
+// Returns null if no named vendor is a better option (same or worse tier).
 function getGreenestAlternative(vendor, task, complexity) {
   const taskRecs = recommendations[task];
   if (!taskRecs || !taskRecs[complexity]) return null;
@@ -79,7 +82,14 @@ function getGreenestAlternative(vendor, task, complexity) {
   }
   if (!candidates.length) return null;
   candidates.sort((a, b) => (RATING_ORDER[a.rating] || 99) - (RATING_ORDER[b.rating] || 99));
-  return candidates[0];
+
+  // Only return if the best candidate is strictly better (lower order) than current vendor
+  const currentRating = (vendor === primary.vendor)
+    ? primary.rating
+    : (primary.vendorAlts && primary.vendorAlts[vendor] ? primary.vendorAlts[vendor].rating : null);
+  const currentOrder = currentRating ? (RATING_ORDER[currentRating] || 99) : 99;
+  const best = candidates[0];
+  return (RATING_ORDER[best.rating] || 99) < currentOrder ? best : null;
 }
 
 // GR-01/GR-02/GR-06: resolve the registry node for the given task and complexity.

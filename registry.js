@@ -3,7 +3,7 @@
 
 // Bump REGISTRY_VERSION on every registry change (patch = correction, minor = new model/mode, major = structural)
 // Update REGISTRY_LAST_UPDATED and add an entry to CHANGELOG.md at the same time.
-const REGISTRY_VERSION      = '2.1.0';
+const REGISTRY_VERSION      = '2.2.0';
 const REGISTRY_LAST_UPDATED = '2026-05-28';
 
 const RESEARCH_NOTES = {
@@ -371,18 +371,30 @@ const recommendations = {
       rating:'🟢', tool:'Slide animation (PowerPoint / Keynote)', vendor:null,
       reason:'AI video generation carries among the highest compute costs of any enterprise AI task — a short clip consumes 10–50× the energy of a text request. Slide-based animations achieve comparable results for most internal and training content at zero AI cost.',
       fallback:{ tool:'Screen recording with voiceover', vendor:null, reason:'Record a narrated walkthrough — no AI generation cost, immediate output, fully controllable.' },
+      vendorAlts:{
+        chatgpt: { tool:'Sora (standard quality)', rating:'🔴', reason:'AI video generation carries significant compute cost — even a short clip consumes 10–50× the energy of a text request. Standard quality reduces overhead; write a precise prompt to minimise retries.' },
+        gemini:  { tool:'Google Veo 2 (standard)', rating:'🔴', reason:'AI video generation is energy-intensive even at standard quality. Write a precise prompt before generating to minimise retries — each failed pass is a full generation.' },
+      },
       lastValidated:'2026-05-01',
     },
     moderate: {
       rating:'🟢', tool:'Professional video production', vendor:null,
-      reason:'AI video generation at this scale consumes extreme compute resources — among the highest of any enterprise AI task. No approved AI video tool is in the current shortlist. Professional production delivers better quality control and is typically more cost-effective than iterative AI generation.',
+      reason:'AI video generation at this scale consumes extreme compute resources — among the highest of any enterprise AI task. Professional production delivers better quality control and is typically more cost-effective than iterative AI generation.',
       fallback:{ tool:'Stock footage + motion graphics', vendor:null, reason:'Combine licensed stock footage with motion graphics tools — zero AI cost and immediate output for training and marketing content.' },
+      vendorAlts:{
+        chatgpt: { tool:'Sora (HD quality)', rating:'🟣', reason:'HD AI video generation has very high compute cost. Minimise iteration with detailed scene descriptions and storyboards before generating — each pass consumes significant resources.' },
+        gemini:  { tool:'Google Veo 2 (HD)', rating:'🟣', reason:'HD AI video generation carries high compute cost. Write detailed, precise prompts and prepare a storyboard before generating to reduce retries.' },
+      },
       lastValidated:'2026-05-01',
     },
     complex: {
       rating:'🟢', tool:'Professional video production', vendor:null,
-      reason:'Complex AI video generation has extreme energy overhead and no approved AI video tool exists in the current shortlist. Professional human production provides full creative control without the environmental and cost trade-offs of iterative AI generation.',
+      reason:'Complex AI video generation has extreme energy overhead. Professional human production provides full creative control without the environmental and cost trade-offs of iterative AI generation.',
       fallback:{ tool:'Stock footage + motion graphics', vendor:null, reason:'If budget or timeline limits professional production, combine licensed stock footage with motion graphics tools — zero AI cost, immediate output.' },
+      vendorAlts:{
+        chatgpt: { tool:'Sora (HD quality)', rating:'🟣', reason:'Complex AI video generation at high quality has extreme compute overhead. Develop detailed storyboards and precise prompts before starting — each generation pass is expensive and iterations multiply the cost.' },
+        gemini:  { tool:'Google Veo 2 (HD)', rating:'🟣', reason:'Complex AI video generation carries extreme energy overhead. Minimise iterations with detailed creative direction and precise prompts — each failed pass is a full generation at highest cost.' },
+      },
       lastValidated:'2026-05-01',
     },
   },
