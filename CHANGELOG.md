@@ -5,6 +5,13 @@ Versions follow [Semantic Versioning](https://semver.org): patch for corrections
 
 ---
 
+## [2.2.1] — 2026-05-28
+
+### Removed
+- `vid_gen.*.vendorAlts.chatgpt` (Sora): removed — Sora is no longer available (GR-01). Google Veo 2 via Gemini remains the only AI video generation option in the tool picker.
+
+---
+
 ## [2.2.0] — 2026-05-28
 
 ### Added
