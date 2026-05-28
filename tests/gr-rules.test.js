@@ -72,7 +72,7 @@ const RATING_WEIGHT    = { '🟢': 0, '🟡': 1, '🟠': 2, '🔴': 3, '🟣': 4
 // Valid tool strings per SPEC.md Section 2 (source of truth for GR-02).
 const SPEC_TOOLS = new Set([
   // 2.1 ChatGPT
-  'ChatGPT Auto', 'GPT-5.5 Instant', 'GPT-5.5 Thinking', 'Pro Reasoning mode',
+  'ChatGPT Auto', 'ChatGPT Auto (vision)', 'GPT-5.5 Instant', 'GPT-5.5 Thinking', 'Pro Reasoning mode',
   // 2.2 Claude — updated to 4.x (open item 3.1 resolved)
   'Claude Haiku 4.5', 'Claude Haiku 4.5 (vision)',
   'Claude Sonnet 4.6', 'Claude Sonnet 4.6 (vision)',

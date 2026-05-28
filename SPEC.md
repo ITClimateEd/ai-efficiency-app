@@ -52,6 +52,7 @@ All valid recommendation outputs. `registry.js` is the implementation of this re
 | Model / Mode | Cost tier | When to use |
 |---|---|---|
 | **Auto** | — | Default for all tasks. System routes between Instant and Thinking. Always start here. |
+| ChatGPT Auto (vision) | — | Auto with image input. Vision is native to the GPT-5.5 family — no mode change required. Use for image Q&A, chart reading, and visual analysis tasks. |
 | GPT-5.5 Instant | Standard | Fast, efficient. Routine tasks — writing, summarizing, Q&A. |
 | GPT-5.5 Thinking | Higher | Complex reasoning, analysis, multi-step problems. Use only when Auto is insufficient. |
 | Pro Reasoning mode | Highest | Reserve for hardest analytical tasks. Admin must enable. |

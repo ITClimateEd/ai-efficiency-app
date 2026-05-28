@@ -3,7 +3,7 @@
 
 // Bump REGISTRY_VERSION on every registry change (patch = correction, minor = new model/mode, major = structural)
 // Update REGISTRY_LAST_UPDATED and add an entry to CHANGELOG.md at the same time.
-const REGISTRY_VERSION      = '1.7.3';
+const REGISTRY_VERSION      = '1.7.4';
 const REGISTRY_LAST_UPDATED = '2026-05-27';
 
 const RESEARCH_NOTES = {
@@ -193,18 +193,27 @@ const recommendations = {
       rating:'🟠', tool:'Claude Haiku 4.5 (vision)', vendor:'claude',
       reason:'Small vision-capable model handles clear image Q&A and object classification without a heavyweight multimodal pipeline.',
       fallback:{ tool:'ChatGPT Auto', vendor:'chatgpt', reason:'Auto mode routes simple image Q&A to the appropriate GPT-5.5 tier — vision is built into the family.' },
+      vendorAlts:{
+        chatgpt:{ tool:'ChatGPT Auto (vision)', rating:'🟠', reason:'GPT-5.5 supports image uploads natively — Auto routes simple image Q&A and object identification to the most efficient tier.', fallback:{ tool:'Claude Haiku 4.5 (vision)', vendor:'claude', reason:'Lightweight vision model for simple image Q&A.' } },
+      },
       lastValidated:'2026-05-27',
     },
     moderate: {
       rating:'🟠', tool:'Claude Sonnet 4.6 (vision)', vendor:'claude',
       reason:'Mid-tier multimodal model for structured image analysis, chart reading, and detailed descriptions.',
       fallback:{ tool:'ChatGPT Auto', vendor:'chatgpt', reason:'Auto mode handles document and chart analysis; vision capability is standard across the GPT-5.5 family.' },
+      vendorAlts:{
+        chatgpt:{ tool:'ChatGPT Auto (vision)', rating:'🟠', reason:'GPT-5.5 handles chart reading, document analysis, and structured image descriptions — vision is built into the Auto tier.', fallback:{ tool:'Claude Sonnet 4.6 (vision)', vendor:'claude', reason:'Mid-tier multimodal model for structured analysis.' } },
+      },
       lastValidated:'2026-05-27',
     },
     complex: {
       rating:'🟠', tool:'Claude Sonnet 4.6 (vision)', vendor:'claude',
       reason:'Even complex tasks — multi-image comparison, dense diagram reading — stay within Sonnet\'s range; no frontier model needed.',
       fallback:{ tool:'ChatGPT Auto', vendor:'chatgpt', reason:'Auto mode manages complex visual inputs; upgrade to GPT-5.5 Thinking only if analytical reasoning over the image is required.' },
+      vendorAlts:{
+        chatgpt:{ tool:'ChatGPT Auto (vision)', rating:'🟠', reason:'Auto handles multi-image comparison and dense diagram reading; escalate to GPT-5.5 Thinking only if reasoning over the image content is required.', fallback:{ tool:'Claude Sonnet 4.6 (vision)', vendor:'claude', reason:'Handles complex visual tasks without a frontier model.' } },
+      },
       lastValidated:'2026-05-27',
     },
   },
