@@ -143,7 +143,9 @@ Please open an issue before making significant changes to the recommendation log
 
 ## About
 
-Built by [IT Climate Ed](https://tools.itclimateed.com) as part of a sustainability consulting practice focused on sustainable AI and IT. The tool helps enterprise teams — in tech, government, and financial services — reduce the energy footprint of their AI usage without sacrificing productivity.
+Built by [IT Climate Ed](https://itclimateed.com) as part of a sustainability consulting practice focused on sustainable AI and IT. The tool helps enterprise teams — in tech, government, and financial services — reduce the energy footprint of their AI usage without sacrificing productivity.
+
+Enterprise teams looking to go deeper can reach out at [itclimateed.com](https://itclimateed.com) for workshops and consulting engagements.
 
 ---
 
