@@ -295,6 +295,51 @@
     }
     .rec-btn-primary:hover { background: #157A34; border-color: #157A34; }
 
+    /* ── Bug report modal ───────────────────────────────────────── */
+    .bug-modal-overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,.45);
+      z-index: 9998;
+      display: flex; align-items: center; justify-content: center;
+      padding: 1rem;
+    }
+    .bug-modal {
+      background: var(--color-background-primary);
+      border-radius: var(--border-radius-lg);
+      padding: 1.5rem;
+      max-width: 480px; width: 100%;
+      box-shadow: 0 8px 32px rgba(0,0,0,.18);
+    }
+    .bug-modal-title {
+      font-size: 16px; font-weight: 600;
+      color: var(--color-text-primary);
+      margin-bottom: 1.1rem;
+    }
+    .bug-modal label {
+      display: block;
+      font-size: 11px; font-weight: 600;
+      color: var(--color-text-tertiary);
+      letter-spacing: .06em; text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+    .bug-modal textarea {
+      width: 100%; font-size: 13px;
+      padding: .5rem .75rem;
+      border: 0.5px solid var(--color-border-primary);
+      border-radius: var(--border-radius-md);
+      resize: vertical; font-family: inherit;
+      color: var(--color-text-primary);
+      background: var(--color-background-primary);
+      line-height: 1.5; box-sizing: border-box;
+    }
+    .bug-modal textarea:focus { outline: none; border-color: var(--green-dark); }
+    .bug-modal-field { margin-bottom: 1rem; }
+    .bug-modal-actions { display: flex; gap: 8px; margin-top: 1.25rem; flex-wrap: wrap; }
+    .bug-modal-error {
+      font-size: 12px; color: var(--color-text-danger);
+      margin-top: .4rem; display: none;
+    }
+
     /* ── No-AI flow ─────────────────────────────────────────────── */
     .noai-question {
       font-size: 15px; color: var(--color-text-primary);
@@ -512,6 +557,26 @@
     </div>
   </main>
 
+  <!-- Bug report modal -->
+  <div id="bug-modal-overlay" class="bug-modal-overlay" style="display:none" onclick="if(event.target===this)closeBugModal()">
+    <div class="bug-modal" role="dialog" aria-modal="true" aria-labelledby="bug-modal-title">
+      <p class="bug-modal-title" id="bug-modal-title">🐛 Report a Bug</p>
+      <div class="bug-modal-field">
+        <label for="bug-desc">Description <span style="color:var(--color-text-danger);font-size:13px;text-transform:none;letter-spacing:0">*</span></label>
+        <textarea id="bug-desc" rows="4" placeholder="What went wrong? What did you expect to see?"></textarea>
+        <p class="bug-modal-error" id="bug-desc-error">Please describe the bug before submitting.</p>
+      </div>
+      <div class="bug-modal-field">
+        <label for="bug-steps">Steps to reproduce <span style="font-weight:400;text-transform:none;letter-spacing:0;font-size:10px">(optional)</span></label>
+        <textarea id="bug-steps" rows="3" placeholder="1. Select task type…&#10;2. Choose complexity…&#10;3. See issue"></textarea>
+      </div>
+      <div class="bug-modal-actions">
+        <button class="rec-btn rec-btn-primary" onclick="submitBugReport()">Submit on GitHub</button>
+        <button class="rec-btn" onclick="closeBugModal()">Cancel</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Footer -->
   <footer>
     © 2026 IT Climate Ed LLC · Last updated: May 2026 · Sources: OpenAI, Anthropic, Google, Microsoft documentation<br>
@@ -558,6 +623,7 @@
           '<button class="rec-btn rec-btn-primary" onclick="copyRec()">📋 Copy recommendation</button>' +
           '<button class="rec-btn" onclick="shareResult()">🔗 Share this result</button>' +
           '<button class="rec-btn" onclick="resetAll()">↺ Start over</button>' +
+          '<button class="rec-btn" onclick="openBugModal()">🐛 Report a bug</button>' +
         '</div>' +
       '</div>' +
       '<p class="global-note">AI model capabilities change frequently. Recommendations are reviewed periodically.</p>';
@@ -584,6 +650,7 @@
           '<button class="rec-btn rec-btn-primary" onclick="copyRec()">📋 Copy recommendation</button>' +
           '<button class="rec-btn" onclick="shareResult()">🔗 Share this result</button>' +
           '<button class="rec-btn" onclick="resetAll()">↺ Start over</button>' +
+          '<button class="rec-btn" onclick="openBugModal()">🐛 Report a bug</button>' +
         '</div>' +
       '</div>' +
       '<p class="global-note">AI model capabilities change frequently. Recommendations are reviewed periodically.</p>';
@@ -652,6 +719,7 @@
           gapFallbackHtml +
           '<div class="rec-actions">' +
             '<button class="rec-btn" onclick="resetAll()">↺ Start over</button>' +
+            '<button class="rec-btn" onclick="openBugModal()">🐛 Report a bug</button>' +
           '</div>' +
         '</div>' +
         '<p class="global-note">AI model capabilities change frequently. Recommendations are reviewed periodically.</p>';
@@ -726,6 +794,7 @@
           '<button class="rec-btn rec-btn-primary" onclick="copyRec()">📋 Copy recommendation</button>' +
           '<button class="rec-btn" onclick="shareResult()">🔗 Share this result</button>' +
           '<button class="rec-btn" onclick="resetAll()">↺ Start over</button>' +
+          '<button class="rec-btn" onclick="openBugModal()">🐛 Report a bug</button>' +
         '</div>' +
       '</div>' +
       '<p class="global-note">AI model capabilities change frequently. Recommendations are reviewed periodically.</p>';
@@ -824,6 +893,47 @@
     const orig = btn.innerHTML;
     btn.innerHTML = msg;
     setTimeout(() => { btn.innerHTML = orig; }, 2000);
+  }
+
+  // ── Bug report modal ─────────────────────────────────────────────
+  function openBugModal() {
+    document.getElementById('bug-desc').value = '';
+    document.getElementById('bug-steps').value = '';
+    document.getElementById('bug-desc-error').style.display = 'none';
+    document.getElementById('bug-modal-overlay').style.display = 'flex';
+    setTimeout(() => document.getElementById('bug-desc').focus(), 50);
+  }
+
+  function closeBugModal() {
+    document.getElementById('bug-modal-overlay').style.display = 'none';
+  }
+
+  function submitBugReport() {
+    const desc = document.getElementById('bug-desc').value.trim();
+    const steps = document.getElementById('bug-steps').value.trim();
+    if (!desc) {
+      document.getElementById('bug-desc-error').style.display = 'block';
+      document.getElementById('bug-desc').focus();
+      return;
+    }
+    const title = 'Bug report: ' + desc.slice(0, 60);
+    const body = [
+      '**Description**',
+      desc,
+      '',
+      '**Steps to reproduce**',
+      steps || '_Not provided_',
+      '',
+      '---',
+      '*Reported via AI Model Efficiency Selector*  ',
+      '*URL: ' + window.location.href + '*',
+    ].join('\n');
+    const url = 'https://github.com/pascaljoly/ai-efficiency-app/issues/new' +
+      '?title=' + encodeURIComponent(title) +
+      '&body=' + encodeURIComponent(body) +
+      '&labels=bug';
+    window.open(url, '_blank', 'noopener');
+    closeBugModal();
   }
   </script>
 
