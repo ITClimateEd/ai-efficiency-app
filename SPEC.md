@@ -60,16 +60,15 @@ All valid recommendation outputs. `registry.js` is the implementation of this re
 
 ### 2.2 Claude
 
-> Direct Claude access (claude.ai or API). Versions reflect current tool codebase — update when Anthropic releases replacements.
+> Direct Claude access (claude.ai or API). Updated to Claude 4.x — open item 3.1 resolved.
 
 | Model / Mode | Cost tier | When to use |
 |---|---|---|
-| **Claude Haiku 3.5** | Lowest | Lightest model. Short text, emails, summaries, label generation. |
-| Claude Haiku 3.5 (vision) | Lowest | Simple image Q&A, object classification. No reasoning overhead. |
-| Claude Sonnet 3.5 | Mid | Multi-step drafts, structured documents, multi-document analysis. |
-| Claude Sonnet 3.5 (vision) | Mid | Charts, document images, detailed image analysis. |
-| Claude Sonnet 3.7 | Mid-high | Complex writing, design documents, higher capability tasks. |
-| Claude Sonnet 3.7 (Extended Thinking) | High | Extended reasoning. Complex analytical tasks, structured problem-solving. |
+| **Claude Haiku 4.5** | Lowest | Lightest model. Short text, emails, summaries, label generation. |
+| Claude Haiku 4.5 (vision) | Lowest | Simple image Q&A, object classification. No reasoning overhead. |
+| Claude Sonnet 4.6 | Mid | Multi-step drafts, structured documents, multi-document analysis. |
+| Claude Sonnet 4.6 (vision) | Mid | Charts, document images, detailed image analysis. |
+| Claude Sonnet 4.6 (Extended Thinking) | High | Extended reasoning. Complex analytical tasks, structured problem-solving. |
 
 ---
 
@@ -216,7 +215,7 @@ All valid recommendation outputs. `registry.js` is the implementation of this re
 
 | # | Item | Status |
 |---|------|--------|
-| 3.1 | **Claude versions** — Codebase references Haiku 3.5, Sonnet 3.5, Sonnet 3.7. Confirm whether direct Claude access entries should be updated to 4.x versions. | Open |
+| 3.1 | **Claude versions** — Updated to Haiku 4.5, Sonnet 4.6, Sonnet 4.6 (Extended Thinking) in Section 2.2. | Resolved |
 | 3.3 | **GitHub Copilot — admin policy warning** — Non-base models require admin enablement. Confirm whether the tool should surface a warning when recommending any model other than GPT-5.3-Codex or Auto. | Open |
 | 3.4 | **M365 Word — Anthropic timeline** — Anthropic model support for Word expected summer 2026. When live, Word should adopt the same model list as Excel and PowerPoint. Flag for registry update. | Open |
 | 3.5 | **EU data boundary** — Claude Opus in M365 Excel/PowerPoint processes data outside the EU Data Boundary. Recommendations involving these models should carry a data residency warning for EU-based clients. Not yet implemented. | Open |
