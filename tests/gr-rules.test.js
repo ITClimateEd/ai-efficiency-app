@@ -94,6 +94,7 @@ const SPEC_TOOLS = new Set([
   'M365 Copilot PowerPoint (Auto)',
   // 2.9 Image generation
   'Stock image library', 'Personal or client-provided photos',
+  'Built-in image editing (Photos / Snip & Sketch / Preview)',
   'DALL-E 3 (standard quality)', 'DALL-E 3 (HD)',
   'DALL-E 3 (inpainting, standard quality)',
   'Gemini Flash (Image)', 'Gemini Pro (Image)',

@@ -162,6 +162,7 @@ All valid recommendation outputs. `registry.js` is the implementation of this re
 |---|---|---|
 | **Stock image library** | Zero | PRIMARY RECOMMENDATION. Use stock images, personal photos, or existing assets. No AI inference cost. |
 | **Personal or client-provided photos** | Zero | PRIMARY RECOMMENDATION. Always preferred over AI generation. |
+| **Built-in image editing (Photos / Snip & Sketch / Preview)** | Zero | PRIMARY RECOMMENDATION for img_edit non-AI path. OS-native tools for crop, resize, colour-correct — zero AI cost. |
 | DALL-E 3 (standard quality) | High | AI FALLBACK ONLY. Use only when user confirms no non-AI alternative exists. Standard quality required — never HD by default. |
 | DALL-E 3 (HD) | Very High | AI FALLBACK ONLY. Reserve for final client-facing deliverables where standard quality is insufficient and no non-AI option exists. |
 | DALL-E 3 (inpainting, standard) | High | AI FALLBACK ONLY. Targeted edits to existing images when non-AI editing tools cannot achieve the result. |

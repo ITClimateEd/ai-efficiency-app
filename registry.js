@@ -3,7 +3,7 @@
 
 // Bump REGISTRY_VERSION on every registry change (patch = correction, minor = new model/mode, major = structural)
 // Update REGISTRY_LAST_UPDATED and add an entry to CHANGELOG.md at the same time.
-const REGISTRY_VERSION      = '1.7.1';
+const REGISTRY_VERSION      = '1.7.2';
 const REGISTRY_LAST_UPDATED = '2026-05-27';
 
 const RESEARCH_NOTES = {
@@ -211,7 +211,7 @@ const recommendations = {
   img_gen_chat: {
     // nonai = GR-12 Yes path: user has existing images
     nonai: {
-      rating:'🟢', tool:'Your existing images or photos', vendor:null,
+      rating:'🟢', tool:'Personal or client-provided photos', vendor:null,
       reason:'Use owned or licensed images — zero AI generation cost and full control over the output.',
       lastValidated:'2026-05-01',
     },
@@ -238,7 +238,7 @@ const recommendations = {
   img_gen_slides: {
     // nonai = GR-12 Yes path: user has existing images/photos for slides
     nonai: {
-      rating:'🟢', tool:'Stock images or personal photos', vendor:null,
+      rating:'🟢', tool:'Stock image library', vendor:null,
       reason:'Insert your own or licensed images into slides — zero AI generation cost. PowerPoint Designer arranges them automatically with no AI overhead.',
       lastValidated:'2026-05-01',
     },
