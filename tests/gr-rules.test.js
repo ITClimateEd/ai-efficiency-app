@@ -109,6 +109,13 @@ const SPEC_TOOLS = new Set([
   'Platform-embedded captioning (Teams / Zoom)',
   'PowerPoint Designer (non-AI layouts)',
   'Microsoft Stream (auto-transcription)',
+  'Microsoft Teams Premium (auto-transcription)',
+  'Microsoft Teams Premium (enhanced transcription)',
+  'Microsoft Teams Premium + manual review',
+  'Zoom or Meet closed captions',
+  'Microsoft Stream enhanced transcription',
+  'Microsoft Stream (auto-transcription) + manual review',
+  'Teams Premium transcription + manual review',
 ]);
 
 // ── Test runner ───────────────────────────────────────────────────

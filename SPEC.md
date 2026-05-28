@@ -206,10 +206,17 @@ All valid recommendation outputs. `registry.js` is the implementation of this re
 
 | Tool / Mode | Cost tier | When to use |
 |---|---|---|
-| Platform transcription (Teams / Zoom / Meet) | Zero | No additional model call. Always prefer over standalone tools when available. |
-| Platform captioning (Teams / Zoom) | Zero | Native captioning. No file upload or extra model required. |
+| Platform-embedded transcription (Teams / Zoom / Meet) | Zero | No additional model call. Always prefer over standalone tools when available. |
+| Platform-embedded captioning (Teams / Zoom) | Zero | Native captioning. No file upload or extra model required. |
 | PowerPoint Designer (non-AI layouts) | Zero | Zero AI cost. Use for layout when content is ready. |
 | Microsoft Stream (auto-transcription) | Zero | Platform-native transcription. No additional model call needed. |
+| Microsoft Teams Premium (auto-transcription) | Zero | Enhanced accuracy with speaker labels for Teams meetings. Use when standard embedded transcription is insufficient. |
+| Microsoft Teams Premium (enhanced transcription) | Zero | Enhanced accuracy for accented speech and complex audio. Upgrade within the Teams ecosystem. |
+| Microsoft Teams Premium + manual review | Zero | Enhanced diarisation with speaker labels for multi-speaker or technical meetings. Manual review corrects residual errors. |
+| Zoom or Meet closed captions | Zero | Platform-native captioning for Zoom and Google Meet. No external upload required. |
+| Microsoft Stream enhanced transcription | Zero | Improved accuracy for recorded content in Microsoft Stream. No external service required. |
+| Microsoft Stream (auto-transcription) + manual review | Zero | Platform-native transcription with manual review for complex or multilingual video content. |
+| Teams Premium transcription + manual review | Zero | Enhanced diarisation for long-form or complex video within the Microsoft ecosystem. |
 
 ---
 
