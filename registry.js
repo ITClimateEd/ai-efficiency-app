@@ -3,7 +3,7 @@
 
 // Bump REGISTRY_VERSION on every registry change (patch = correction, minor = new model/mode, major = structural)
 // Update REGISTRY_LAST_UPDATED and add an entry to CHANGELOG.md at the same time.
-const REGISTRY_VERSION      = '1.7.2';
+const REGISTRY_VERSION      = '1.7.3';
 const REGISTRY_LAST_UPDATED = '2026-05-27';
 
 const RESEARCH_NOTES = {
@@ -332,13 +332,13 @@ const recommendations = {
   vid_gen: {
     // nonai = GR-12 Yes path: user has existing footage → zero AI cost
     nonai: {
-      rating:'🟢', tool:'Screen recording or stock footage', vendor:null,
+      rating:'🟢', tool:'Screen recording', vendor:null,
       reason:'Use existing recordings or licensed stock footage — zero AI generation cost. For most enterprise needs, this achieves equivalent results without any AI overhead.',
       lastValidated:'2026-05-01',
     },
     // simple/moderate/complex = GR-12 No path: no existing media, explicit energy cost stated
     simple: {
-      rating:'🟢', tool:'Slide-based animation (PowerPoint / Keynote)', vendor:null,
+      rating:'🟢', tool:'Slide animation (PowerPoint / Keynote)', vendor:null,
       reason:'AI video generation carries among the highest compute costs of any enterprise AI task — a short clip consumes 10–50× the energy of a text request. Slide-based animations achieve comparable results for most internal and training content at zero AI cost.',
       fallback:{ tool:'Screen recording with voiceover', vendor:null, reason:'Record a narrated walkthrough — no AI generation cost, immediate output, fully controllable.' },
       lastValidated:'2026-05-01',

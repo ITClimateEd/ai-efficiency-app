@@ -101,6 +101,7 @@ const SPEC_TOOLS = new Set([
   // 2.10 Video generation
   'Stock footage', 'Screen recording', 'Stock footage + motion graphics',
   'Professional video production', 'Slide animation (PowerPoint / Keynote)',
+  'Screen recording with voiceover',
   // 2.11 Gemini
   'Gemini Flash 2.0', 'Gemini Pro 1.5',
   'Google Slides (Gemini Flash)', 'Google Slides (Gemini Pro Image)',

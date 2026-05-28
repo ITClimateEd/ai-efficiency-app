@@ -182,6 +182,7 @@ All valid recommendation outputs. `registry.js` is the implementation of this re
 | **Stock footage + motion graphics** | Zero | PRIMARY RECOMMENDATION. Achieves comparable results for presentations and training content. |
 | **Professional video production** | Zero | PRIMARY RECOMMENDATION. Highest quality, zero AI inference cost. |
 | Slide animation (PowerPoint / Keynote) | Zero | PRIMARY RECOMMENDATION. For simple video needs — zero AI cost, zero new assets required. |
+| Screen recording with voiceover | Zero | Narrated walkthrough — no AI generation cost, immediate output, fully controllable. |
 
 > No AI video generation tool (Veo or equivalent) is included in the current enterprise shortlist. If a user confirms no non-AI alternative is available, surface this gap explicitly per GR-05.
 
