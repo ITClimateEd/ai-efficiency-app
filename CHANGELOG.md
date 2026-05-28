@@ -45,10 +45,10 @@ Versions follow [Semantic Versioning](https://semver.org): patch for corrections
 ## [2026-05-27] — Bug report button (no registry version bump)
 
 ### Added
-- "🐛 Report a bug" button in `rec-actions` on all four result paths: media-gate non-AI result, no-AI result, GR-05 gap card, and normal recommendation card.
-- Modal with two fields: **Description** (required textarea) and **Steps to reproduce** (optional textarea). Backdrop click or Cancel dismisses without submitting.
-- On submit: opens a new GitHub Issues tab with `title`, `body` (formatted markdown including description, steps, and current page URL), and `labels=bug` pre-filled via query params. No backend needed.
-- Styling follows existing design tokens and reuses `.rec-btn`, `.rec-label` conventions.
+- "🐛 Report a bug" button in `rec-actions` on all four result paths: media-gate non-AI result, no-AI result, GR-05 gap card, and normal recommendation card. Opens a Google Form in a new tab — no GitHub account required.
+
+### Changed
+- Replaced the original GitHub Issues modal (form fields, URL builder) with a direct `window.open()` call to the Google Form. Removed all modal CSS, HTML, and JS.
 
 ---
 
