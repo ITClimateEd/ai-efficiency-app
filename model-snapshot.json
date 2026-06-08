@@ -1,5 +1,5 @@
 {
-  "last_checked": "2026-06-01",
+  "last_checked": "2026-06-08",
   "vendors": {
     "anthropic": {
       "models": [
@@ -32,13 +32,10 @@
     },
     "openai": {
       "models": [
-        "gpt-5.4-mini",
-        "gpt-5.4-nano",
-        "gpt-5.5",
         "gpt-oss"
       ],
       "source": "https://platform.openai.com/docs/models",
-      "last_changed": "2026-06-01"
+      "last_changed": "2026-06-08"
     },
     "github_copilot": {
       "models": [],
