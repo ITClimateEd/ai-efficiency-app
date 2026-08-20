@@ -70,6 +70,7 @@ All valid recommendation outputs. `registry.js` is the implementation of this re
 | Claude Sonnet 4.6 | Mid | Multi-step drafts, structured documents, multi-document analysis. |
 | Claude Sonnet 4.6 (vision) | Mid | Charts, document images, detailed image analysis. |
 | Claude Sonnet 4.6 (Extended Thinking) | High | Extended reasoning. Complex analytical tasks, structured problem-solving. |
+| Claude Opus 4.8 | Highest | Reserved for the most demanding research/analysis — multi-source synthesis and analytical depth beyond what Sonnet 4.6 Extended Thinking covers. Use only for `analyze` complex tasks; not a default for write/design/email. |
 
 ---
 
@@ -255,4 +256,4 @@ The registry is versioned in `registry.js` using `REGISTRY_VERSION` (semver) and
 ---
 
 *Spec version: 3 — May 2026*
-*Registry version: 1.7.4*
+*Registry version: 2.4.0*

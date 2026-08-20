@@ -3,8 +3,8 @@
 
 // Bump REGISTRY_VERSION on every registry change (patch = correction, minor = new model/mode, major = structural)
 // Update REGISTRY_LAST_UPDATED and add an entry to CHANGELOG.md at the same time.
-const REGISTRY_VERSION      = '2.3.0';
-const REGISTRY_LAST_UPDATED = '2026-05-28';
+const REGISTRY_VERSION      = '2.4.0';
+const REGISTRY_LAST_UPDATED = '2026-08-20';
 
 const RESEARCH_NOTES = {
   primarySource: 'Jegham et al. (2025) — How Hungry is AI? Benchmarking Energy, Water, and Carbon Footprint of LLM Inference. arXiv:2505.09598',
@@ -190,10 +190,16 @@ const recommendations = {
       },
     },
     complex: {
-      rating:'🔴', tool:'Claude Sonnet 4.6 (Extended Thinking)', vendor:'claude',
-      reason:'Reasoning activates on demand for deep synthesis — more efficient than routing a standard query to a frontier model by default. Reasoning models consume significantly more energy per query than standard models — activate only when task complexity justifies it.',
+      // GR-09 exception, scoped to analyze/complex only (issue #5): Sonnet 4.6 Extended Thinking
+      // is retained as the ceiling for every other complex.* node (write, design, email). Opus 4.8
+      // is justified here specifically because deep multi-source research/synthesis is the one task
+      // shape in this registry where Extended Thinking's reasoning depth is the limiting factor, not
+      // just reasoning duration — see issue #5. Do not copy this override to other complex nodes
+      // without the same justification (GR-09 requires it per-path, not by default).
+      rating:'🟣', tool:'Claude Opus 4.8', vendor:'claude',
+      reason:'Reserved for deep multi-source research and synthesis where Sonnet 4.6 Extended Thinking\'s reasoning depth is the limiting factor, not just duration. Opus is the heaviest model in this registry — use only when the task genuinely requires it, not as a default for "complex". Reasoning models consume significantly more energy per query than standard models — activate only when task complexity justifies it.',
       fallback:{ tool:'M365 Copilot Word (Think Deeper)', vendor:'m365', reason:'Think Deeper applies extended reasoning for deep synthesis — no manual model selection required. Reasoning models consume significantly more energy per query than standard models — activate only when task complexity justifies it.' },
-      lastValidated:'2026-05-27',
+      lastValidated:'2026-08-20',
       vendorAlts:{
         chatgpt:{ tool:'GPT-5.5 Thinking', rating:'🔴', reason:'Thinking mode activates on demand for deep synthesis — more efficient than routing every query to a frontier model by default. Reasoning models consume significantly more energy per query than standard models — activate only when task complexity justifies it.', fallback:{ tool:'M365 Copilot Word (Think Deeper)', vendor:'m365', reason:'Think Deeper applies extended reasoning for deep synthesis — no manual model selection required. Reasoning models consume significantly more energy per query than standard models — activate only when task complexity justifies it.' } },
         gemini: { tool:'Gemini 2.5 Thinking', rating:'🔴', reason:'Extended thinking activates on demand for deep synthesis — more efficient than always routing to a frontier model. Reasoning models consume significantly more energy per query than standard models — activate only when task complexity justifies it.' },

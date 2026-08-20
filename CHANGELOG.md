@@ -5,6 +5,19 @@ Versions follow [Semantic Versioning](https://semver.org): patch for corrections
 
 ---
 
+## [2.4.0] — 2026-08-20
+
+### Added
+
+- `recommendations.analyze.complex`: primary recommendation for the `text → analyze/research → complex` path (Claude vendor) changed from `Claude Sonnet 4.6 (Extended Thinking)` to `Claude Opus 4.8` (🟣 Heaviest). Addresses issue #5. `Claude Opus 4.8` added to Section 2.2 of `SPEC.md`.
+
+### Notes
+
+- GR-09 (no upselling) requires per-path justification for recommending a heavier model — this override is scoped to `analyze.complex` only. Every other `complex` node (`write`, `design`, `email`) keeps `Claude Sonnet 4.6 (Extended Thinking)` as the ceiling; do not propagate this change to those paths without the same justification.
+- `analyze.complex.vendorAlts` (chatgpt, gemini, m365) left unchanged — issue #5 scoped the request to the Claude vendor path only.
+
+---
+
 ## [2.3.0] — 2026-05-28
 
 ### Added
